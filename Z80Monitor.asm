@@ -358,6 +358,8 @@ memmap_init:	in a,(beepr)	; unlock memmap
 
 		include "aydrvr.asm";
 
+		include "eeprom_prog.asm";
+
 endprog	equ $
 
 	output_bin "z80monitor.bin",0,endprog    ; 
