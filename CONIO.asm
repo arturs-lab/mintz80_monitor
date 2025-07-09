@@ -19,8 +19,7 @@ PRINT_STRING:
 ;GET_CHAR
 ;Function: Get upper case ASCII character from user into Accumulator
 ;***************************************************************************
-GET_CHAR:
-        CALL    UART_RX         ;Get char into Acc
+GET_CHAR:	CALL    UART_RX         ;Get char into Acc
         CALL    TO_UPPER        ;Character has to be upper case
         RET
         
@@ -28,8 +27,8 @@ GET_CHAR:
 ;PRINT_CHAR
 ;Function: Get upper case ASCII character from Accumulator to UART
 ;***************************************************************************
-PRINT_CHAR:
-        CALL UART_TX    ;Echo character to terminal
+PRINT_CHAR:	CALL UART_TX    ;Echo character to terminal
+
         RET
         
 ; Optional print char
@@ -50,19 +49,19 @@ PRTSKIP:
 ;Function: Convert character in Accumulator to upper case 
 ;***************************************************************************
 TO_UPPER:       
-        CP      'a'     ; Nothing to do if not lower case
+        CP      "a"     ; Nothing to do if not lower case
         RET     C
-        CP      'z' + 1 ; > 'z'?
+        CP      "z" + 1 ; > "z"?
         RET     NC      ; Nothing to do, either
         AND     5Fh     ; Convert to upper case
         RET
             
 ;***************************************************************************
 ;MKPRINT
-;Function: Make all characters printable by replacing control-chars with '.'
+;Function: Make all characters printable by replacing control-chars with "."
 ;***************************************************************************
-LOWPRTV:    EQU         ' '
-HIGPRTV:    EQU         '~'
+LOWPRTV:    EQU         " "
+HIGPRTV:    EQU         "~"
 MKPRINT:
         CP      LOWPRTV
         JR      C, ADDOT
@@ -70,21 +69,20 @@ MKPRINT:
         JR      NC, ADDOT
         RET
 ADDOT:
-        LD      A, '.'
+        LD      A, "."
         RET
         
 ;***************************************************************************
 ;PRINT_NEW_LINE
 ;Function: Prints carriage return and line feed
 ;***************************************************************************			
-NEW_LINE_STRING:
-        DEFB    0Dh, 0Ah ,EOS
-
 PRINT_NEW_LINE:
-        PUSH    HL
-        LD      HL,NEW_LINE_STRING
-        CALL    PRINT_STRING
-        POP     HL
+        PUSH    af
+        LD      A, $0d
+        CALL    PRINT_CHAR
+        LD      A, $0a
+        CALL    PRINT_CHAR
+        POP     af
         RET
         
 ;***************************************************************************
@@ -92,23 +90,23 @@ PRINT_NEW_LINE:
 ;Function: Checks if value in A is a hexadecimal digit, C flag set if true
 ;***************************************************************************		
 CHAR_ISHEX:         
-                                    ;Checks if Acc between '0' and 'F'
-        CP      'F' + 1         ;(Acc) > 'F'? 
+                                    ;Checks if Acc between "0" and "F"
+        CP      "F" + 1         ;(Acc) > "F"? 
         RET     NC              ;Yes - Return / No - Continue
-        CP      '0'             ;(Acc) < '0'?
+        CP      "0"             ;(Acc) < "0"?
         JP      NC,CIH1         ;Yes - Jump / No - Continue
         CCF                     ;Complement carry (clear it)
         RET
 CIH1:       
-                                ;Checks if Acc below '9' and above 'A'
-        CP      '9' + 1         ;(Acc) < '9' + 1?
-        RET     C               ;Yes - Return / No - Continue (meaning Acc between '0' and '9')
-        CP      'A'             ;(Acc) > 'A'?
+                                ;Checks if Acc below "9" and above "A"
+        CP      "9" + 1         ;(Acc) < "9" + 1?
+        RET     C               ;Yes - Return / No - Continue (meaning Acc between "0" and "9")
+        CP      "A"             ;(Acc) > "A"?
         JP      NC,CIH2         ;Yes - Jump / No - Continue
         CCF                     ;Complement carry (clear it)
         RET
 CIH2:        
-                                ;Only gets here if Acc between 'A' and 'F'
+                                ;Only gets here if Acc between "A" and "F"
         SCF                     ;Set carry flag to indicate the char is a hex digit
         RET
         
@@ -122,11 +120,11 @@ GETHEXNIB:
         JP      NC,NONHEXNIB    ; Yes - Continue / No - Exit
         CALL    OPRINTCHAR
 
-        CP      '9' + 1         ; Is it a digit less or equal '9' + 1?
+        CP      "9" + 1         ; Is it a digit less or equal "9" + 1?
         JP      C,IS_NUM        ; Yes - Jump / No - Continue
         SUB     07h             ; Adjust for A-F digits
 IS_NUM:                
-        SUB     '0'             ; Subtract to get nib between 0->15
+        SUB     "0"             ; Subtract to get nib between 0->15
         AND     0Fh             ; Only return lower 4 bits
         RET
 NONHEXNIB:                      ; Allow exit on wrong char
@@ -197,10 +195,10 @@ GHW_ERR:
 ;***************************************************************************
 NIB2CHAR:
         AND     0Fh             	;Only low nibble in byte
-        ADD     A,'0'             	;Adjust for char offset
-        CP      '9' + 1         	;Is the hex digit > 9?
+        ADD     A,"0"             	;Adjust for char offset
+        CP      "9" + 1         	;Is the hex digit > 9?
         JR      C,N2C1				;Yes - Jump / No - Continue
-        ADD     A,'A' - '0' - 0Ah 	;Adjust for A-F
+        ADD     A,"A" - "0" - 0Ah 	;Adjust for A-F
 N2C1:
         RET
 
@@ -266,22 +264,25 @@ PRINTHWORD:
 ;Transforms the HEX-character in A to a value fitting in the lower nibble
 ;***************************************************************************
 CHAR2NIB:
-        SUB     '0'
-        CP      015h
-        JR      NC, C2N_DONE
-        SUB     005h
-c2N_DONE:
+        SUB     "0"
+        CP      0ah
+        JR      C, C2N_DONE
+        SUB     007h
+        CP      010h			; need to deduct 20h if it was lower case letter
+        JR      C, C2N_DONE
+        SUB     020h
+C2N_DONE:
         AND     0Fh
         RET
 
         
 PRTBIT:
         JR      C, PB0
-        LD      A, '1'
+        LD      A, "1"
         JR      PBPRT
         
 PB0:
-        LD      A, '0'
+        LD      A, "0"
         JR      PBPRT 
         
 PBPRT:
@@ -290,7 +291,7 @@ PBPRT:
 
 ;***************************************************************************
 ;PRT8BIT
-;Function: Special case: print the MPF's user flag bits
+;Function: Special case: print the MPF"s user flag bits
 ;***************************************************************************
         
 PRT8BIT:
@@ -314,19 +315,18 @@ P8B_RET:
 CHARS2BYTE:
         PUSH    BC
         LD      A, (HL)
+        INC     HL
         CALL    CHAR2NIB        ; get upper nibble from char
         RLC     A
         RLC     A
         RLC     A
         RLC     A
         LD      B, A
-        INC     HL
         LD      A, (HL)
+        INC     HL
         CALL    CHAR2NIB        ; get lower nibble from char
         OR      B
-        LD      A, B
         POP     BC
-        INC     HL
         RET
 
 ;***************************************************************************
