@@ -13,61 +13,29 @@ HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 ;HELP_COMMAND
 ;Function: Print help dialogue box
 ;***************************************************************************
-HLPMSG1: DEFB 'ZMC80 Monitor Command List', 0Dh, 0Ah, EOS
-HLPMSG2: DEFB '? - view command list', 0Dh, 0Ah, EOS
-HLPMSGc: DEFB 'C - clear screen', 0Dh, 0Ah, EOS
-HLPMSGd: DEFB 'D - print 100h bytes from specified location', 0Dh, 0Ah, EOS
-HLPMSGe: DEFB 'E - edit bytes in memory', 0Dh, 0Ah, EOS
-HLPMSGf: DEFB 'F - fill memory range with value', 0Dh, 0Ah, EOS
-HLPMSGg: DEFB 'G - jump to memory address', 0Dh, 0Ah, EOS
-HLPMSGk: DEFB 'K - call to memory address', 0Dh, 0Ah, EOS
-HLPMSGm: DEFB 'M - copy bytes in memory', 0Dh, 0Ah, EOS
-HLPMSGo: DEFB 'O - write byte to output port', 0Dh, 0Ah, EOS
-HLPMSGp: DEFB 'P - print port scan (00-FF)', 0Dh, 0Ah, EOS
-HLPMSGr: DEFB 'R - monitor reset', 0Dh, 0Ah, EOS
-HLPMSGq: DEFB 'Q - test MPF keyboard', 0Dh, 0Ah, EOS
-HLPMSGs: DEFB 'S - calculate checksum for memory range', 0Dh, 0Ah, EOS
-HLPMSGt: DEFB 'T - test memory range', 0Dh, 0Ah, EOS
-HLPMSGz: DEFB 'Z - dump user registers (STEP)', 0Dh, 0Ah, EOS
-HLPMSG8: DEFB '+ - print next block of memory', 0Dh, 0Ah, EOS
-HLPMSG9: DEFB '- - print previous block of memory', 0Dh, 0Ah, EOS
+HLPMSG1: DEFB "ZMC80 Monitor Command List", 0Dh, 0Ah
+HLPMSG2: DEFB "? - view command list", 0Dh, 0Ah
+HLPMSGc: DEFB "C - clear screen", 0Dh, 0Ah
+HLPMSGd: DEFB "D - print 100h bytes from specified location", 0Dh, 0Ah
+HLPMSGe: DEFB "E - edit bytes in memory", 0Dh, 0Ah
+HLPMSGf: DEFB "F - fill memory range with value", 0Dh, 0Ah
+HLPMSGg: DEFB "G - jump to memory address", 0Dh, 0Ah
+HLPMSGk: DEFB "K - call to memory address", 0Dh, 0Ah
+HLPMSGm: DEFB "M - copy bytes in memory", 0Dh, 0Ah
+         DEFB "N - read IO port", 0Dh, 0Ah
+HLPMSGo: DEFB "O - write byte to output port", 0Dh, 0Ah
+HLPMSGp: DEFB "P - print port scan (00-FF)", 0Dh, 0Ah
+HLPMSGq: DEFB "Q - test MPF keyboard", 0Dh, 0Ah
+HLPMSGr: DEFB "R - monitor reset", 0Dh, 0Ah
+HLPMSGs: DEFB "S - calculate checksum for memory range", 0Dh, 0Ah
+HLPMSGt: DEFB "T - test memory range", 0Dh, 0Ah
+HLPMSGz: DEFB "Z - dump user registers (STEP)", 0Dh, 0Ah
+HLPMSG8: DEFB "+ - print next block of memory", 0Dh, 0Ah
+HLPMSG9: DEFB "- - print previous block of memory", 0Dh, 0Ah
+HLPMSGA: DEFB ": - Load hex-intel record", 0DH, 0AH, EOS
 
 HELP_COMMAND:
         LD      HL, HLPMSG1     ;Print some messages
-        CALL    PRINT_STRING
-        LD      HL, HLPMSG2
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGc
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGd
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGe
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGf
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGg
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGk
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGm
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGo
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGp
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGq
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGr
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGs
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGt
-        CALL    PRINT_STRING
-        LD      HL, HLPMSGz
-        CALL    PRINT_STRING
-        LD      HL, HLPMSG8
-        CALL    PRINT_STRING
-        LD      HL, HLPMSG9
         CALL    PRINT_STRING
         LD      A, EOS          ;Load $FF into Acc so MON_COMMAND finishes
         RET
@@ -76,14 +44,12 @@ HELP_COMMAND:
 ;MEMORY_DUMP_COMMAND
 ;Function: Print $80 databytes from specified location
 ;***************************************************************************
-MDC_1: DEFB 'Memory Dump Command', 0Dh, 0Ah, EOS
-MDC_2: DEFB 'Location to start in 4 digit HEX: ',EOS
-MDC_3: DEFB '      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F', 0Dh, 0Ah, EOS
+MDC_1: DEFB "Memory Dump", 0Dh, 0Ah
+MDC_2: DEFB "Location to start in 4 digit HEX: ",EOS
+MDC_3: DEFB "      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EOS
 
 MDCMD:
 			LD 		HL,MDC_1			;Print some messages 
-			CALL    PRINT_STRING
-			LD 		HL,MDC_2	
 			CALL    PRINT_STRING
 			
 			CALL    GETHEXWORD			;HL now points to databyte location	
@@ -103,19 +69,19 @@ MDLINE:
 			LD		DE,	ASCDMPBUF
 			LD		B,16				;Register B holds counter of dump bytes to print
 			CALL	PRINTHWORD			;Print dump line address in hex form
-			LD		A,' '				;Print spacer
+			LD		A," "				;Print spacer
 			CALL	PRINT_CHAR
 			DEC		C					;Decrement C to keep track of number of lines printed
 MDBYTES:
 			LD		A,(HL)				;Load Acc with databyte HL points to
 			CALL	PRINTHBYTE  		;Print databyte in HEX form 
 			CALL	CHAR2BUF			;Store ASCII char
-			LD		A,' '				;Print spacer
+			LD		A," "				;Print spacer
 			CALL	PRINT_CHAR	
 			INC 	HL					;Increase HL to next address pointer
 			DJNZ	MDBYTES				;Print 16 bytes out since B holds 16
 			
-			LD		A,' '				;Print spacer
+			LD		A," "				;Print spacer
 			CALL	PRINT_CHAR			;
 			LD		A, EOS
 			LD		(ASCDMPEND), A		;Make sure there is a EOS
@@ -142,10 +108,10 @@ CHAR2BUF:
 ;MEMORY_MOVE_COMMAND
 ;Function: Copy data blocks in memory
 ;***************************************************************************
-MVC_1:	DEFB	'Move Data Command', 0Dh, 0Ah, EOS
-MVC_S:	DEFB	'Start Location: ', EOS
-MVC_E:	DEFB	'End Location: ', EOS
-MVC_D:	DEFB	'Destination Location: ', EOS
+MVC_1:	DEFB	"Move Data", 0Dh, 0Ah, EOS
+MVC_S:	DEFB	"Start Location: ", EOS
+MVC_E:	DEFB	"End Location: ", EOS
+MVC_D:	DEFB	"Destination Location: ", EOS
 
 MOVE_COMMAND:
         LD		HL, MVC_1	; Print some messages
@@ -230,8 +196,8 @@ GETP:
 ; Function: Fill a memory block
 ;***************************************************************************
 
-MFC_1:	DEFB	'Fill Memory Command', 0Dh, 0Ah, EOS
-MFC_D:	DEFB	'Data value (one byte): ', EOS
+MFC_1:	DEFB	"Fill Memory", 0Dh, 0Ah, EOS
+MFC_D:	DEFB	"Data value (one byte): ", EOS
 
 FILL_COMMAND:
         LD		HL, MFC_1	; Print some messages
@@ -328,17 +294,17 @@ EDIT_COMMAND:
         RET		NZ
         
 EDIT_LP:
-        LD		A, ':'
+        LD		A, ":"
         CALL	PRINT_CHAR
-        LD		A, ' '
+        LD		A, " "
         CALL	PRINT_CHAR
         
         LD		A, (HL)		; Print original value
         CALL	PRINTHBYTE
         
-        LD		A, '>'
+        LD		A, ">"
         CALL	PRINT_CHAR
-        LD		A, ' '
+        LD		A, " "
         CALL	PRINT_CHAR
         
         CALL	GETHEXBYTE
@@ -359,29 +325,31 @@ EDIT_LP:
 ;PORT_SCAN_COMMAND
 ;Function: Print $100 databytes from specified location
 ;***************************************************************************
-PSC_1: DEFB 'Port Scan Command', 0Dh, 0Ah, EOS
-PSC_3: DEFB '     0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F', 0Dh, 0Ah, EOS
+PSC_1: DEFB "Port Scan", 0Dh, 0Ah, EOS
+;PSC_3: DEFB "     0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EOS
 
 PSCOMMAND:
         LD 		HL,PSC_1			;Print some messages 
         CALL    PRINT_STRING
         
-        LD 		HL,PSC_3			;Print some messages 
+        LD 		HL,MDC_3			;Print some messages 
         CALL    PRINT_STRING
 
         LD		BC, 0h
         XOR     A
 PS_NEWPL:                   ; Start new line, start with port address
+        LD		A, " "
+        CALL	PRINT_CHAR  ; address - contents separator
         LD      A,C
         CALL	PRINTHBYTE
-        LD		A, ' '
+        LD		A, " "
         CALL	PRINT_CHAR  ; address - contents separator
         CALL	PRINT_CHAR
         
 PS_LOOP:                    ; Print port contents
         IN		A, (C)
         CALL	PRINTHBYTE
-        LD		A, ' '
+        LD		A, " "
         CALL	PRINT_CHAR ; inter-port-contents separator
         
         INC		BC
@@ -397,11 +365,39 @@ PS_LOOP:                    ; Print port contents
         JR		PS_NEWPL
         
 PS_CONT:                    ; continue on same line
-        LD		A, ' '
+        LD		A, " "
         CALL	PRINT_CHAR
         JR		PS_LOOP
 
 PS_END:                     ; done all ports
+        RET
+
+;***************************************************************************
+;READ_FROM_IO_COMMAND
+;Function: Print value read from specified IO port
+;***************************************************************************
+RIC_1: DEFB "IO Read", 0Dh, 0Ah
+RIC_2: DEFB "Enter IO address. Only $00nn supported. 'ENTER' ends", 0Dh, 0Ah, EOS
+
+RICOMMAND:        LD 		HL,RIC_1			;Print some messages 
+        CALL    PRINT_STRING
+        
+RILOOP:        CALL    GETHEXBYTE
+        LD      (MVADDR), A             ; Misuse Move address buffer to store port
+        LD      A, (ERRFLAG)
+        CP      E_NONE
+        JR      NZ,RICOUT
+        
+        LD		A, " "
+        CALL	PRINT_CHAR
+        LD      A, (MVADDR)
+        LD      C, A
+        LD      B, 0
+        IN      A, (C)
+        CALL	PRINTHBYTE
+        CALL	PRINT_NEW_LINE
+        JR      RILOOP
+RICOUT:        CALL	PRINT_NEW_LINE
         RET
 
 ; untested code, 2023-04-24
@@ -410,8 +406,8 @@ PS_END:                     ; done all ports
 ; Function: Write byte to port
 ;***************************************************************************
 
-MPW_1:  DEFB    'Write data to port Command', 0Dh, 0Ah
-MPW_P:  DEFB    'Port & data: ', EOS
+MPW_1:  DEFB    "Write data to port", 0Dh, 0Ah
+MPW_P:  DEFB    "Port & data: ", EOS
 
 PW_COMMAND:
         LD      HL, MPW_1
@@ -422,7 +418,7 @@ PW_COMMAND:
         CP      E_NONE
         RET     NZ
         
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         CALL    GETHEXBYTE
         LD      (MVADDR+1), A
@@ -441,9 +437,9 @@ PW_COMMAND:
 ; Function: Execute a program at memory location
 ;***************************************************************************
 
-MGo_1:	DEFB	'Execute program in memory Command', 0Dh, 0Ah, EOS
+MGo_1:	DEFB	"Execute program in memory", 0Dh, 0Ah, EOS
 
-MGo_2:	DEFB	'Memory location: ', EOS
+MGo_2:	DEFB	"Memory location: ", EOS
 
 GO_COMMAND:
         LD		HL, MGo_1	; Print some messages
@@ -462,7 +458,7 @@ GO_COMMAND:
 ; Function: Execute a program at memory location and expect a RET
 ;***************************************************************************
 
-MCl_1:	DEFB	'Call program in memory Command', 0Dh, 0Ah, EOS
+MCl_1:	DEFB	"Call program in memory", 0Dh, 0Ah, EOS
 
 CL_COMMAND:
         LD		HL, MCl_1	; Print some messages
@@ -486,13 +482,13 @@ CL_COMMAND:
 ; Function: Calculate checksum for address range in three bytes
 ;***************************************************************************
 
-CCKSM_1:	DEFB	'Calculate checksum for memory range Command', 0Dh, 0Ah, EOS
+CCKSM_1:	DEFB	"Calculate checksum for memory range", 0Dh, 0Ah, EOS
 
-CCKSM_2:	DEFB	'Start location: ', EOS
+CCKSM_2:	DEFB	"Start location: ", EOS
 
-CCKSM_3:	DEFB	'End location: ', EOS
+CCKSM_3:	DEFB	"End location: ", EOS
 
-CCKSM_4:    DEFB    'Checksum: ', EOS
+CCKSM_4:    DEFB    "Checksum: ", EOS
 
 CCKSM_COMMAND:
         LD		HL, CCKSM_1
@@ -567,15 +563,13 @@ HEXI_COMMAND:
 ;  sz addr typ data                     chk
 
 ; This part reads the record into the buffer. 
-; Note the ':' is already eaten by the command interpreter.
-HEXI_COMMAND:
-        LD      A, 1
+; Note the ":" is already eaten by the command interpreter.
+HEXI_COMMAND:	LD      A, 1
         LD      (MUTE), A
         LD      HL, UPLOADBUF
         LD      (RX_READ_P), HL
         LD      (RX_WRITE_P), HL
-HXI_LOOP:
-        CALL    UART_RX_RDY
+HXI_LOOP:	CALL    UART_RX_RDY
         CALL    UART_RX
         LD      HL, (RX_WRITE_P)
         LD      (HL), A
@@ -586,24 +580,21 @@ HXI_LOOP:
         JR      Z, HXI_RCVD
         JR      HXI_LOOP
         
-HXI_RCVD:                               ; the record is received, echo the start address
-        LD      A, 0
+; the record is received, echo the start address
+HXI_RCVD:	LD      A, 0
         LD      (MUTE), A
         
         LD      HL, UPLOADBUF + 2       ; Point to the first address char.
         LD      B, 4
-HXIADRLP:
-        LD      A, (HL)
+HXIADRLP:	LD      A, (HL)
         CALL    PRINT_CHAR
         INC     HL
         DJNZ    HXIADRLP
         
-        LD      A, (HL)
-        CALL    PRINT_CHAR
-        CALL    PRINT_NEW_LINE
+;        CALL    PRINT_NEW_LINE
         
-HXI_PROC:                               ; processing the record
-        LD      HL, UPLOADBUF
+; processing the record
+HXI_PROC:	LD      HL, UPLOADBUF
         CALL    CHARS2BYTE              ; get record size
         LD      (ULSIZE), A             ; store it
         CALL    CHARS2BYTE              ; get record address, MSB
@@ -612,41 +603,53 @@ HXI_PROC:                               ; processing the record
         LD      (IECADDR), A 
         CALL    CHARS2BYTE              ; get record type
         LD      (IERECTYPE), A
-        CP      00h                     ; compare to end record
+        CP      01h                     ; compare to end record
         JR      Z, HXI_ENDR
         LD      A, (ULSIZE)
         LD      B, A                    ; set up DJNZ loop
         LD      DE, (IECADDR)
-HXD_LOOP:
-        CALL    CHARS2BYTE              ; get data byte
+HXD_LOOP:	CALL    CHARS2BYTE              ; get data byte
         LD      (DE), A                 ; store it at target location
         INC     DE
         DJNZ    HXD_LOOP                ; repeat for all data bytes
-        CALL    CHARS2BYTE              ; Get checksum
 
-HXI_ENDR:                               ; Done
-        RET
+;; unmute
+;HXI_UNMT:	LD      A, 0
+;        LD      (MUTE), A
+
+        ld a," "
+        CALL    PRINT_CHAR
+        CALL    CHARS2BYTE              ; Get checksum. Not that anyone checks it...
+        call PRINTHBYTE
+        dec hl
+        ld (hl),a			; in case anyone wants to use checksum, store it in last byte of data buffer
+        CALL    PRINT_NEW_LINE
+
+; Done
+        xor a	; checksum being returned in A was matching command checks, so zero A
+HXI_ENDR:	RET
         
-USERAF: EQU     01FBCh
-USERBC: EQU     01FBEh
-USERDE: EQU     01FC0h
-USERHL: EQU     01FC2h
-UAFP:   EQU     01FC4h
-UBCP:   EQU     01FC6h
-UDEP:   EQU     01FC8h
-UHLP:   EQU     01FCAh
-USERIX: EQU     01FCCh
-USERIY: EQU     01FCEh
-USERSP: EQU     01FD0h
-USERIF: EQU     01FD2h
-FLAGH:  EQU     01FD4h
-FLAGL:  EQU     01FD6h
-FLAGHP: EQU     01FD8h
-FLAGLP: EQU     01FDAh
-USERPC: EQU     01FDCh
+USERRREG:	equ $1fbc
+USERAF: EQU     USERRREG+0
+USERBC: EQU     USERRREG+2
+USERDE: EQU     USERRREG+4
+USERHL: EQU     USERRREG+6
+UAFP:   EQU     USERRREG+8
+UBCP:   EQU     USERRREG+10
+UDEP:   EQU     USERRREG+12
+UHLP:   EQU     USERRREG+14
+USERIX: EQU     USERRREG+16
+USERIY: EQU     USERRREG+18
+USERSP: EQU     USERRREG+20
+USERIF: EQU     USERRREG+22
+FLAGH:  EQU     USERRREG+24
+FLAGL:  EQU     USERRREG+26
+FLAGHP: EQU     USERRREG+28
+FLAGLP: EQU     USERRREG+30
+USERPC: EQU     USERRREG+32
         
-RDLN_1: DEFB    ' AF   BC   DE   HL   IX   IY   AF', 027h, '  BC', 027h, '  DE', 027h, '  HL', 027h, EOS
-RDLN_3: DEFB    ' SP   PC   IF   SZ-H-PNC  SZ-H-PNC', 027h  , EOS
+RDLN_1: DEFB    " AF   BC   DE   HL   IX   IY   AF", 027h, "  BC", 027h, "  DE", 027h, "  HL", 027h, EOS
+RDLN_3: DEFB    " SP   PC   IF   SZ-H-PNC  SZ-H-PNC", 027h  , EOS
 
 REGDUMP_COMMAND:
         LD      HL, RDLN_1
@@ -656,53 +659,53 @@ REGDUMP_COMMAND:
         
         LD      HL, (USERAF)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERBC)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERDE)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERHL)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERIX)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERIY)
         CALL    PRINTHWORD
         
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
 
         LD      HL, (UAFP)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (UBCP)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (UDEP)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (UHLP)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         CALL    PRINT_NEW_LINE
@@ -714,25 +717,25 @@ REGDUMP_COMMAND:
         
         LD      HL, (USERSP)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERPC)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         
         LD      HL, (USERIF)
         CALL    PRINTHWORD
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         CALL    PRINT_CHAR
         
         LD      A, (USERAF+1)
         CALL    PRT8BIT
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
-        LD      A, ' '
+        LD      A, " "
         CALL    PRINT_CHAR
         LD      A, (UAFP+1)
         CALL    PRT8BIT
@@ -746,10 +749,10 @@ REGDMPJ:
 ; RAM test
 ; Tssss eeee
 
-TRC_1: DEFB 'RAM Test Command', 0Dh, 0Ah, EOS
-TRC_2: DEFB 'Location to start in 4 digit HEX: ', EOS
-TRC_3: DEFB 0Dh, 0Ah, 'Location to end in 4 digit HEX: ', EOS
-TRC_4: DEFB 0Dh, 0Ah, 'Start address should be before End address', EOS
+TRC_1: DEFB "RAM Test", 0Dh, 0Ah, EOS
+TRC_2: DEFB "Location to start in 4 digit HEX: ", EOS
+TRC_3: DEFB 0Dh, 0Ah, "Location to end in 4 digit HEX: ", EOS
+TRC_4: DEFB 0Dh, 0Ah, "Start address should be before End address", EOS
 
 TRAM_COMMAND:
         LD      HL,TRC_1        ;Print some messages 
@@ -792,14 +795,14 @@ _TC_NEGL:
 _TC_DONE:        
         RET
         
-MTC_1: DEFB 0Dh, 0Ah, ' Pass 1: ??h to 00h ', EOS
-MTC_2: DEFB 0Dh, 0Ah, ' Pass 2: 00h to 55h ', EOS
-MTC_3: DEFB 0Dh, 0Ah, ' Pass 3: 55h to AAh ', EOS
-MTC_4: DEFB 0Dh, 0Ah, ' Pass 4: AAh to FFh ', EOS
-MTC_5: DEFB 0Dh, 0Ah, ' Memory OK', EOS
-MTCER1: DEFB ' Error at: ', EOS
-MTCER2: DEFB ' value expected: ', EOS
-MTCER3: DEFB ', found: ', EOS
+MTC_1: DEFB 0Dh, 0Ah, " Pass 1: ??h to 00h ", EOS
+MTC_2: DEFB 0Dh, 0Ah, " Pass 2: 00h to 55h ", EOS
+MTC_3: DEFB 0Dh, 0Ah, " Pass 3: 55h to AAh ", EOS
+MTC_4: DEFB 0Dh, 0Ah, " Pass 4: AAh to FFh ", EOS
+MTC_5: DEFB 0Dh, 0Ah, " Memory OK", EOS
+MTCER1: DEFB " Error at: ", EOS
+MTCER2: DEFB " value expected: ", EOS
+MTCER3: DEFB ", found: ", EOS
 
 MTEST:
         ; Test strategy in four passes:
@@ -880,11 +883,11 @@ MTEST:
         
         LD      HL, MTC_5       ; Ok text
         CALL    PRINT_STRING        
-_MTDONE
+_MTDONE:
         RET
 
-MCHECK
-_MCLOOP
+MCHECK:
+_MCLOOP:
         LD      A, (MTPHFLAG)
         CP      1
         JR      Z, _MCSKIPOLD   ; Skip old value check for pass 1
@@ -895,7 +898,7 @@ _MCLOOP
         LD      (IX+4), A       ; store actual value
         CP      (IX+5)          ; compare with expected
         JR      NZ, _MTLPER1    ; jump to error when unequal
-_MCSKIPOLD
+_MCSKIPOLD:
         ; new value write
         LD      A, D
         LD      (HL), A         ; write new value
@@ -908,26 +911,26 @@ _MCSKIPOLD
         CALL    CPADDR          ; 
         INC     HL              ; 
         JR      NZ, _MCLOOP     ; 
-        AND     A               ; 'Clear Carry flag'
+        AND     A               ; "Clear Carry flag"
         LD      A, 1
         JR      _MCDONE
 
 ; Error handling
-_MTLPER1
+_MTLPER1:
         PUSH    AF
         CALL    PRINT_NEW_LINE
-        LD      A, '1'
+        LD      A, "1"
         CALL    PRINT_CHAR
-        LD      A, '.'
+        LD      A, "."
         CALL    PRINT_CHAR
         POP     AF
         JR      _MTLPER
-_MTLPER2
+_MTLPER2:
         PUSH    AF
         CALL    PRINT_NEW_LINE
-        LD      A, '2'
+        LD      A, "2"
         CALL    PRINT_CHAR
-        LD      A, '.'
+        LD      A, "."
         CALL    PRINT_CHAR
         POP     AF
 
@@ -947,7 +950,7 @@ _MTLPER:
         CALL    PRINTHBYTE
         CALL    PRINT_NEW_LINE
         SCF                     ; Flag the error for calling routine
-_MCDONE        
+_MCDONE:        
         RET
 
 ; **********************************************************************
