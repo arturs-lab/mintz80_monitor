@@ -14,13 +14,13 @@ VERSMIN:    EQU     '7'
                                   ; CONSTANTS-aaaa-pp.asm files to
                                   ; CONSTANTS.asm
 
-;ROM_BOTTOM:  EQU    0F000h		; Bottom address of ROM
-ROM_TOP:     EQU    ROM_BOTTOM + 00FFFh		; Top address of ROM
+;ROM_BOTTOM:  EQU    0E000h		; Bottom address of ROM
+ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 
-;RAM_BOTTOM:  EQU    01800h		; Bottom address of RAM
-RAM_TOP:     EQU    RAM_BOTTOM + 00FFh		; Top address of RAM	
+;RAM_BOTTOM:  EQU    00100h		; Bottom address of RAM
+RAM_TOP:     EQU    RAM_BOTTOM + 4FFFh		; Top address of RAM	
 
-;UART_BASE:  EQU     0E0h        ; Base port address, DART uses 4 ports
+;UART_BASE:  EQU     008h        ; Base port address, DART uses 4 ports
 
 MPFMON:     EQU    0000h
 ASCDMPBUF:  EQU    RAM_BOTTOM + 0h	    	;Buffer to construct ASCII part of memory dump
@@ -124,7 +124,31 @@ UART2:      EQU    (UART_BASE & 00Fh) / 1h   + '0'
             ENDIF
             ENDIF
 
-			ORG ROM_BOTTOM
+	org 0
+	ld sp,$5fff
+	ld hl,$0020
+	call del1		; looks like Z80 needs this delay to successfully write to IO ports
+	ld a,$0d		; (SYSCLK MHz/2/(value+1))
+;	ld a,$0f		; (SYSCLK MHz/2/(value+1))
+	out (turbo),a
+	out (cpld),a	; display
+	out (cpld2),a	; display
+	ld b,$04
+xx	call delay		; give user time to read output
+	dec b
+	jr nz,xx
+;	call init_uart
+;	call flshrx		; flush receive buffer
+	jp ROUTINES
+
+delay	ld hl,$0000		; delay loop
+del1	dec hl		; count delay
+	ld a,h
+	or a,l
+	jr nz,del1		; repeat till 0
+	ret
+
+;			ORG ROM_BOTTOM
 ROUTINES:
 R_MAIN:         JP      MAIN            ; init DART and starts command loop
 R_U_INIT:       JP      UART_INIT       ; configures DARTchannel B 
@@ -267,9 +291,14 @@ CLEAR_ERROR:
         POP     AF
         RET
         
-        INCLUDE	USARTDriver.asm
+        INCLUDE	UARTDriver.asm
         INCLUDE	MONCommands.asm
         INCLUDE	CONIO.asm
         INCLUDE CFDriver.asm
 
         END
+
+endprog	equ $
+
+	output_bin "serial16c550.bin",0,endprog    ; 
+	output_list "serial16c550.lst"
