@@ -6,6 +6,13 @@
 ;***************************************************************************
 
 		
+; initialize both SIO channels
+SIO_INIT:	call SIOA_INIT	; first init SIO A
+		call SIOB_INIT	; first init SIO A
+		call jSIO_A_INT_SET	; initialize SIOA interrupts
+		call jSIO_A_EI		; more interrupt code
+		ret
+
 ;***************************************************************************
 ;SIOA_INIT
 ;Function: Initialize the SIOA to BAUD Rate 4800 
@@ -25,12 +32,8 @@ SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
         out (SIO_CA),a
 		ret
 
-; initialize both SIO channels
-SIO_INIT:	call SIOA_INIT	; first init SIO A
-					; then fall through to SIOB_INIT
-
 ;***************************************************************************
-;SIOA_INIT
+;SIOB_INIT
 ;Function: Initialize the SIOB to BAUD Rate 4800 
 ;the followings are settings for channel B
 ;***************************************************************************
