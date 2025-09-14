@@ -1,0 +1,546 @@
+# File X:\zeus\mintz80_monitor\ymztest.asm
+2000 21 1B 20    	ld hl,ENDCODE
+2003 11 60 EA    	ld de,MUSIC1
+2006 01 9C 13    	ld bc,endprog-MUSIC1
+2009 ED B0       	ldir
+200B CD 00 FA    pllp	call PLAYER
+200E C9          	ret
+200F 1E FF       rtrn	ld e,$ff
+2011 C9          	ret
+2012 21 FF FF    delay	ld hl,$ffff		; delay loop
+2015 2B          del1	dec hl			; count delay
+2016 7C          	ld a,h
+2017 B5          	or a,l
+2018 20 FB       	jr nz,del1		; repeat till 0
+201A C9          	ret
+EA60 00 28 35 35 35 2B 35 35 28 35 28 2D 35 28 35 26 EA60	DB	$00,$28,$35,$35,$35,$2B,$35,$35,$28,$35,$28,$2D,$35,$28,$35,$26
+EA70 35 28 35 35 35 2F 35 35 28 35 28 30 35 2F 35 2B 	DB	$35,$28,$35,$35,$35,$2F,$35,$35,$28,$35,$28,$30,$35,$2F,$35,$2B
+EA80 35 28 35 2F 35 28 35 28 26 35 26 23 35 2A 35 28 	DB	$35,$28,$35,$2F,$35,$28,$35,$28,$26,$35,$26,$23,$35,$2A,$35,$28
+EA90 35 35 35 35 35 35 35 35 35 04 06 07 09 0B 0D 0F 	DB	$35,$35,$35,$35,$35,$35,$35,$35,$35,$04,$06,$07,$09,$0B,$0D,$0F
+EAA0 10 04 35 35 35 10 35 35 0E 35 0E 0B 35 0E 35 10 	DB	$10,$04,$35,$35,$35,$10,$35,$35,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EAB0 35 04 35 35 35 10 35 35 35 35 0B 0B 35 0E 35 10 	DB	$35,$04,$35,$35,$35,$10,$35,$35,$35,$35,$0B,$0B,$35,$0E,$35,$10
+EAC0 35 07 35 35 35 0C 35 35 0E 35 0E 0B 35 0E 35 10 	DB	$35,$07,$35,$35,$35,$0C,$35,$35,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EAD0 35 04 35 35 35 10 35 35 35 35 10 0E 35 0B 35 07 	DB	$35,$04,$35,$35,$35,$10,$35,$35,$35,$35,$10,$0E,$35,$0B,$35,$07
+EAE0 35 04 35 35 35 10 35 35 0E 35 0E 0B 35 0E 35 10 	DB	$35,$04,$35,$35,$35,$10,$35,$35,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EAF0 35 04 37 35 35 10 35 35 35 35 0B 0B 35 0E 35 10 	DB	$35,$04,$37,$35,$35,$10,$35,$35,$35,$35,$0B,$0B,$35,$0E,$35,$10
+EB00 35 07 37 35 35 0C 35 35 0E 35 0E 0B 35 0E 35 10 	DB	$35,$07,$37,$35,$35,$0C,$35,$35,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EB10 35 04 35 35 35 10 35 35 35 35 10 0E 35 0B 35 07 	DB	$35,$04,$35,$35,$35,$10,$35,$35,$35,$35,$10,$0E,$35,$0B,$35,$07
+EB20 35 04 37 35 35 10 35 35 0E 35 0E 0B 35 0E 35 10 	DB	$35,$04,$37,$35,$35,$10,$35,$35,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EB30 35 04 37 35 35 10 35 35 35 35 0B 0B 35 0E 35 10 	DB	$35,$04,$37,$35,$35,$10,$35,$35,$35,$35,$0B,$0B,$35,$0E,$35,$10
+EB40 35 07 37 35 35 0C 35 35 0E 35 0E 0B 35 0E 35 10 	DB	$35,$07,$37,$35,$35,$0C,$35,$35,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EB50 35 04 35 35 35 10 35 35 35 35 10 0E 35 0B 35 07 	DB	$35,$04,$35,$35,$35,$10,$35,$35,$35,$35,$10,$0E,$35,$0B,$35,$07
+EB60 35 04 37 36 35 10 35 37 0E 35 0E 0B 35 0E 35 10 	DB	$35,$04,$37,$36,$35,$10,$35,$37,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EB70 35 04 37 36 35 10 35 37 35 35 0B 0B 35 0E 35 10 	DB	$35,$04,$37,$36,$35,$10,$35,$37,$35,$35,$0B,$0B,$35,$0E,$35,$10
+EB80 35 07 37 36 35 0C 35 37 0E 35 0E 0B 35 0E 35 10 	DB	$35,$07,$37,$36,$35,$0C,$35,$37,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EB90 35 04 37 36 35 10 35 37 35 35 10 0E 3E 0B 35 07 	DB	$35,$04,$37,$36,$35,$10,$35,$37,$35,$35,$10,$0E,$3E,$0B,$35,$07
+EBA0 35 04 37 36 35 10 35 37 0E 35 0E 0B 35 0E 35 10 	DB	$35,$04,$37,$36,$35,$10,$35,$37,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EBB0 35 04 37 36 35 10 35 37 35 35 0B 0B 35 0E 35 10 	DB	$35,$04,$37,$36,$35,$10,$35,$37,$35,$35,$0B,$0B,$35,$0E,$35,$10
+EBC0 35 07 37 36 35 0C 35 37 0E 35 0E 0B 35 0E 35 10 	DB	$35,$07,$37,$36,$35,$0C,$35,$37,$0E,$35,$0E,$0B,$35,$0E,$35,$10
+EBD0 35 04 37 36 35 10 35 37 35 35 10 0E 3E 0B 35 07 	DB	$35,$04,$37,$36,$35,$10,$35,$37,$35,$35,$10,$0E,$3E,$0B,$35,$07
+EBE0 35 3F       	DB	$35,$3F
+EE48 35 35 1C 35 35 1C 1F 35 1F 1C 35 1C 21 21 1C 1C EE48	DB	$35,$35,$1C,$35,$35,$1C,$1F,$35,$1F,$1C,$35,$1C,$21,$21,$1C,$1C
+EE58 1A 1A 1C 35 35 1C 23 35 23 1C 35 1C 24 24 23 23 	DB	$1A,$1A,$1C,$35,$35,$1C,$23,$35,$23,$1C,$35,$1C,$24,$24,$23,$23
+EE68 1F 1F 1C 1C 23 23 28 23 1C 1A 1C 1A 1A 17 17 1E 	DB	$1F,$1F,$1C,$1C,$23,$23,$28,$23,$1C,$1A,$1C,$1A,$1A,$17,$17,$1E
+EE78 1C 35 35 35 35 35 35 35 35 35 35 35 35 35 3B 3A 	DB	$1C,$35,$35,$35,$35,$35,$35,$35,$35,$35,$35,$35,$35,$35,$3B,$3A
+EE88 3A 35 04 35 36 35 35 35 37 35 35 0E 35 0B 35 0E 	DB	$3A,$35,$04,$35,$36,$35,$35,$35,$37,$35,$35,$0E,$35,$0B,$35,$0E
+EE98 35 10 04 35 36 35 35 35 37 35 35 35 35 0B 35 0E 	DB	$35,$10,$04,$35,$36,$35,$35,$35,$37,$35,$35,$35,$35,$0B,$35,$0E
+EEA8 35 10 07 35 36 35 35 35 37 35 35 0E 35 0B 35 0E 	DB	$35,$10,$07,$35,$36,$35,$35,$35,$37,$35,$35,$0E,$35,$0B,$35,$0E
+EEB8 35 10 04 35 36 35 35 35 37 35 3E 35 0E 3E 0B 3E 	DB	$35,$10,$04,$35,$36,$35,$35,$35,$37,$35,$3E,$35,$0E,$3E,$0B,$3E
+EEC8 07 39 1C 35 36 3E 1F 35 37 1C 38 38 21 3E 1C 3E 	DB	$07,$39,$1C,$35,$36,$3E,$1F,$35,$37,$1C,$38,$38,$21,$3E,$1C,$3E
+EED8 1A 39 1C 35 36 3E 23 35 37 1C 38 38 24 3E 23 3E 	DB	$1A,$39,$1C,$35,$36,$3E,$23,$35,$37,$1C,$38,$38,$24,$3E,$23,$3E
+EEE8 1F 39 1C 36 23 3E 28 37 37 1A 38 38 17 3E 1E 3E 	DB	$1F,$39,$1C,$36,$23,$3E,$28,$37,$37,$1A,$38,$38,$17,$3E,$1E,$3E
+EEF8 1C 39 37 35 36 3E 35 35 37 35 35 3E 0E 3E 0B 3E 	DB	$1C,$39,$37,$35,$36,$3E,$35,$35,$37,$35,$35,$3E,$0E,$3E,$0B,$3E
+EF08 35 39 1C 35 36 3E 1F 35 37 1C 38 38 21 3E 1C 3E 	DB	$35,$39,$1C,$35,$36,$3E,$1F,$35,$37,$1C,$38,$38,$21,$3E,$1C,$3E
+EF18 1A 39 1C 35 36 3E 23 35 37 1C 38 38 24 3E 23 3E 	DB	$1A,$39,$1C,$35,$36,$3E,$23,$35,$37,$1C,$38,$38,$24,$3E,$23,$3E
+EF28 1F 39 1C 36 23 3E 28 37 37 1A 38 38 17 3E 1E 3E 	DB	$1F,$39,$1C,$36,$23,$3E,$28,$37,$37,$1A,$38,$38,$17,$3E,$1E,$3E
+EF38 1C 39 37 35 36 3E 35 35 37 35 35 3E 0E 3E 0B 3E 	DB	$1C,$39,$37,$35,$36,$3E,$35,$35,$37,$35,$35,$3E,$0E,$3E,$0B,$3E
+EF48 07 39 04 23 28 3E 28 23 37 2B 38 38 0B 3E 2A 3E 	DB	$07,$39,$04,$23,$28,$3E,$28,$23,$37,$2B,$38,$38,$0B,$3E,$2A,$3E
+EF58 2A 39 35 23 28 3E 28 23 37 2B 38 38 2A 3E 28 3E 	DB	$2A,$39,$35,$23,$28,$3E,$28,$23,$37,$2B,$38,$38,$2A,$3E,$28,$3E
+EF68 35 39 07 1F 24 3E 24 1F 37 0E 38 38 0B 3E 35 3E 	DB	$35,$39,$07,$1F,$24,$3E,$24,$1F,$37,$0E,$38,$38,$0B,$3E,$35,$3E
+EF78 10 39 26 23 28 3E 28 23 37 23 38 3E 0E 3E 0B 3E 	DB	$10,$39,$26,$23,$28,$3E,$28,$23,$37,$23,$38,$3E,$0E,$3E,$0B,$3E
+EF88 07 39 35 23 28 3E 28 23 37 2B 38 38 0B 3E 2A 3E 	DB	$07,$39,$35,$23,$28,$3E,$28,$23,$37,$2B,$38,$38,$0B,$3E,$2A,$3E
+EF98 2A 39 35 23 28 3E 28 23 37 2B 38 38 2A 3E 28 3E 	DB	$2A,$39,$35,$23,$28,$3E,$28,$23,$37,$2B,$38,$38,$2A,$3E,$28,$3E
+EFA8 35 39 35 1F 24 3E 24 1F 37 0E 38 38 0B 3E 35 3E 	DB	$35,$39,$35,$1F,$24,$3E,$24,$1F,$37,$0E,$38,$38,$0B,$3E,$35,$3E
+EFB8 26 39 26 23 28 3E 28 23 37 23 38 3E 0E 3E 0B 3E 	DB	$26,$39,$26,$23,$28,$3E,$28,$23,$37,$23,$38,$3E,$0E,$3E,$0B,$3E
+EFC8 07 3F       	DB	$07,$3F
+F230 1C 1C 35 1C 1C 1F 1C 1F 1C 1F 1C 21 1C 1C 21 1A F230	DB	$1C,$1C,$35,$1C,$1C,$1F,$1C,$1F,$1C,$1F,$1C,$21,$1C,$1C,$21,$1A
+F240 1C 1C 1C 1C 1C 23 1C 23 1C 23 1C 24 1C 23 24 1F 	DB	$1C,$1C,$1C,$1C,$1C,$23,$1C,$23,$1C,$23,$1C,$24,$1C,$23,$24,$1F
+F250 23 1C 1F 23 1C 28 23 1C 1A 1C 1A 17 17 1E 1E 1C 	DB	$23,$1C,$1F,$23,$1C,$28,$23,$1C,$1A,$1C,$1A,$17,$17,$1E,$1E,$1C
+F260 1E 1C 1C 1C 1C 1C 1C 1C 1C 3D 3D 3C 3C 3B 35 35 	DB	$1E,$1C,$1C,$1C,$1C,$1C,$1C,$1C,$1C,$3D,$3D,$3C,$3C,$3B,$35,$35
+F270 35 39 37 36 35 35 10 37 35 0E 35 35 0B 35 0E 35 	DB	$35,$39,$37,$36,$35,$35,$10,$37,$35,$0E,$35,$35,$0B,$35,$0E,$35
+F280 10 39 37 36 35 35 10 37 35 35 35 35 0B 35 0E 35 	DB	$10,$39,$37,$36,$35,$35,$10,$37,$35,$35,$35,$35,$0B,$35,$0E,$35
+F290 10 39 37 36 35 35 0C 37 35 0E 35 35 0B 35 0E 35 	DB	$10,$39,$37,$36,$35,$35,$0C,$37,$35,$0E,$35,$35,$0B,$35,$0E,$35
+F2A0 10 39 37 36 35 35 10 37 35 35 35 10 3E 0E 3E 0B 	DB	$10,$39,$37,$36,$35,$35,$10,$37,$35,$35,$35,$10,$3E,$0E,$3E,$0B
+F2B0 3E 1C 37 36 35 1F 10 37 1C 0E 1C 21 0B 1C 0E 1A 	DB	$3E,$1C,$37,$36,$35,$1F,$10,$37,$1C,$0E,$1C,$21,$0B,$1C,$0E,$1A
+F2C0 10 1C 04 36 35 23 10 37 1C 35 1C 24 0B 23 0E 1F 	DB	$10,$1C,$04,$36,$35,$23,$10,$37,$1C,$35,$1C,$24,$0B,$23,$0E,$1F
+F2D0 10 1C 07 23 36 28 0C 1C 1A 0E 1A 17 0B 1E 0E 1C 	DB	$10,$1C,$07,$23,$36,$28,$0C,$1C,$1A,$0E,$1A,$17,$0B,$1E,$0E,$1C
+F2E0 10 35 04 36 35 35 10 37 35 35 3E 10 3E 0E 3E 0B 	DB	$10,$35,$04,$36,$35,$35,$10,$37,$35,$35,$3E,$10,$3E,$0E,$3E,$0B
+F2F0 3E 1C 04 36 35 1F 10 37 1C 0E 1C 21 0B 1C 0E 1A 	DB	$3E,$1C,$04,$36,$35,$1F,$10,$37,$1C,$0E,$1C,$21,$0B,$1C,$0E,$1A
+F300 10 1C 04 36 35 23 10 37 1C 35 1C 24 0B 23 0E 1F 	DB	$10,$1C,$04,$36,$35,$23,$10,$37,$1C,$35,$1C,$24,$0B,$23,$0E,$1F
+F310 10 1C 07 23 36 28 0C 1C 1A 0E 1A 17 0B 1E 0E 1C 	DB	$10,$1C,$07,$23,$36,$28,$0C,$1C,$1A,$0E,$1A,$17,$0B,$1E,$0E,$1C
+F320 10 35 04 36 35 35 10 37 35 35 3E 10 3E 0E 3E 0B 	DB	$10,$35,$04,$36,$35,$35,$10,$37,$35,$35,$3E,$10,$3E,$0E,$3E,$0B
+F330 3E 07 35 28 36 28 10 28 2B 0E 2B 35 2B 2A 0E 2A 	DB	$3E,$07,$35,$28,$36,$28,$10,$28,$2B,$0E,$2B,$35,$2B,$2A,$0E,$2A
+F340 10 35 04 28 36 28 10 28 2B 35 2B 2A 0B 28 0E 35 	DB	$10,$35,$04,$28,$36,$28,$10,$28,$2B,$35,$2B,$2A,$0B,$28,$0E,$35
+F350 10 35 35 24 36 24 0C 24 35 24 26 35 26 35 0E 26 	DB	$10,$35,$35,$24,$36,$24,$0C,$24,$35,$24,$26,$35,$26,$35,$0E,$26
+F360 35 26 04 28 36 28 10 28 35 26 28 35 28 35 3E 35 	DB	$35,$26,$04,$28,$36,$28,$10,$28,$35,$26,$28,$35,$28,$35,$3E,$35
+F370 3E 35 04 28 36 28 10 28 2B 0E 2B 35 2B 2A 0E 2A 	DB	$3E,$35,$04,$28,$36,$28,$10,$28,$2B,$0E,$2B,$35,$2B,$2A,$0E,$2A
+F380 10 35 04 28 36 28 10 28 2B 35 2B 2A 0B 28 0E 35 	DB	$10,$35,$04,$28,$36,$28,$10,$28,$2B,$35,$2B,$2A,$0B,$28,$0E,$35
+F390 10 35 07 24 36 24 0C 24 35 24 26 35 26 35 0E 26 	DB	$10,$35,$07,$24,$36,$24,$0C,$24,$35,$24,$26,$35,$26,$35,$0E,$26
+F3A0 10 26 04 28 36 28 10 28 35 26 28 10 28 35 3E 35 	DB	$10,$26,$04,$28,$36,$28,$10,$28,$35,$26,$28,$10,$28,$35,$3E,$35
+F3B0 3E 3F       	DB	$3E,$3F
+F618 6D EF CE 57 00 EF 57 00 EF 57 EF 00 57 EF 57 EF 57 EF 57 00 	DB	$6D,$EF,$CE,$57,$00,$EF,$57,$00,$EF,$57,$EF,$00,$57,$EF,$57,$EF,$57,$EF,$57,$00
+F62C 00 EF 57 00 EF 57 EF 00 57 EF 57 EF 57 EF 57 EF 	DB	$00,$EF,$57,$00,$EF,$57,$EF,$00,$57,$EF,$57,$EF,$57,$EF,$57,$EF
+F63C 57 EF 57 EF 00 57 EF 00 57 EF 57 EF 57 44 00 00 	DB	$57,$EF,$57,$EF,$00,$57,$EF,$00,$57,$EF,$57,$EF,$57,$44,$00,$00
+F64C 00 34 00 00 75 49 29 49 49 49 49 29 EC 	DB	$00,$34,$00,$00,$75,$49,$29,$49,$49,$49,$49,$29,$EC
+F799 3F          XTRAEND	DB	$3f
+FA00 C3 A5 FB    FA00	jp	FBA5
+FA03 21 13 C2 11 12 FA 01 2C 01 ED B0 C9 FA03	DB	$21,$13,$C2,$11,$12,$FA,$01,$2C,$01,$ED,$B0,$C9
+FA0F 0F          FA0F	DB	$0F
+FA10 0F 0F       FA10	DB	$0F,$0F ; channel 1
+FA12 A8 01       FA12	DB	$A8,$01	; channel 2
+FA14 9F 06       FA14	DB	$9F,$06	; channel 3
+FA16 3D 01       FA16	DB	$3D,$01 
+FA18 1E          RNOISEP	DB	$1E
+FA19 FB          RENABLE	DB	$FB
+FA1A 00 00 0F    RAMPLIT	DB	$00,$00,$0F
+FA1D 00 00       RENVPER	DB	$00,$00
+FA1F 00          RENVSHAP	DB	$00
+FA20 10          FA20	DB	$10
+FA21 00 00 00    FA21	DB	$00,$00,$00
+FA24 00 00 00    FA24	DB	$00,$00,$00 
+FA27 00          FA27	DB	$00
+FA28 00 00 00 00 00 00 FA28	DB	$00,$00,$00,$00,$00,$00
+FA2E 60 EA       CHAMUSICPTR	DB	$60,$EA	; channel A music data address, $EA60
+FA30 61 EA       	DB	$61,$EA
+FA32 48 EE       CHBMUSICPTR	DB	$48,$EE	; channel B music data address, $EE48
+FA34 49 EE       	DB	$49,$EE
+FA36 30 F2       CHCMUSICPTR	DB	$30,$F2	; channel C music data address, $F230
+FA38 31 F2       	DB	$31,$F2
+FA3A 18 F6       FA3A	DB	XTRA,XTRA>>8	; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, should be $F618 per new locations
+FA3C 19 F6       	DB	$19,$F6 
+FA3E E6          PBSPEED	DB	$E6	; playback speed
+FA3F 08 07 06 05 06 07 08 09 0A 0B 0B 0B 0B 0B 0B 0B 0F FA3F	DB	$08,$07,$06,$05,$06,$07,$08,$09,$0A,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0F
+FA50 0E 0D 0C 0B 0A 09 08 07 06 05 04 03 02 01 00 0F 	DB	$0E,$0D,$0C,$0B,$0A,$09,$08,$07,$06,$05,$04,$03,$02,$01,$00,$0F
+FA60 0E 0D 0C 0B 0A 09 08 08 09 0A 0B 0C 0D 0E 0F 04 	DB	$0E,$0D,$0C,$0B,$0A,$09,$08,$08,$09,$0A,$0B,$0C,$0D,$0E,$0F,$04
+FA70 06 08 0A 0B 0C 0D 0E 0F 0E 0D 0C 0B 0A 07 03 08 	DB	$06,$08,$0A,$0B,$0C,$0D,$0E,$0F,$0E,$0D,$0C,$0B,$0A,$07,$03,$08
+FA80 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0B 09 08 0B 	DB	$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0B,$09,$08,$0B
+FA90 0B 0B 0B 0B 0B 0B 0B 08 05 02 02 03 03 03 03 08 	DB	$0B,$0B,$0B,$0B,$0B,$0B,$0B,$08,$05,$02,$02,$03,$03,$03,$03,$08
+FAA0 0B 0D 0E 0F 0F 0E 0D 0C 0B 0A 09 09 09 09 09 0F 	DB	$0B,$0D,$0E,$0F,$0F,$0E,$0D,$0C,$0B,$0A,$09,$09,$09,$09,$09,$0F
+FAB0 00 0F 00 0F 00 0F 00 0F 00 0F 00 0F 00 0F 08 9F 	DB	$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$08,$9F
+FAC0 06 40 06 E6 05 91 05 41 05 F6 04 AE 04 6B 04 2C FAC0	DB	$06,$40,$06,$E6,$05,$91,$05,$41,$05,$F6,$04,$AE,$04,$6B,$04,$2C
+FAD0 04 F0 03 B7 03 82 03 4F 03 20 03 F3 02 C8 02 A1 FAD0	DB	$04,$F0,$03,$B7,$03,$82,$03,$4F,$03,$20,$03,$F3,$02,$C8,$02,$A1
+FAE0 02 7B 02 57 02 36 02 16 02 F8 01 DC 01 C1 01 A8 FAE0	DB	$02,$7B,$02,$57,$02,$36,$02,$16,$02,$F8,$01,$DC,$01,$C1,$01,$A8
+FAF0 01 90 01 79 01 64 01 50 01 3D 01 2C 01 1B 01 0B FAF0	DB	$01,$90,$01,$79,$01,$64,$01,$50,$01,$3D,$01,$2C,$01,$1B,$01,$0B
+FB00 01 FC 00 EE 00 E0 00 D4 00 C8 00 BD 00 B2 00 A8 FB00	DB	$01,$FC,$00,$EE,$00,$E0,$00,$D4,$00,$C8,$00,$BD,$00,$B2,$00,$A8
+FB10 00 9F 00 96 00 8D 00 85 00 7E 00 77 00 70 00 6A FB10	DB	$00,$9F,$00,$96,$00,$8D,$00,$85,$00,$7E,$00,$77,$00,$70,$00,$6A
+FB20 00 64 00 5E 00 59 00 54 00 FF FF 08 09 18 09 00 FB20	DB	$00,$64,$00,$5E,$00,$59,$00,$54,$00,$FF,$FF,$08,$09,$18,$09,$00
+FB30 80 1C 80 04 10 0C 10 14 10 1C 80 1E 80 00 00 FB30	DB	$80,$1C,$80,$04,$10,$0C,$10,$14,$10,$1C,$80,$1E,$80,$00,$00 
+FB3F 00 00 00 00 00 00 FB3F	DB	$00,$00,$00,$00,$00,$00 
+FB45 CD 51 FB    FB45	call	FB51	; play notes for all channels?
+FB48 CD 0F 20    	call	rtrn		; $28E	;poll keyboard
+FB4B 1C          	inc	e
+FB4C 28 F7       	jr	z,FB45	; continue loop
+FB4E C3 C7 FB    	jp	FBC7	; unless key pressed - then exit
+FB51 F3          FB51	di			; make sure interrupts turned off
+FB52 21 19 FA    	ld	hl,RENABLE	; set enable register to all channels enabled + noise on
+FB55 06 FF       	ld	b,$FF
+FB57 70          	ld	(hl),b
+FB58 23          	inc	hl
+FB59 04          	inc	b		; then set amplitudes to 0
+FB5A CD D9 FC    	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
+FB5D 21 20 FA    	ld	hl,FA20	; zero 
+FB60 70          	ld	(hl),b
+FB61 23          	inc	hl
+FB62 CD D9 FC    	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
+FB65 21 27 FA    	ld	hl,FA27	; zero
+FB68 70          	ld	(hl),b
+FB69 23          	inc	hl
+FB6A CD D9 FC    	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
+FB6D 23          	inc	hl
+FB6E CD D9 FC    	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
+FB71 21 3A FA    	ld	hl,FA3A
+FB74 CD D0 FB    	call	FBD0
+FB77 CD 9D FC    	call	FC9D
+FB7A 21 2E FA    	ld	hl,CHAMUSICPTR	; channel A music data address
+FB7D CD D0 FB    	call	FBD0		; get note and reg value
+FB80 3E 01       	ld	a,$01		; channel number
+FB82 CD F4 FB    	call	FBF4
+FB85 21 32 FA    	ld	hl,CHBMUSICPTR	; channel B music data address
+FB88 CD D0 FB    	call	FBD0		; get note and reg value
+FB8B 3E 02       	ld	a,$02		; channel number
+FB8D CD F4 FB    	call	FBF4
+FB90 21 36 FA    	ld	hl,CHCMUSICPTR	; channel C music data address
+FB93 CD D0 FB    	call	FBD0		; get note and reg value
+FB96 3E 03       	ld	a,$03		; channel number
+FB98 CD F4 FB    	call	FBF4
+FB9B CD 15 FD    	call	FD15
+FB9E CD C6 FD    	call	AYSETREG
+FBA1 CD 72 FC    	call	FC72
+FBA4 C9          	ret
+FBA5 21 60 EA    FBA5	ld	hl,MUSIC1	; EA60 location of music
+FBA8 11 2E FA    	ld	de,CHAMUSICPTR	; 
+FBAB 01 E8 03    	ld	bc,$03E8	; 1000 decimal - length of channel data
+FBAE CD BD FB    	call	FBBD		; store location of data for channel A - EA60 -> FA2E
+FBB1 CD BD FB    	call	FBBD		; store location of data for channel B - EE48 -> FA32
+FBB4 CD BD FB    	call	FBBD		; store location of data for channel C - F230 -> FA36
+FBB7 CD BD FB    	call	FBBD		; store location of data for - F618 -> FA3A
+FBBA C3 45 FB    	jp	FB45
+FBBD 7D          FBBD	ld	a,l
+FBBE 12          	ld	(de),a
+FBBF 13          	inc	de
+FBC0 7C          	ld	a,h
+FBC1 12          	ld	(de),a
+FBC2 13          	inc	de
+FBC3 09          	add	hl,bc
+FBC4 13          	inc	de
+FBC5 13          	inc	de
+FBC6 C9          	ret
+FBC7 16 07       FBC7	ld	d,$07	; Write FF to register 7 - disable all channels. Should be 3F to not turn on output on IO ports
+FBC9 1E FF       	ld	e,$FF
+FBCB CD B8 FD    	call	AYWRITE
+FBCE FB          	ei
+FBCF C9          	ret		; exit
+FBD0 5E          FBD0	ld	e,(hl)	; HL points to address of current note pointer
+FBD1 23          	inc	hl	; load that pointer into DE
+FBD2 56          	ld	d,(hl)
+FBD3 13          	inc	de	; point to next note
+FBD4 1A          FBD4	ld	a,(de)	; get sample
+FBD5 FE 3F       	cp	$3F	; check if loop command 'b'
+FBD7 CA EB FB    	jp	z,FBEB	; jump if loop command
+FBDA 47          	ld	b,a	; save current note in B
+FBDB 72          	ld	(hl),d	; save current note pointer
+FBDC 2B          	dec	hl
+FBDD 73          	ld	(hl),e
+FBDE 87          	add	a,a	; note * 2
+FBDF 5F          	ld	e,a	; turn it into offset to 16 bit table
+FBE0 16 00       	ld	d,$00
+FBE2 21 C0 FA    	ld	hl,FABF	; get address of beginning of note to reg value map
+FBE5 19          	add	hl,de		; add offset
+FBE6 56          	ld	d,(hl)		; get value from table
+FBE7 23          	inc	hl
+FBE8 5E          	ld	e,(hl)
+FBE9 EB          	ex	de,hl		; put it in HL
+FBEA C9          	ret
+FBEB 23          FBEB	inc	hl	; after current sample register we have loop dest address register
+FBEC 5E          	ld	e,(hl)	; get that address
+FBED 23          	inc	hl
+FBEE 56          	ld	d,(hl)
+FBEF 2B          	dec	hl	; then point back to current sample
+FBF0 2B          	dec	hl
+FBF1 C3 D4 FB    	jp	FBD4	; and continue loop
+FBF4 4F          FBF4	ld	c,a		; save channel number in C for later
+FBF5 78          	ld	a,b		; get note number
+FBF6 FE 36       	cp	$36
+FBF8 30 3F       	jr	nc,FC39
+FBFA 3E FF       	ld	a,$FF		; is H = $FF ?
+FBFC BC          	cp	h
+FBFD C8          	ret	z		; return if so
+FBFE 79          	ld	a,c		; get channel number
+FBFF E5          	push	hl		; save HL for later - contains register value for note
+FC00 87          	add	a,a		; 16 bit offset to channel data
+FC01 3D          	dec	a
+FC02 21 10 FA    	ld	hl,FA10	; point to table (not FA12?)
+FC05 16 00       	ld	d,$00
+FC07 5F          	ld	e,a
+FC08 19          	add	hl,de		; add 16 bit offset
+FC09 D1          	pop	de		; get note register value
+FC0A 73          	ld	(hl),e		; store DE in table
+FC0B 2B          	dec	hl
+FC0C 72          	ld	(hl),d
+FC0D 21 24 FA    	ld	hl,FA24	; point to table
+FC10 16 00       	ld	d,$00
+FC12 59          	ld	e,c		; load channel number
+FC13 19          	add	hl,de		; add 8 bit offset - 1
+FC14 2B          	dec	hl
+FC15 7E          	ld	a,(hl)		; get value
+FC16 2B          	dec	hl
+FC17 2B          	dec	hl
+FC18 2B          	dec	hl
+FC19 77          	ld	(hl),a		; store in corresponding address of table at FA21
+FC1A 21 0F FA    	ld	hl,FA0F	; point to table
+FC1D 19          	add	hl,de		; DE = channel number
+FC1E 2B          	dec	hl
+FC1F 7E          	ld	a,(hl)		; get amplitude value
+FC20 21 19 FA    	ld	hl,RENABLE	; select amplitude shadow table
+FC23 19          	add	hl,de		; add offset to channel
+FC24 77          	ld	(hl),a		; store amplitude value
+FC25 21 19 FA    	ld	hl,RENABLE	; select channel enable shadow reg
+FC28 0D          	dec	c		; decrement channel number
+FC29 C2 2E FC    	jp	nz,FC2E		; skip if not zero
+FC2C CB 86       	res	0,(hl)		; if 0 turn on channel A in channel enable shadow reg
+FC2E 0D          FC2E	dec	c		; decrement channel number
+FC2F C2 34 FC    	jp	nz,FC34		; skip if not zero
+FC32 CB 8E       	res	1,(hl)		; if 0 turn on channel B in channel enable shadow reg
+FC34 0D          FC34	dec	c		; decrement channel number
+FC35 C0          	ret	nz		; skip if not zero
+FC36 CB 96       	res	2,(hl)		; if 0 turn on channel C in channel enable shadow reg
+FC38 C9          	ret
+FC39 7C          FC39	ld	a,h
+FC3A 32 18 FA    	ld	(RNOISEP),a	; put H in noise period shadow reg
+FC3D 7D          	ld	a,l
+FC3E E6 F0       	and	$F0
+FC40 FE 00       	cp	$00
+FC42 28 1F       	jr	z,FC63		; jump if upper nibble of L is 0
+FC44 0F          	rrca
+FC45 0F          	rrca
+FC46 0F          	rrca
+FC47 0F          	rrca
+FC48 21 21 FA    FC48	ld	hl,FA21	; point to table
+FC4B 16 00       	ld	d,$00		; add offset
+FC4D 59          	ld	e,c
+FC4E 19          	add	hl,de
+FC4F 2B          	dec	hl
+FC50 77          	ld	(hl),a		; store in table
+FC51 21 19 FA    	ld	hl,RENABLE
+FC54 0D          	dec	c
+FC55 20 03       	jr	nz,FC5A
+FC57 CB 9E       	res	3,(hl)		; if 0 turn on noise A in channel enable shadow reg
+FC59 C9          	ret
+FC5A 0D          FC5A	dec	c
+FC5B 20 03       	jr	nz,FC60
+FC5D CB A6       	res	4,(hl)		; if 0 turn on noise B in channel enable shadow reg
+FC5F C9          	ret
+FC60 CB AE       FC60	res	5,(hl)		; if 0 turn on noise C in channel enable shadow reg
+FC62 C9          	ret
+FC63 7D          FC63	ld	a,l		; get lower nibble of L
+FC64 E6 0F       	and	$0F
+FC66 21 1A FA    	ld	hl,RAMPLIT	; point to amplitude shadow registers
+FC69 16 00       	ld	d,$00
+FC6B 59          	ld	e,c
+FC6C 19          	add	hl,de		; add offset to register in question
+FC6D 2B          	dec	hl
+FC6E 77          	ld	(hl),a		; set amplitude
+FC6F AF          	xor	a		; zero A
+FC70 18 D6       	jr	FC48		; loop back
+FC72 3E 01       FC72	ld	a,$01		; channel A
+FC74 CD D5 FD    	call	FDD5
+FC77 3E 02       	ld	a,$02		; channel B
+FC79 CD D5 FD    	call	FDD5
+FC7C 3E 03       	ld	a,$03		; channel C
+FC7E CD D5 FD    	call	FDD5
+FC81 CD C6 FD    	call	AYSETREG		; send shadow values to AY regs
+FC84 3A 3E FA    	ld	a,(PBSPEED)	; get playback speed
+FC87 06 32       FC87	ld	b,$32		; delay loop
+FC89 00          FC89	nop
+FC8A 10 FD       	djnz	FC89
+FC8C 3C          	inc	a
+FC8D 20 F8       	jr	nz,FC87
+FC8F CD 95 FD    	call	UPDPERVAL	; update 3 channel period values from table at $FA28
+FC92 21 20 FA    	ld	hl,FA20	; increment $FA20 counter
+FC95 34          	inc	(hl)
+FC96 7E          	ld	a,(hl)
+FC97 FE 10       	cp	$10		; did it reach $10?
+FC99 C8          	ret	z		; yes, return
+FC9A C3 72 FC    	jp	FC72		; no, continue loop
+FC9D 78          FC9D	ld	a,b
+FC9E E6 03       	and	$03		; put 2 lowest bits of B in C
+FCA0 4F          	ld	c,a
+FCA1 CB 50       	bit	2,b		; bit 2 flag
+FCA3 20 06       	jr	nz,FCAB
+FCA5 CB 58       	bit	3,b		; bit 3 flag
+FCA7 C2 DF FC    	jp	nz,FCDF
+FCAA C9          	ret
+FCAB CB 58       FCAB	bit	3,b
+FCAD C2 F5 FC    	jp	nz,FCF5
+FCB0 3E F0       	ld	a,$F0		; bit 2 on bit 3 off
+FCB2 A0          	and	b		; get upprt nibble of B
+FCB3 CB 0F       	rrc	a
+FCB5 CB 0F       	rrc	a
+FCB7 CB 0F       	rrc	a
+FCB9 CB 0F       	rrc	a
+FCBB 47          	ld	b,a		; put it in B
+FCBC AF          	xor	a		; zero A
+FCBD B9          	cp	c		; is C 0?
+FCBE 28 0E       	jr	z,FCCE		; yes
+FCC0 21 0F FA    	ld	hl,FA0F	; no, point to 
+FCC3 16 00       	ld	d,$00
+FCC5 59          	ld	e,c
+FCC6 19          	add	hl,de		; add offset
+FCC7 2B          	dec	hl
+FCC8 70          	ld	(hl),b		; put upper nibble of B in table
+FCC9 06 00       	ld	b,$00
+FCCB C3 05 FD    	jp	FD05
+FCCE 21 0F FA    FCCE	ld	hl,FA0F	; C was 0, point to 
+FCD1 CD D9 FC    	call	FCD9		; Store B in 3 channel shadow regs
+FCD4 06 00       	ld	b,$00
+FCD6 C3 0F FD    	jp	FD0F
+FCD9 70          FCD9	ld	(hl),b		; store B in 3 channels
+FCDA 23          	inc	hl
+FCDB 70          	ld	(hl),b
+FCDC 23          	inc	hl
+FCDD 70          	ld	(hl),b
+FCDE C9          	ret
+FCDF 79          FCDF	ld	a,c		; bit 2 off, bit 3 on
+FCE0 32 3F FB    	ld	(FB3F),a	; put lowest 2 bits of B in FB3F
+FCE3 3E F0       	ld	a,$F0
+FCE5 A0          	and	b		; get high nibble
+FCE6 07          	rlca
+FCE7 07          	rlca
+FCE8 07          	rlca
+FCE9 CB 60       	bit	4,b
+FCEB 47          	ld	b,a
+FCEC 28 03       	jr	z,FCF1
+FCEE EE 7F       	xor	$7F
+FCF0 3C          	inc	a
+FCF1 32 27 FA    FCF1	ld	(FA27),a
+FCF4 C9          	ret
+FCF5 CB 60       FCF5	bit	4,b		; bit 2 on, bit 3 on
+FCF7 C0          	ret	nz
+FCF8 3E E0       	ld	a,$E0		; get 3 highest bits of B
+FCFA A0          	and	b
+FCFB 07          	rlca
+FCFC CB 07       	rlc	a
+FCFE CB 07       	rlc	a
+FD00 47          	ld	b,a		; put 3 highest bits in bottom
+FD01 AF          	xor	a		; zero A
+FD02 B9          	cp	c		; is C 0?
+FD03 28 0A       	jr	z,FD0F		; yes
+FD05 16 00       FD05	ld	d,$00		; no, use it as offset to FA24 table
+FD07 59          	ld	e,c
+FD08 21 24 FA    	ld	hl,FA24
+FD0B 19          	add	hl,de
+FD0C 2B          	dec	hl
+FD0D 70          	ld	(hl),b		; put 3 highest bits of B in table
+FD0E C9          	ret
+FD0F 21 24 FA    FD0F	ld	hl,FA24	; point to FA24 table
+FD12 C3 D9 FC    	jp	FCD9		; sotre B in 3 channels
+FD15 21 27 FA    FD15	ld	hl,FA27	; point to FA27 table
+FD18 AF          	xor	a
+FD19 BE          	cp	(hl)		; is it 0 ?
+FD1A C8          	ret	z		; yes, done
+FD1B 46          	ld	b,(hl)		; no , load it into B
+FD1C 3A 3F FB    	ld	a,(FB3F)	; load A from F3BF
+FD1F FE 00       	cp	$00
+FD21 28 20       	jr	z,FD43		; skip if 0
+FD23 DD 21 12 FA 	ld	ix,RTPERIOD	; period of channel A
+FD27 21 2E FA    	ld	hl,CHAMUSICPTR	; pointer to channel A music
+FD2A 3D          	dec	a
+FD2B CA 5E FD    	jp	z,FD5E		; skip if 0
+FD2E 21 32 FA    	ld	hl,CHBMUSICPTR
+FD31 DD 23       	inc	ix
+FD33 DD 23       	inc	ix		; period of channel B
+FD35 3D          	dec	a
+FD36 CA 5E FD    	jp	z,FD5E		; skip if 0
+FD39 21 36 FA    	ld	hl,CHCMUSICPTR
+FD3C DD 23       	inc	ix
+FD3E DD 23       	inc	ix		; period of channel C
+FD40 C3 5E FD    	jp	FD5E		; jump to FD5E
+FD43 21 2E FA    FD43	ld	hl,CHAMUSICPTR	; pointer to channel A music
+FD46 DD 21 12 FA 	ld	ix,RTPERIOD	; period of channel A
+FD4A CD 5E FD    	call	FD5E
+FD4D DD 23       	inc	ix
+FD4F DD 23       	inc	ix		; period of channel B
+FD51 21 32 FA    	ld	hl,CHBMUSICPTR	; channel B
+FD54 CD 5E FD    	call	FD5E
+FD57 DD 23       	inc	ix
+FD59 DD 23       	inc	ix		; period of channel C
+FD5B 21 36 FA    	ld	hl,CHCMUSICPTR	; channel C
+FD5E 5E          FD5E	ld	e,(hl)		; get current note from music
+FD5F 23          	inc	hl
+FD60 56          	ld	d,(hl)
+FD61 1A          	ld	a,(de)
+FD62 80          	add	a,b		; add B
+FD63 FE 35       	cp	$35
+FD65 D0          	ret	nc		; return if A <= $35 (53 dec)
+FD66 16 00       	ld	d,$00
+FD68 87          	add	a,a
+FD69 5F          	ld	e,a		; DE = 2 * A
+FD6A 21 C0 FA    	ld	hl,FABF	; point to $FABF table
+FD6D 19          	add	hl,de
+FD6E 5E          	ld	e,(hl)
+FD6F 23          	inc	hl
+FD70 56          	ld	d,(hl)		; get 16 bit value
+FD71 DD 6E 00    	ld	l,(ix+$00)	; get current period for channel
+FD74 DD 66 01    	ld	h,(ix+$01)
+FD77 EB          	ex	de,hl
+FD78 AF          	xor	a		; clear C flag
+FD79 ED 52       	sbc	hl,de		; subtract value from current period
+FD7B 7D          	ld	a,l		; switch bytes
+FD7C 6C          	ld	l,h
+FD7D 67          	ld	h,a
+FD7E AF          	xor	a
+FD7F C5          	push	bc
+FD80 06 04       	ld	b,$04
+FD82 EE 00       FD82	xor	$00		; divide HL by 16 ?
+FD84 CB 1C       	rr	h
+FD86 CB 1D       	rr	l
+FD88 CB 1F       	rr	a
+FD8A 10 F6       	djnz	FD82
+FD8C B4          	or	h
+FD8D DD 77 16    	ld	(ix+$16),a
+FD90 DD 75 17    	ld	(ix+$17),l
+FD93 C1          	pop	bc
+FD94 C9          	ret
+FD95 21 12 FA    UPDPERVAL	ld	hl,RTPERIOD
+FD98 11 28 FA    	ld	de,FA28
+FD9B 06 03       	ld	b,$03		; for 3 channels
+FD9D 7E          FD9D	ld	a,(hl)		; get channel period in DE
+FD9E E5          	push	hl
+FD9F 23          	inc	hl
+FDA0 66          	ld	h,(hl)
+FDA1 6F          	ld	l,a
+FDA2 EB          	ex	de,hl
+FDA3 7E          	ld	a,(hl)		; get entry from $FA28 in HL
+FDA4 23          	inc	hl
+FDA5 E5          	push	hl
+FDA6 66          	ld	h,(hl)
+FDA7 6F          	ld	l,a
+FDA8 19          	add	hl,de		; add DE (channel period) and HL ($FA28)
+FDA9 30 01       	jr	nc,FDAC
+FDAB 23          	inc	hl
+FDAC 4C          FDAC	ld	c,h
+FDAD 7D          	ld	a,l
+FDAE D1          	pop	de		; pop pointer to $FA28
+FDAF 13          	inc	de
+FDB0 E1          	pop	hl		; pop pointer to channel period
+FDB1 77          	ld	(hl),a		; store new value in channel period
+FDB2 23          	inc	hl
+FDB3 71          	ld	(hl),c
+FDB4 23          	inc	hl		; point to next channel
+FDB5 10 E6       	djnz	FD9D		; loop through channels
+FDB7 C9          	ret
+FDB8 C5          AYWRITE	push	bc		; write value in E to AY register given in D
+FDB9 01 02 00    	ld	bc,AYSEL	; AY register select
+FDBC ED 51       	out	(c),d
+FDBE 01 03 00    	ld	bc,AYDTA	; AY register value
+FDC1 ED 59       	out	(c),e
+FDC3 C1          	pop	bc
+FDC4 14          	inc	d		; point to next AY register
+FDC5 C9          	ret
+FDC6 21 12 FA    AYSETREG	ld	hl,RTPERIOD	; set AY registers with values pointed to by HL
+FDC9 16 00       	ld	d,$00		; point to first AY register
+FDCB 06 0E       	ld	b,$0E		; count of registers to init
+FDCD 5E          FDCD	ld	e,(hl)		; load value to be put in register
+FDCE 23          	inc	hl		; point to next value
+FDCF CD B8 FD    	call	AYWRITE		; write to reg
+FDD2 10 F9       	djnz	FDCD		; loop through count in B
+FDD4 C9          	ret
+FDD5 21 1A FA    FDD5	ld	hl,RAMPLIT	; point to amplitudes table
+FDD8 3D          	dec	a
+FDD9 5F          	ld	e,a
+FDDA 16 00       	ld	d,$00
+FDDC 19          	add	hl,de
+FDDD EB          	ex	de,hl		; DE = channel amplitude
+FDDE 21 07 00    	ld	hl,$0007	; add 7 to offset - that ends up being channel offset into $FA21 table
+FDE1 19          	add	hl,de
+FDE2 7E          	ld	a,(hl)		; get value
+FDE3 FE 00       	cp	$00
+FDE5 C8          	ret	z		; return if 0
+FDE6 D5          	push	de		; save pointer to channel amplitude
+FDE7 21 3F FA    	ld	hl,FA3F	; 16 byte tables for each channel
+FDEA 3D          	dec	a		; get channel number
+FDEB 17          	rla
+FDEC 17          	rla
+FDED 17          	rla
+FDEE 17          	rla
+FDEF 16 00       	ld	d,$00
+FDF1 5F          	ld	e,a
+FDF2 19          	add	hl,de		; HL = $FA3F + ($FA21 + CH#) * 16
+FDF3 3A 20 FA    	ld	a,(FA20)	; get offset from FA20
+FDF6 5F          	ld	e,a
+FDF7 19          	add	hl,de		; add offset in table for given channel
+FDF8 7E          	ld	a,(hl)		; get value
+FDF9 E1          	pop	hl		; get pointer to channel amplitude
+FDFA 77          	ld	(hl),a		; put value there
+FDFB C9          	ret
+# End of file X:\zeus\mintz80_monitor\ymztest.asm
