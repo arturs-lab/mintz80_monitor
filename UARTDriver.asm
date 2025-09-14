@@ -22,8 +22,7 @@ UART7:       EQU    UART_BASE+07h            	;Scratch register
 ;UART_INIT
 ;Function: Initialize the UART to BAUD Rate 9600 (1.8432 MHz clock input)
 ;***************************************************************************
-UART_INIT:
-            LD     A,80h				;Mask to Set DLAB Flag
+UART_INIT:		LD     A,80h				;Mask to Set DLAB Flag
 			OUT    (UART3),A
 			LD     A,12					;Divisor = 12 @ 9600bps w/ 1.8432 Mhz
 ;			LD     A,1					;Divisor = 1 @ 115200bps w/ 1.8432 Mhz
@@ -37,11 +36,22 @@ UART_INIT:
 			RET		
 		
 ;***************************************************************************
+;UART_PRNT_SP:
+;Function: Print out string starting at MEM location (SP) to 16550 UART
+; put string to print, terminated by EOS immediately after the CALL instruction
+; calling this procedure
+;***************************************************************************
+UART_PRNT_SP:	pop HL
+			call UART_PRNT_STR
+			inc hl
+			push hl
+			ret
+
+;***************************************************************************
 ;UART_PRNT_STR:
 ;Function: Print out string starting at MEM location (HL) to 16550 UART
 ;***************************************************************************
-UART_PRNT_STR:
-			PUSH	AF
+UART_PRNT_STR:	PUSH	AF
 UARTPRNTSTRLP:
 			LD		A,(HL)
             CP		EOS					;Test for end byte
@@ -71,8 +81,7 @@ UARTTXRDY_LP:
 ;UART_TX
 ;Function: Transmit character in A to UART
 ;***************************************************************************
-UART_TX:
-			CALL  UART_TX_RDY			;Make sure UART is ready to receive
+UART_TX:		CALL  UART_TX_RDY			;Make sure UART is ready to receive
 			OUT   (UART0),A				;Transmit character in A to UART
 			RET
 				
@@ -94,8 +103,7 @@ UART_RXRDY_LP:
 ;RX_CHK
 ;Function: Non-blocking receive check
 ;***************************************************************************
-RX_CHK:
-			IN		A,(UART5)			;Fetch the control register
+RX_CHK:		IN		A,(UART5)			;Fetch the control register
 			AND	1					;Mask other bits, has some char arrived?
 			RET
 
@@ -103,8 +111,7 @@ RX_CHK:
 ;UART_RX
 ;Function: Receive character in UART to A
 ;***************************************************************************
-UART_RX:
-			CALL  UART_RX_RDY			;Make sure UART is ready to receive
+UART_RX:		CALL  UART_RX_RDY			;Make sure UART is ready to receive
 			IN    A,(UART0)				;Receive character in UART to A
 			RET			
 
