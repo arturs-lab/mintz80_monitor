@@ -113,8 +113,7 @@ MVC_S:	DEFB	"Start Location: ", EOS
 MVC_E:	DEFB	"End Location: ", EOS
 MVC_D:	DEFB	"Destination Location: ", EOS
 
-MOVE_COMMAND:
-        LD		HL, MVC_1	; Print some messages
+MOVE_COMMAND:	LD		HL, MVC_1	; Print some messages
         CALL	PRINT_STRING
         
         LD		HL, MVC_S
@@ -161,18 +160,15 @@ MVDN:	ex		de, hl
         lddr
         inc		de
         RET
-MVUP:
-        add		hl,de
+MVUP:		add		hl,de
         ldir
         dec		de
         RET;
-MERR:
-        LD		A, E_PARAM
+MERR:		LD		A, E_PARAM
         LD		(ERRFLAG), A
         RET;
 
-GETP:
-        ld		e, (hl) ; MVADDR
+GETP:		ld		e, (hl) ; MVADDR
         inc		hl
         ld		d, (hl) ; MVADDR+1
         inc		hl
@@ -199,8 +195,7 @@ GETP:
 MFC_1:	DEFB	"Fill Memory", 0Dh, 0Ah, EOS
 MFC_D:	DEFB	"Data value (one byte): ", EOS
 
-FILL_COMMAND:
-        LD		HL, MFC_1	; Print some messages
+FILL_COMMAND:	LD		HL, MFC_1	; Print some messages
         CALL	PRINT_STRING
         
         LD		HL, MVC_S	; Start msg.
@@ -258,8 +253,7 @@ F_ORDERR:
 ; Function: Print the next block of memory
 ;***************************************************************************
 
-NEXTP_COMMAND:
-        LD 		HL,MDC_3	
+NEXTP_COMMAND:	LD 		HL,MDC_3	
         CALL    PRINT_STRING
         LD		HL, (DMPADDR)
         INC		H
@@ -271,8 +265,7 @@ NEXTP_COMMAND:
 ; Function: Print the previous block of memory
 ;***************************************************************************
 
-PREVP_COMMAND:
-        LD 		HL,MDC_3	
+PREVP_COMMAND:	LD 		HL,MDC_3	
         CALL    PRINT_STRING
         LD		HL, (DMPADDR)
         DEC		H
@@ -284,8 +277,7 @@ PREVP_COMMAND:
 ; Function: Edit bytes in memory
 ;***************************************************************************
 
-EDIT_COMMAND:
-        LD 		HL, MVC_S	; Start msg.
+EDIT_COMMAND:	LD 		HL, MVC_S	; Start msg.
         CALL    PRINT_STRING
         
         CALL	GETHEXWORD	; Get first address
@@ -293,8 +285,7 @@ EDIT_COMMAND:
         CP		E_NONE
         RET		NZ
         
-EDIT_LP:
-        LD		A, ":"
+EDIT_LP:	LD		A, ":"
         CALL	PRINT_CHAR
         LD		A, " "
         CALL	PRINT_CHAR
@@ -328,8 +319,7 @@ EDIT_LP:
 PSC_1: DEFB "Port Scan", 0Dh, 0Ah, EOS
 ;PSC_3: DEFB "     0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EOS
 
-PSCOMMAND:
-        LD 		HL,PSC_1			;Print some messages 
+PSCOMMAND:	LD 		HL,PSC_1			;Print some messages 
         CALL    PRINT_STRING
         
         LD 		HL,MDC_3			;Print some messages 
@@ -409,8 +399,7 @@ RICOUT:        CALL	PRINT_NEW_LINE
 MPW_1:  DEFB    "Write data to port", 0Dh, 0Ah
 MPW_P:  DEFB    "Port & data: ", EOS
 
-PW_COMMAND:
-        LD      HL, MPW_1
+PW_COMMAND:	LD      HL, MPW_1
         CALL    PRINT_STRING
         CALL    GETHEXBYTE
         LD      (MVADDR), A             ; Misuse Move address buffer to store port
@@ -430,6 +419,7 @@ PW_COMMAND:
         LD      C, A
         LD      A, (MVADDR+1)
         OUT     (C), A
+        xor a			; zero A because upon return other commands will be tested for and value in a may trigger them
         RET
 
 ;***************************************************************************
@@ -441,8 +431,7 @@ MGo_1:	DEFB	"Execute program in memory", 0Dh, 0Ah, EOS
 
 MGo_2:	DEFB	"Memory location: ", EOS
 
-GO_COMMAND:
-        LD		HL, MGo_1	; Print some messages
+GO_COMMAND:	LD		HL, MGo_1	; Print some messages
         CALL	PRINT_STRING
         LD		HL, MGo_2	; Print some messages
         CALL	PRINT_STRING
@@ -460,8 +449,7 @@ GO_COMMAND:
 
 MCl_1:	DEFB	"Call program in memory", 0Dh, 0Ah, EOS
 
-CL_COMMAND:
-        LD		HL, MCl_1	; Print some messages
+CL_COMMAND:	LD		HL, MCl_1	; Print some messages
         CALL	PRINT_STRING
         LD		HL, MGo_2	; Print some messages
         CALL	PRINT_STRING
@@ -490,8 +478,7 @@ CCKSM_3:	DEFB	"End location: ", EOS
 
 CCKSM_4:    DEFB    "Checksum: ", EOS
 
-CCKSM_COMMAND:
-        LD		HL, CCKSM_1
+CCKSM_COMMAND:	LD		HL, CCKSM_1
         CALL	PRINT_STRING
         
         LD		HL, CCKSM_2	    ; start
@@ -651,8 +638,7 @@ USERPC: EQU     USERRREG+32
 RDLN_1: DEFB    " AF   BC   DE   HL   IX   IY   AF", 027h, "  BC", 027h, "  DE", 027h, "  HL", 027h, EOS
 RDLN_3: DEFB    " SP   PC   IF   SZ-H-PNC  SZ-H-PNC", 027h  , EOS
 
-REGDUMP_COMMAND:
-        LD      HL, RDLN_1
+REGDUMP_COMMAND:	LD      HL, RDLN_1
         CALL    PRINT_STRING
         
         CALL    PRINT_NEW_LINE
@@ -754,8 +740,7 @@ TRC_2: DEFB "Location to start in 4 digit HEX: ", EOS
 TRC_3: DEFB 0Dh, 0Ah, "Location to end in 4 digit HEX: ", EOS
 TRC_4: DEFB 0Dh, 0Ah, "Start address should be before End address", EOS
 
-TRAM_COMMAND:
-        LD      HL,TRC_1        ;Print some messages 
+TRAM_COMMAND:	LD      HL,TRC_1        ;Print some messages 
         CALL    PRINT_STRING
         LD      HL,TRC_2
         CALL    PRINT_STRING
@@ -804,7 +789,6 @@ MTCER1: DEFB " Error at: ", EOS
 MTCER2: DEFB " value expected: ", EOS
 MTCER3: DEFB ", found: ", EOS
 
-MTEST:
         ; Test strategy in four passes:
         ; 1. Loop through start to end and for each memory location:
         ;    Set to 00h and check new value
@@ -827,7 +811,7 @@ MTEST:
         ; MVADDR+4 : actual value, MVADDR+5 : expected value
         ; D : new value, E : old value
         
-        LD      IX, MVADDR
+MTEST:	LD      IX, MVADDR
 ; Pass 1   ; check only new value (write phase)
         LD      HL, MTC_1
         CALL    PRINT_STRING
@@ -958,8 +942,7 @@ _MCDONE:
 ;  HL contains current address, BC contains end address
 ;  Z-flag set when equal
 ; **********************************************************************
-CPADDR:
-        LD      A, B        ; End MSB
+CPADDR:	LD      A, B        ; End MSB
         CP      H           ; end MSB - current MSB : B - H
         JR      NZ, _CPDONE ; When MSBs are unequal
         LD      A, C        ; End LSB
