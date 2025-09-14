@@ -1,0 +1,48 @@
+# File C:\zeus\mintz80_monitor\sio_no_int_test.asm
+2000 CD 41 20    main:		call setPIO         ; set PIO
+2003 3E 20               ld a,$20      ; load initial LED pattern into RAM
+2005 32 80 30            ld (RAMCELL),a
+2008 06 20       		ld b,$20
+200A 21 33 20    		ld hl,hlo
+200D 7E          prt_hlo:	ld a,(hl)
+200E FE 00       		cp 0
+2010 28 06       		jr z, main_loop
+2012 CD 93 FD    		call jSIOA_TX
+2015 23          		inc hl
+2016 18 F5       		jr prt_hlo
+2018 3A 80 30    main_loop:	ld a,(RAMCELL)      ; load the byte from RAM
+201B 3C                  inc a
+201C E6 7F       		and a,$7f
+201E FE 7F               cp $7f
+2020 20 02               jr nz,storeByte
+2022 3E 20               ld a,$20
+2024 D3 1E       storeByte:	out (PIO_DB),a      ; send the pattern to the PIO
+2026 32 80 30            ld (RAMCELL),a      ; write the new pattern into RAM for later reload
+2029 0E FF               ld c,0xff           ; a little delay
+202B CD 52 20            call delay
+202E 10 E8               djnz main_loop           ; repeat 256 times
+2030 F3          		di
+2031 97          		sub a
+2032 C9          		ret
+2033 0D 0A 48 65 6C 6C 6F 72 6C 64 21 0D 0A 00 hlo:	db $0d,$0a,"Hellorld!",$0d,$0a,$0
+2041 3E CF               ld a,11001111b      ; mode 3 (bit control)
+2043 D3 1F               out (PIO_CB),a
+2045 3E 00               ld a,00000000b      ; set pins of port A to OUTPUT
+2047 D3 1F               out (PIO_CB),a
+2049 3E CF               ld a,11001111b      ; mode 3 (bit control)
+204B D3 1D               out (PIO_CA),a
+204D 3E 00               ld a,00000000b      ; set pins of port A to OUTPUT
+204F D3 1D               out (PIO_CA),a
+2051 C9                  ret
+2052 C5          delay:	push bc
+2053 06 FF       loop1:	ld b,0xff
+2055 10 FE       loop2:	djnz loop2
+2057 CD 99 FD    		call jSIOA_RX_CHK
+205A 28 06       		jr z,loop3
+205C 32 81 30    		ld (RAMCELL+1),a
+205F CD 93 FD    		call jSIOA_TX
+2062 0D          loop3:  dec c
+2063 20 EE               jr nz, loop1
+2065 C1                  pop bc
+2066 C9                  ret
+# End of file C:\zeus\mintz80_monitor\sio_no_int_test.asm
