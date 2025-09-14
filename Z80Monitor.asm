@@ -8,7 +8,7 @@
 ;***************************************************************************
 
 VERSMYR:    EQU     "1"
-VERSMIN:    EQU     "0"
+VERSMIN:    EQU     "1"
 
             INCLUDE "CONSTANTS.asm" ; copy or edit one of the 
                                   ; CONSTANTS-aaaa-pp.asm files to
@@ -16,58 +16,12 @@ VERSMIN:    EQU     "0"
 SCAN:        EQU     005FEh
 
 ;ROM_BOTTOM:  EQU    0F000h		; Bottom address of ROM
-ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
+;ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 
 ;RAM_BOTTOM:  EQU    01800h		; Bottom address of RAM
 ;RAM_TOP:     EQU    RAM_BOTTOM + 1FFFh		; Top address of RAM	
-RAM_TOP:     EQU    $ffff
 
 ;UART_BASE:  EQU     0E0h        ; Base port address, DART uses 4 ports
-
-MONVARS	EQU	RAM_TOP - $1FF	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
-MPFMON:     EQU    0000h
-ASCDMPBUF:  EQU    MONVARS + 0h      ;Buffer to construct ASCII part of memory dump
-ASCDMPEND:  EQU    MONVARS + 10h     ;End of buffer, fill with EOS
-DMPADDR:    EQU    MONVARS + 11h     ;Last dump address
-MVADDR:     EQU    MONVARS + 12h     ; 6 bytes: start-address, end-address, dest-address or fill-value (23, 24, 25, 26, 27, 28)
-ERRFLAG:    EQU    MONVARS + 18h     ; Location to store 
-MUTE:       EQU    MONVARS + 19h     ; 0 - print received chars, 1 - do not print received chars
-ULSIZE:     EQU    MONVARS + 1Ah     ; actual size of current/last hex-intel message
-IECHECKSUM: EQU    MONVARS + 1Bh        ; hex-intel record checksum
-IECADDR:    EQU    MONVARS + 1Ch        ; hex-intel record address (2 bytes)
-IERECTYPE:  EQU    MONVARS + 1Eh        ; hex-intel record type
-DEBUG:      EQU    MONVARS + 1Fh
-MTPHFLAG:	 EQU    MONVARS + 1Fh     ; Phase counter: phase 1 doesn't check old value (being unknown)
-RX_READ_P:  EQU    MONVARS + 20h     ; read pointer
-RX_WRITE_P: EQU    MONVARS + 22h     ; write pointer
-CHKSUM_C:   EQU    MONVARS + 24h     ; uses 3 bytes
-CF_SECCNT:  EQU    MONVARS + 27h 
-CF_LBA0:    EQU    MONVARS + 28h
-CF_LBA1:    EQU    MONVARS + 29h
-CF_LBA2:    EQU    MONVARS + 2Ah
-CF_LBA3:    EQU    MONVARS + 2Bh
-UPLOADBUF:  EQU    MONVARS + 2Ch     ; Buffer for hex-intel upload. Allows up to 32 bytes (20h) per line.
-ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 bytes...
-ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
-MSGBUF:     EQU    UPLOADBUF
-
-; Error codes intel Hex record
-E_NONE:     EQU    00h
-E_NOHEX:    EQU    01h			; input char not 0-9, A-F
-E_PARAM:    EQU    02h			; inconsistent range; start > end
-E_BUFSIZE:  EQU    03h			; size larger than buffer
-E_HITYP:    EQU    04h			; unsupported hex-intel record type
-E_HICKSM:   EQU    05h			; hex-intel record checksum error
-E_HIEND:    EQU    06h			; hex-intel end record type found
-
-HI_DATA:    EQU    00h
-HI_END:     EQU    01h
-
-ESC:        EQU    01Bh		; 
-EOS:        EQU    000h		; End of string
-MUTEON:     EQU    001h
-LF:         EQU    00Ah
-CR:         EQU    00Dh
 
 
             ORG ROM_BOTTOM
@@ -83,6 +37,9 @@ R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
             DEFS    3
             
             ORG ROM_BOTTOM + 24     ; room for eight routine entries
+
+		include "jumptab.asm"		;
+
 ;***************************************************************************
 ;MAIN
 ;Function: Entrance to user program
@@ -99,10 +56,16 @@ MAIN:
 	call delay		; looks like Z80 needs this delay to successfully write to IO ports
 	ld a,$01		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
-	call ayinit
+	call ymzinit
 	ld bc,$0200	; bc = duration
 	ld a,$06		; a = pitch
 	call beep
+	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
+	call PIO_INIT		; init PIO
+	call CTC_INIT_ALL     ; init CTC
+	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
+	call SIO_A_INT_SET	; initialize SIOA interrupts
+	call SIO_A_EI		; more interrupt code
 dio:	ld hl,hellostr
 	call PRINT_STRING
 	call dmpio
@@ -141,13 +104,15 @@ RESET_COMMAND:
 ;PRINT_MON_HDR
 ;Function: Print out program header info
 ;***************************************************************************
-MNMSG1:     DEFB    0DH, 0Ah, "AL80 Computer", 09h, 09h, 09h, "2015 MCook"
+MNMSG1:     DEFB    0DH, 0Ah, "MintZ80 Computer", 09h, 09h, 09h, "2015 MCook"
 MNMSG2:     DEFB    0DH, 0Ah, " adaptation to MPF-1 / Z80 DART", 09h, "2022 F.J.Kraan", 0Dh, 0Ah
-            DEFB    "Adaptation to AL80 2025 Artur's Lab", 0Dh, 0Ah
+            DEFB    "Adaptation to MintZ80 2025 Artur's Lab", 0Dh, 0Ah
 MNMSG3A:    DEFB    "Monitor v", VERSMYR, ".", VERSMIN, ", ROM: ", EOS
 MNMSG3B:    DEFB    "h, RAM: ", EOS
-MNMSG3C:    DEFB    "h, DART: ", EOS
-MNMSG3D:    DEFB    "h", 0Dh, 0AH, 0Dh, 0AH
+MNMSG3C:    DEFB    "h, PIO: ", EOS
+MNMSG3D:    DEFB    "h, CTC: ", EOS
+MNMSG3E:    DEFB    "h, SIO: ", EOS
+MNMSG3F:    DEFB    "h", 0Dh, 0AH, 0Dh, 0AH
 MONHLP:     DEFB    09h," Input ? for command list", 0Dh, 0AH, EOS
 MONERR:     DEFB    0Dh, 0AH, "Error in params: ", EOS
 
@@ -161,11 +126,19 @@ PRINT_MON_HDR:
         CALL    PRINT_STRING
         LD      HL, RAM_BOTTOM
         CALL    PRINTHWORD
-        LD      HL, MNMSG3C         ; 3rd part UART
+        LD      HL, MNMSG3C         ; 3rd part PIO
         CALL    PRINT_STRING
-        LD      A, UART_BASE
+        LD      A, PIO_BASE
         CALL    PRINTHBYTE
-        LD      HL, MNMSG3D         ; 4th part, line ending
+        LD      HL, MNMSG3D         ; 4th part CTC
+        CALL    PRINT_STRING
+        LD      A, CTC_BASE
+        CALL    PRINTHBYTE
+        LD      HL, MNMSG3E         ; 5th part SIO
+        CALL    PRINT_STRING
+        LD      A, SIO_BASE
+        CALL    PRINTHBYTE
+        LD      HL, MNMSG3F         ; 6th part, line ending
         CALL    PRINT_STRING
         RET
 
@@ -237,10 +210,9 @@ MON_COMMAND:    ; Inserted ERROR_CHK for all commands requiring input
         CALL    ERROR_CHK
         RET
         
-UTERMTST:
                         ; micro terminal: scans MPF keyboard and sends ASCII 
                         ; '0'-'F' for the hex keys and '10-1F' for other keys.
-        CALL    RX_CHK
+UTERMTST:	CALL    RX_CHK
         RET     NZ      ; Return on serial received char
         LD      IX, SCTXT
         CALL    SCAN
@@ -266,8 +238,7 @@ SCTXT   DB      10000111b    ; t
         DB      10001111b    ; E
         DB      10101110b    ; S
 
-ERROR_CHK:
-        LD      A, (ERRFLAG)
+ERROR_CHK:	LD      A, (ERRFLAG)
         CP      E_NONE
         RET     Z
         LD      HL, MONERR
@@ -275,8 +246,7 @@ ERROR_CHK:
         LD      A, (ERRFLAG)
         CALL    PRINTHBYTE
         CALL    PRINT_NEW_LINE
-CLEAR_ERROR:
-        PUSH    AF
+CLEAR_ERROR:	PUSH    AF
         LD      A, E_NONE
         LD      (ERRFLAG), A
         POP     AF
@@ -286,8 +256,9 @@ CLEAR_ERROR:
 ;        INCLUDE	"DARTDriver.asm"
         INCLUDE	"MONCommands.asm"
         INCLUDE	"CONIO.asm"
-;        INCLUDE CFDriver.asm
+        INCLUDE "CFDriver.asm"
 
+;		jmp 0
 MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed) 
 		
 
@@ -307,6 +278,8 @@ MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed)
 ; $78 - 60ms -> 16.666Hz
 ; $9b - 99.6ms -> 10.04Hz
 ; $9c - 100.8ms
+; at CPU CLK = 10MHz:
+; $01 - 52us -> 19.23kHz
 
 del00:	ld a,$00		; delay loop
 delay:	push af			; count delay
@@ -356,9 +329,30 @@ memmap_init:	in a,(beepr)	; unlock memmap
 	out (beepr),a	; lock memmap
 	ret
 
-		include "aydrvr.asm";
+; Coopy jump table from EEPROM to RAM so that routines can be swapped out
+JUMPTAB_INIT:	push AF
+			push HL
+			push DE
+			push BC
+
+			ld hl,JUMPTABR
+			ld de,JUMPTAB
+			ld bc,JUMPTAB_END-JUMPTABR
+			ldir
+
+			pop BC
+			pop DE
+			pop HL
+			pop AF
+			ret
+
+		include "PIODriver.asm"
+		include "CTCDriver.asm"
+		include "SIODriver.asm"
+		include "ymzdrvr.asm";
 
 		include "eeprom_prog.asm";
+;		include "eeprom_write.asm";
 
 endprog	equ $
 
