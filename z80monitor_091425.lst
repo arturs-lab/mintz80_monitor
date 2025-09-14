@@ -1,1636 +1,1639 @@
 # File C:\zeus\mintz80_monitor\Z80Monitor.asm
-0000 C3 DB 00    R_MAIN:     JP      MAIN            ; init DART and starts command loop
-0003 C3 50 03    R_U_INIT:   JP      UART_INIT       ; configures DARTchannel B 
-0006 C3 B8 0E    R_PRT_NL:   JP      PRINT_NEW_LINE  ; sends a CR LF
-0009 C3 86 0E    R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
+0000 C3 68 03    R_MAIN:     JP      MAIN            ; init DART and starts command loop
+0003 C3 DD 05    R_U_INIT:   JP      UART_INIT       ; configures DARTchannel B 
+0006 C3 45 11    R_PRT_NL:   JP      PRINT_NEW_LINE  ; sends a CR LF
+0009 C3 13 11    R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
 000C 00 00 00                DEFS    3   ; spare  entries
 000F 00 00 00                DEFS    3
 0012 00 00 00                DEFS    3
 0015 00 00 00                DEFS    3
 # End of file C:\zeus\mintz80_monitor\Z80Monitor.asm
-# File C:\zeus\mintz80_monitor\jumptab.asm
-0018 C3 1A 12    jJUMPTAB_INIT	jp JUMPTAB_INIT
-001B C3 50 0F    jPRINTHNIB		jp PRINTHNIB
-001E C3 59 0F    jPRINTHBYTE:	jp PRINTHBYTE
-0021 C3 6A 0F    jPRINTHWORD	jp PRINTHWORD
-0024 C3 91 0E    jPRINT_CHAR:	jp PRINT_CHAR
-0027 C3 86 0E    jPRINT_STRING:	jp PRINT_STRING
-002A C3 B8 0E    jPRINT_NEW_LINE	jp PRINT_NEW_LINE
-002D C3 DB 0E    jGETHEXNIB		jp GETHEXNIB
-0030 C3 F9 0E    jGETHEXBYTE	jp GETHEXBYTE
-0033 C3 21 0F    jGETHEXWORD	jp GETHEXWORD
-0036 C3 8A 0E    jGET_CHAR		jp GET_CHAR
-0039 C3 A4 0F    jCHARS2BYTE	jp CHARS2BYTE
-003C C3 89 03    jUART_RX_RDY	jp UART_RX_RDY
-003F C3 97 03    jUART_RX		jp UART_RX
-0042 C3 92 03    jRX_CHK		jp RX_CHK
-0045 C3 7A 03    jUART_TX_RDY	jp UART_TX_RDY
-0048 C3 83 03    jUART_TX		jp UART_TX
-004B C3 65 03    jUART_PRNT_SP	jp UART_PRNT_SP
-004E C3 6C 03    jUART_PRNT_STR	jp UART_PRNT_STR
-0051 C3 A3 0E    jTO_UPPER		jp TO_UPPER
-0054 C3 C5 0E    jCHAR_ISHEX	jp CHAR_ISHEX
-0057 C3 3E 0F    jNIB2CHAR		jp NIB2CHAR
-005A C3 75 0F    jCHAR2NIB		jp CHAR2NIB
-005D C3 D1 11    jdel00:		jp del00
-0060 C3 D3 11    jdelay:		jp delay
-0063 C3 DC 11    jbeep:		jp beep
-0066 C3 25 13    jymzinit		jp ymzinit
-0069 C3 3A 13    jymzwr		jp ymzwr
-006C C3 40 13    jymzsetreg		jp ymzsetreg
-006F C3 B6 13    jepp_prep		jp epp_prep
-0072 C3 C8 13    jepp_upda		jp epp_upda
-0075 C3 1D 14    jepp_prog		jp epp_prog
-0078 C3 3F 12    jCTC_INIT_ALL	jp CTC_INIT_ALL
-007B C3 51 12    jCTC0_INIT		jp CTC0_INIT
-007E C3 51 12    jCTC1_INIT		jp CTC0_INIT
-0081 C3 51 12    jCTC2_INIT		jp CTC0_INIT
-0084 C3 51 12    jCTC3_INIT		jp CTC0_INIT
-0087 C3 71 12    jCTC_TC_INIT	jp CTC_TC_INIT
-008A C3 9F 12    jSIO_INIT		jp SIO_INIT
-008D C3 86 12    jSIOA_INIT		jp SIOA_INIT
-0090 C3 A2 12    jSIOB_INIT		jp SIOB_INIT
-0093 C3 B3 12    jSIO_A_INT_SET	jp SIO_A_INT_SET
-0096 C3 BC 12    jSIOA_RTS_OFF	jp SIOA_RTS_OFF
-0099 C3 C5 12    jSIOA_RTS_ON	jp SIOA_RTS_ON
-009C C3 CE 12    jSIO_A_DI		jp SIO_A_DI
-009F C3 D7 12    jSIO_A_EI		jp SIO_A_EI
-00A2 C3 E0 12    jSIOA_PRNT_SP	jp SIOA_PRNT_SP
-00A5 C3 E7 12    jSIOA_PRNT_STR	jp SIOA_PRNT_STR
-00A8 C3 F5 12    jSIOA_TX_RDY	jp SIOA_TX_RDY
-00AB C3 02 13    jSIOA_TX		jp SIOA_TX
-00AE C3 08 13    jSIOA_RX_WAIT	jp SIOA_RX_WAIT
-00B1 C3 14 13    jSIOA_RX_CHK	jp SIOA_RX_CHK
-00B4 C3 1F 13    jSIOA_RX		jp SIOA_RX
-00B7 C3 2E 12    jPIO_INIT		jp PIO_INIT
-00BA C3 BB 0F    jCF_INIT:		jp CF_INIT
-00BD C3 FD 0F    jCF_LP_BUSY:	jp CF_LP_BUSY
-00C0 C3 05 10    jCF_LP_CMD_RDY:	jp CF_LP_CMD_RDY
-00C3 C3 0F 10    jCF_LP_DAT_RDY:	jp CF_LP_DAT_RDY
-00C6 C3 19 10    jCF_RD_CMD:	jp CF_RD_CMD
-00C9 C3 2F 10    jCF_RD_SECT:	jp CF_RD_SECT
-00CC C3 B6 11    jCF_WR_CMD:	jp CF_WR_CMD
-00CF C3 00 00    jj:	jp 0
-00D2 DB D8       epp_toggle:	in a,(memmap)	; call this at $ffnn after executing epp_prep
-00D4 EE 02       		xor a,$02
-00D6 D3 D8       		out (memmap),a
-00D8 C3 00 00    		jp $0
-# End of file C:\zeus\mintz80_monitor\jumptab.asm
-# File C:\zeus\mintz80_monitor\Z80Monitor.asm
-00DB F3          	di
-00DC 3E 7B       	ld a,$7b	; disable wdt
-00DE D3 F0       	out ($f0),a
-00E0 3E B1       	ld a,$b1
-00E2 D3 F1       	out ($f1),a
-00E4 31 FF FF    	ld sp,RAM_TOP
-00E7 3E 20       	ld a,$20
-00E9 CD D3 11    	call delay		; looks like Z80 needs this delay to successfully write to IO ports
-00EC 3E 01       	ld a,$01		; (SYSCLK MHz/2/(value+1))
-00EE D3 D0       	out (turbo),a
-00F0 CD 25 13    	call ymzinit
-00F3 01 00 02    	ld bc,$0200	; bc = duration
-00F6 3E 06       	ld a,$06		; a = pitch
-00F8 CD DC 11    	call beep
-00FB CD 1A 12    	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
-00FE CD 2E 12    	call PIO_INIT		; init PIO
-0101 CD 3F 12    	call CTC_INIT_ALL     ; init CTC
-0104 CD 9F 12    	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
-0107 CD B3 12    	call SIO_A_INT_SET	; initialize SIOA interrupts
-010A CD D7 12    	call SIO_A_EI		; more interrupt code
-010D 21 18 01    dio:	ld hl,hellostr
-0110 CD 86 0E    	call PRINT_STRING
-0113 CD EB 11    	call dmpio
-0116 18 19       	jr gomain
-0118 0D 0A 48 65 6C 6C 6F 72 6C 64 0D 0A 43 50 4C 44 20 63 6F 6E 66 69 67 3A 00 hellostr:	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
-0131 31 FF FF    gomain:	LD SP,RAM_TOP		;Load the stack pointer for stack operations.
-0134 CD 50 03    	CALL UART_INIT		;Initialize UART
-0137 CD 3C 02    	CALL PRINT_MON_HDR	;Print the monitor header info
-013A 3E 00       	LD A, 00h
-013C 32 11 FE    	LD (DMPADDR), A
-013F 3E FF       	LD A, 0FFh		; FF00h and next should result in 0000h
-0141 32 12 FE    	LD (DMPADDR+1), A
-0144 CD 48 03    	CALL CLEAR_ERROR
-0147 CD 81 02    	CALL MON_PRMPT_LOOP	;Monitor user prompt loop
-014A 76          	HALT
-014B 21 CF 11    	LD HL,MON_CLS
-014E CD 86 0E    	CALL PRINT_STRING
-0151 C9          	RET
-0152 C3 00 00    	JP MPFMON		;Jumps to 0000 (MPF-1 monitor re-entry)	
-0155 0D 0A 4D 69 6E 74 5A 38 30 20 43 6F 6D 70 75 74 65 72 09 09 09 32 30 31 35 20 4D 43 6F 6F 6B MNMSG1:     DEFB    0DH, 0Ah, "MintZ80 Computer", 09h, 09h, 09h, "2015 MCook"
-0174 0D 0A 20 61 64 61 70 74 61 74 69 6F 6E 20 74 6F 20 4D 50 46 2D 31 20 2F 20 5A 38 30 20 44 41 52 54 09 32 30 32 32 20 46 2E 4A 2E 4B 72 61 61 6E 0D 0A MNMSG2:     DEFB    0DH, 0Ah, " adaptation to MPF-1 / Z80 DART", 09h, "2022 F.J.Kraan", 0Dh, 0Ah
-01A6 41 64 61 70 74 61 74 69 6F 6E 20 74 6F 20 4D 69 6E 74 5A 38 30 20 32 30 32 35 20 41 72 74 75 72 27 73 20 4C 61 62 0D 0A             DEFB    "Adaptation to MintZ80 2025 Artur's Lab", 0Dh, 0Ah
-01CE 4D 6F 6E 69 74 6F 72 20 76 31 2E 31 2C 20 52 4F 4D 3A 20 00 MNMSG3A:    DEFB    "Monitor v", VERSMYR, ".", VERSMIN, ", ROM: ", EOS
-01E2 68 2C 20 52 41 4D 3A 20 00 MNMSG3B:    DEFB    "h, RAM: ", EOS
-01EB 68 2C 20 50 49 4F 3A 20 00 MNMSG3C:    DEFB    "h, PIO: ", EOS
-01F4 68 2C 20 43 54 43 3A 20 00 MNMSG3D:    DEFB    "h, CTC: ", EOS
-01FD 68 2C 20 53 49 4F 3A 20 00 MNMSG3E:    DEFB    "h, SIO: ", EOS
-0206 68 0D 0A 0D 0A MNMSG3F:    DEFB    "h", 0Dh, 0AH, 0Dh, 0AH
-020B 09 20 49 6E 70 75 74 20 3F 20 66 6F 72 20 63 6F 6D 6D 61 6E 64 20 6C 69 73 74 0D 0A 00 MONHLP:     DEFB    09h," Input ? for command list", 0Dh, 0AH, EOS
-0228 0D 0A 45 72 72 6F 72 20 69 6E 20 70 61 72 61 6D 73 3A 20 00 MONERR:     DEFB    0Dh, 0AH, "Error in params: ", EOS
-023C CD 4B 01            CALL    CLEAR_SCREEN        ;Clear the terminal screen
-023F 21 55 01            LD      HL, MNMSG1          ;Print some messages
-0242 CD 86 0E            CALL    PRINT_STRING
-0245 21 00 00            LD      HL, ROM_BOTTOM
-0248 CD 6A 0F            CALL    PRINTHWORD
-024B 21 E2 01            LD      HL, MNMSG3B         ; 2nd part, RAM
-024E CD 86 0E            CALL    PRINT_STRING
-0251 21 00 20            LD      HL, RAM_BOTTOM
-0254 CD 6A 0F            CALL    PRINTHWORD
-0257 21 EB 01            LD      HL, MNMSG3C         ; 3rd part PIO
-025A CD 86 0E            CALL    PRINT_STRING
-025D 3E 1C               LD      A, PIO_BASE
-025F CD 59 0F            CALL    PRINTHBYTE
-0262 21 F4 01            LD      HL, MNMSG3D         ; 4th part CTC
-0265 CD 86 0E            CALL    PRINT_STRING
-0268 3E 10               LD      A, CTC_BASE
-026A CD 59 0F            CALL    PRINTHBYTE
-026D 21 FD 01            LD      HL, MNMSG3E         ; 5th part SIO
-0270 CD 86 0E            CALL    PRINT_STRING
-0273 3E 18               LD      A, SIO_BASE
-0275 CD 59 0F            CALL    PRINTHBYTE
-0278 21 06 02            LD      HL, MNMSG3F         ; 6th part, line ending
-027B CD 86 0E            CALL    PRINT_STRING
-027E C9                  RET
-027F 3E 00       MON_PROMPT: DEFB ">", EOS
-0281 3E 00               LD      A, 00h
-0283 32 19 FE            LD      (MUTE), A       ; Enables echo of received chars
-0286 21 7F 02            LD      HL,MON_PROMPT   ; Print monitor prompt
-0289 CD 86 0E            CALL    PRINT_STRING
-028C CD 8A 0E            CALL    GET_CHAR        ; Get a character from user into Acc
-028F CD 91 0E            CALL    PRINT_CHAR
-0292 FE 0D               CP      CR
-0294 28 03               JR      Z, _MPL_CR
-0296 CD B8 0E            CALL    PRINT_NEW_LINE  ; Print a new line
-0299 CD A1 02            CALL    MON_COMMAND     ; Respond to user input
-029C CD B8 0E            CALL    PRINT_NEW_LINE  ; Print a new line
-029F 18 E0               JR      MON_PRMPT_LOOP
-02A1 CD 48 03            CALL    CLEAR_ERROR
-02A4 FE 3F               CP      "?"
-02A6 CC F3 05            CALL    Z,HELP_COMMAND
-02A9 FE 44               CP      "D"
-02AB CC 63 06            CALL    Z,MDCMD
-02AE FE 43               CP      "C"
-02B0 CC 4B 01            CALL    Z,CLEAR_SCREEN
-02B3 FE 4E               CP      "N"
-02B5 CC 06 09            CALL    Z,RICOMMAND
-02B8 FE 4F               CP      "O"
-02BA CC 54 09            CALL    Z,PW_COMMAND
-02BD FE 50               CP      "P"
-02BF CC 84 08            CALL    Z,PSCOMMAND
-02C2 FE 51               CP      "Q"
-02C4 CC 07 03            CALL    Z,UTERMTST
-02C7 FE 52               CP      "R"
-02C9 CC 52 01            CALL    Z,RESET_COMMAND
-02CC FE 4D               CP      "M"
-02CE CC 06 07            CALL    Z,MOVE_COMMAND
-02D1 FE 46               CP      "F"
-02D3 CC A8 07            CALL    Z,FILL_COMMAND
-02D6 FE 47               CP      "G"
-02D8 CC B0 09            CALL    Z,GO_COMMAND
-02DB FE 4B               CP      "K"
-02DD CC DF 09            CALL    Z,CL_COMMAND
-02E0 FE 2B               CP      "+"
-02E2 CC 18 08            CALL    Z,NEXTP_COMMAND
-02E5 FE 2D               CP      "-"
-02E7 CC 28 08            CALL    Z,PREVP_COMMAND
-02EA FE 45               CP      "E"
-02EC CC 38 08            CALL    Z,EDIT_COMMAND
-02EF FE 3A               CP      ":"
-02F1 CC BD 0A            CALL    Z,HEXI_COMMAND
-02F4 FE 53               CP      "S"
-02F6 CC 4B 0A            CALL    Z,CCKSM_COMMAND
-02F9 FE 54               CP      "T"
-02FB CC C9 0C            CALL    Z, TRAM_COMMAND
-02FE FE 5A               CP      "Z"
-0300 CC 87 0B            CALL    Z,REGDUMP_COMMAND
-0303 CD 33 03            CALL    ERROR_CHK
-0306 C9                  RET
-0307 CD 92 03    UTERMTST:	CALL    RX_CHK
-030A C0                  RET     NZ      ; Return on serial received char
-030B DD 21 2D 03         LD      IX, SCTXT
-030F CD FE 05            CALL    SCAN
-0312 FE 10               CP      010h    ; A - 010h
-0314 38 0A               JR      C, _UTHEX
-0316 CD 59 0F            CALL    PRINTHBYTE
-0319 3E 20               LD      A, " "
-031B CD 91 0E            CALL    PRINT_CHAR
-031E 18 E7               JR      UTERMTST
-0320 CD 3E 0F            CALL    NIB2CHAR
-0323 CD 91 0E            CALL    PRINT_CHAR
-0326 3E 20               LD      A, " "
-0328 CD 91 0E            CALL    PRINT_CHAR
-032B 18 DA               JR      UTERMTST
-032D 87          SCTXT   DB      10000111b    ; t
-032E AE                  DB      10101110b    ; S
-032F 87                  DB      10000111b    ; t
-0330 43                  DB      01000011b    ; r.
-0331 8F                  DB      10001111b    ; E
-0332 AE                  DB      10101110b    ; S
-0333 3A 18 FE    ERROR_CHK:	LD      A, (ERRFLAG)
-0336 FE 00               CP      E_NONE
-0338 C8                  RET     Z
-0339 21 28 02            LD      HL, MONERR
-033C CD 86 0E            CALL    PRINT_STRING
-033F 3A 18 FE            LD      A, (ERRFLAG)
-0342 CD 59 0F            CALL    PRINTHBYTE
-0345 CD B8 0E            CALL    PRINT_NEW_LINE
-0348 F5          CLEAR_ERROR:	PUSH    AF
-0349 3E 00               LD      A, E_NONE
-034B 32 18 FE            LD      (ERRFLAG), A
-034E F1                  POP     AF
-034F C9                  RET
-# End of file C:\zeus\mintz80_monitor\Z80Monitor.asm
-# File C:\zeus\mintz80_monitor\UARTDriver.asm
-0350 3E 80       UART_INIT:		LD     A,80h				;Mask to Set DLAB Flag
-0352 D3 0B       			OUT    (UART3),A
-0354 3E 0C       			LD     A,12					;Divisor = 12 @ 9600bps w/ 1.8432 Mhz
-0356 D3 08       			OUT    (UART0),A			;Set BAUD rate to 9600
-0358 3E 00       			LD     A,00
-035A D3 09       			OUT    (UART1),A			;Set BAUD rate to 9600
-035C 3E 03       			LD     A,03h
-035E D3 0B       			OUT    (UART3),A			;Set 8-bit data, 1 stop bit, reset DLAB Flag
-0360 3E 00       			LD	   A,00h
-0362 D3 09       			OUT    (UART1),A			;no interrupts
-0364 C9          			RET		
-0365 E1          UART_PRNT_SP:	pop HL
-0366 CD 6C 03    			call UART_PRNT_STR
-0369 23          			inc hl
-036A E5          			push hl
-036B C9          			ret
-036C F5          UART_PRNT_STR:	PUSH	AF
-036D 7E          			LD		A,(HL)
-036E FE 00                   CP		EOS					;Test for end byte
-0370 28 06                   JR		Z,UART_END_PRNT_STR	;Jump if end byte is found
-0372 CD 83 03    			CALL	UART_TX
-0375 23                      INC		HL					;Increment pointer to next char
-0376 18 F5                   JR		UARTPRNTSTRLP	;Transmit loop
-0378 F1          			POP		AF
-0379 C9          			RET	 
-037A F5          UART_TX_RDY:	PUSH 	AF
-037B DB 0D       			IN		A,(UART5)			;Fetch the control register
-037D CB 6F       			BIT 	5,A					;Bit will be set if UART is ready to send
-037F 28 FA       			JR		Z,UARTTXRDY_LP		
-0381 F1          			POP     AF
-0382 C9          			RET
-0383 CD 7A 03    UART_TX:		CALL  UART_TX_RDY			;Make sure UART is ready to receive
-0386 D3 08       			OUT   (UART0),A				;Transmit character in A to UART
-0388 C9          			RET
-0389 F5          UART_RX_RDY:	PUSH 	AF					
-038A DB 0D       			IN		A,(UART5)			;Fetch the control register
-038C CB 47       			BIT 	0,A					;Bit will be set if UART is ready to receive
-038E 28 FA       			JR		Z,UART_RXRDY_LP		
-0390 F1          			POP     AF
-0391 C9          			RET
-0392 DB 0D       RX_CHK:		IN		A,(UART5)			;Fetch the control register
-0394 E6 01       			AND	1					;Mask other bits, has some char arrived?
-0396 C9          			RET
-0397 CD 89 03    UART_RX:		CALL  UART_RX_RDY			;Make sure UART is ready to receive
-039A DB 08       			IN    A,(UART0)				;Receive character in UART to A
-039C C9          			RET			
-039D 3E 55       uart_test	ld a,$55
-039F D3 0F       	out (UART7),a
-03A1 DB 0F       	in a,(UART7)
-03A3 FE 55       	cp a,$55
-03A5 20 0A       	jr nz,ut1
-03A7 3E AA       	ld a,$aa
-03A9 D3 0F       	out (UART7),a
-03AB DB 0F       	in a,(UART7)
-03AD FE AA       	cp a,$aa
-03AF 28 08       	jr z,ut2
-03B1 01 00 04    ut1:	ld bc,$0400	; bc = duration
-03B4 3E 04       	ld a,$04		; a = pitch
-03B6 CD DC 11    	call beep
-03B9 C9          ut2:	ret
-# End of file C:\zeus\mintz80_monitor\UARTDriver.asm
-# File C:\zeus\mintz80_monitor\MONCommands.asm
-03BA 5A 4D 43 38 30 20 4D 6F 6E 69 74 6F 72 20 43 6F 6D 6D 61 6E 64 20 4C 69 73 74 0D 0A HLPMSG1: DEFB "ZMC80 Monitor Command List", 0Dh, 0Ah
-03D6 3F 20 2D 20 76 69 65 77 20 63 6F 6D 6D 61 6E 64 20 6C 69 73 74 0D 0A HLPMSG2: DEFB "? - view command list", 0Dh, 0Ah
-03ED 43 20 2D 20 63 6C 65 61 72 20 73 63 72 65 65 6E 0D 0A HLPMSGc: DEFB "C - clear screen", 0Dh, 0Ah
-03FF 44 20 2D 20 70 72 69 6E 74 20 31 30 30 68 20 62 79 74 65 73 20 66 72 6F 6D 20 73 70 65 63 69 66 69 65 64 20 6C 6F 63 61 74 69 6F 6E 0D 0A HLPMSGd: DEFB "D - print 100h bytes from specified location", 0Dh, 0Ah
-042D 45 20 2D 20 65 64 69 74 20 62 79 74 65 73 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A HLPMSGe: DEFB "E - edit bytes in memory", 0Dh, 0Ah
-0447 46 20 2D 20 66 69 6C 6C 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 20 77 69 74 68 20 76 61 6C 75 65 0D 0A HLPMSGf: DEFB "F - fill memory range with value", 0Dh, 0Ah
-0469 47 20 2D 20 6A 75 6D 70 20 74 6F 20 6D 65 6D 6F 72 79 20 61 64 64 72 65 73 73 0D 0A HLPMSGg: DEFB "G - jump to memory address", 0Dh, 0Ah
-0485 4B 20 2D 20 63 61 6C 6C 20 74 6F 20 6D 65 6D 6F 72 79 20 61 64 64 72 65 73 73 0D 0A HLPMSGk: DEFB "K - call to memory address", 0Dh, 0Ah
-04A1 4D 20 2D 20 63 6F 70 79 20 62 79 74 65 73 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A HLPMSGm: DEFB "M - copy bytes in memory", 0Dh, 0Ah
-04BB 4E 20 2D 20 72 65 61 64 20 49 4F 20 70 6F 72 74 0D 0A          DEFB "N - read IO port", 0Dh, 0Ah
-04CD 4F 20 2D 20 77 72 69 74 65 20 62 79 74 65 20 74 6F 20 6F 75 74 70 75 74 20 70 6F 72 74 0D 0A HLPMSGo: DEFB "O - write byte to output port", 0Dh, 0Ah
-04EC 50 20 2D 20 70 72 69 6E 74 20 70 6F 72 74 20 73 63 61 6E 20 28 30 30 2D 46 46 29 0D 0A HLPMSGp: DEFB "P - print port scan (00-FF)", 0Dh, 0Ah
-0509 51 20 2D 20 74 65 73 74 20 4D 50 46 20 6B 65 79 62 6F 61 72 64 0D 0A HLPMSGq: DEFB "Q - test MPF keyboard", 0Dh, 0Ah
-0520 52 20 2D 20 6D 6F 6E 69 74 6F 72 20 72 65 73 65 74 0D 0A HLPMSGr: DEFB "R - monitor reset", 0Dh, 0Ah
-0533 53 20 2D 20 63 61 6C 63 75 6C 61 74 65 20 63 68 65 63 6B 73 75 6D 20 66 6F 72 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 0D 0A HLPMSGs: DEFB "S - calculate checksum for memory range", 0Dh, 0Ah
-055C 54 20 2D 20 74 65 73 74 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 0D 0A HLPMSGt: DEFB "T - test memory range", 0Dh, 0Ah
-0573 5A 20 2D 20 64 75 6D 70 20 75 73 65 72 20 72 65 67 69 73 74 65 72 73 20 28 53 54 45 50 29 0D 0A HLPMSGz: DEFB "Z - dump user registers (STEP)", 0Dh, 0Ah
-0593 2B 20 2D 20 70 72 69 6E 74 20 6E 65 78 74 20 62 6C 6F 63 6B 20 6F 66 20 6D 65 6D 6F 72 79 0D 0A HLPMSG8: DEFB "+ - print next block of memory", 0Dh, 0Ah
-05B3 2D 20 2D 20 70 72 69 6E 74 20 70 72 65 76 69 6F 75 73 20 62 6C 6F 63 6B 20 6F 66 20 6D 65 6D 6F 72 79 0D 0A HLPMSG9: DEFB "- - print previous block of memory", 0Dh, 0Ah
-05D7 3A 20 2D 20 4C 6F 61 64 20 68 65 78 2D 69 6E 74 65 6C 20 72 65 63 6F 72 64 0D 0A 00 HLPMSGA: DEFB ": - Load hex-intel record", 0DH, 0AH, EOS
-05F3 21 BA 03            LD      HL, HLPMSG1     ;Print some messages
-05F6 CD 86 0E            CALL    PRINT_STRING
-05F9 3E 00               LD      A, EOS          ;Load $FF into Acc so MON_COMMAND finishes
-05FB C9                  RET
-05FC 4D 65 6D 6F 72 79 20 44 75 6D 70 0D 0A MDC_1: DEFB "Memory Dump", 0Dh, 0Ah
-0609 4C 6F 63 61 74 69 6F 6E 20 74 6F 20 73 74 61 72 74 20 69 6E 20 34 20 64 69 67 69 74 20 48 45 58 3A 20 00 MDC_2: DEFB "Location to start in 4 digit HEX: ",EOS
-062C 20 20 20 20 20 20 30 20 20 31 20 20 32 20 20 33 20 20 34 20 20 35 20 20 36 20 20 37 20 20 38 20 20 39 20 20 41 20 20 42 20 20 43 20 20 44 20 20 45 20 20 46 0D 0A 00 MDC_3: DEFB "      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EOS
-0663 21 FC 05    			LD 		HL,MDC_1			;Print some messages 
-0666 CD 86 0E    			CALL    PRINT_STRING
-0669 CD 21 0F    			CALL    GETHEXWORD			;HL now points to databyte location	
-066C 3A 18 FE    			LD		A, (ERRFLAG)
-066F FE 00       			CP		E_NONE
-0671 C0          			RET		NZ
-0672 22 11 FE    			LD		(DMPADDR), HL		;Keep address for next/prev.
-0675 E5          			PUSH	HL					;Save HL that holds databyte location on stack
-0676 CD B8 0E    			CALL    PRINT_NEW_LINE		;Print some messages
-0679 CD B8 0E    			CALL    PRINT_NEW_LINE
-067C 21 2C 06    			LD 		HL, MDC_3	
-067F CD 86 0E    			CALL    PRINT_STRING
-0682 E1          			POP		HL					;Restore HL that holds databyte location on stack
-0683 0E 11       MDNXTPR:	LD		C,HEXLINES			;Register C holds counter of dump lines to print
-0685 11 00 FE    			LD		DE,	ASCDMPBUF
-0688 06 10       			LD		B,16				;Register B holds counter of dump bytes to print
-068A CD 6A 0F    			CALL	PRINTHWORD			;Print dump line address in hex form
-068D 3E 20       			LD		A," "				;Print spacer
-068F CD 91 0E    			CALL	PRINT_CHAR
-0692 0D          			DEC		C					;Decrement C to keep track of number of lines printed
-0693 7E          			LD		A,(HL)				;Load Acc with databyte HL points to
-0694 CD 59 0F    			CALL	PRINTHBYTE  		;Print databyte in HEX form 
-0697 CD BD 06    			CALL	CHAR2BUF			;Store ASCII char
-069A 3E 20       			LD		A," "				;Print spacer
-069C CD 91 0E    			CALL	PRINT_CHAR	
-069F 23          			INC 	HL					;Increase HL to next address pointer
-06A0 10 F1       			DJNZ	MDBYTES				;Print 16 bytes out since B holds 16
-06A2 3E 20       			LD		A," "				;Print spacer
-06A4 CD 91 0E    			CALL	PRINT_CHAR			;
-06A7 3E 00       			LD		A, EOS
-06A9 32 10 FE    			LD		(ASCDMPEND), A		;Make sure there is a EOS
-06AC E5          			PUSH	HL
-06AD 21 00 FE    			LD		HL, ASCDMPBUF		;Point HL to ASCII buffer
-06B0 CD 86 0E    			CALL    PRINT_STRING		;Print buffer
-06B3 E1          			POP		HL
-06B4 41          			LD		B,C					;Load B with C to keep track of number of lines printed
-06B5 CD B8 0E    			CALL    PRINT_NEW_LINE		;Get ready for next dump line
-06B8 10 CB       			DJNZ	MDLINE				;Print 16 line out since C holds 16 and we load B with C
-06BA 3E 00       			LD		A,EOS				;Load $FF into Acc so MON_COMMAND finishes
-06BC C9          			RET
-06BD CD AC 0E    			CALL	MKPRINT
-06C0 12          			LD		(DE), A
-06C1 13          			INC		DE
-06C2 C9          			RET
-06C3 4D 6F 76 65 20 44 61 74 61 0D 0A 00 MVC_1:	DEFB	"Move Data", 0Dh, 0Ah, EOS
-06CF 53 74 61 72 74 20 4C 6F 63 61 74 69 6F 6E 3A 20 00 MVC_S:	DEFB	"Start Location: ", EOS
-06E0 45 6E 64 20 4C 6F 63 61 74 69 6F 6E 3A 20 00 MVC_E:	DEFB	"End Location: ", EOS
-06EF 44 65 73 74 69 6E 61 74 69 6F 6E 20 4C 6F 63 61 74 69 6F 6E 3A 20 00 MVC_D:	DEFB	"Destination Location: ", EOS
-0706 21 C3 06    MOVE_COMMAND:	LD		HL, MVC_1	; Print some messages
-0709 CD 86 0E            CALL	PRINT_STRING
-070C 21 CF 06            LD		HL, MVC_S
-070F CD 86 0E            CALL	PRINT_STRING
-0712 CD 21 0F            CALL	GETHEXWORD
-0715 3A 18 FE            LD		A, (ERRFLAG)
-0718 FE 00               CP		E_NONE
-071A C0                  RET		NZ
-071B 22 12 FE            LD		(MVADDR), HL
-071E CD B8 0E            CALL	PRINT_NEW_LINE
-0721 21 E0 06            LD		HL, MVC_E
-0724 CD 86 0E            CALL	PRINT_STRING
-0727 CD 21 0F            CALL	GETHEXWORD
-072A 3A 18 FE            LD		A, (ERRFLAG)
-072D FE 00               CP		E_NONE
-072F C0                  RET		NZ
-0730 22 14 FE            LD		(MVADDR+2), HL
-0733 CD B8 0E            CALL	PRINT_NEW_LINE
-0736 21 EF 06            LD		HL, MVC_D
-0739 CD 86 0E            CALL	PRINT_STRING
-073C CD 21 0F            CALL	GETHEXWORD
-073F 3A 18 FE            LD		A, (ERRFLAG)
-0742 FE 00               CP		E_NONE
-0744 C0                  RET		NZ
-0745 22 16 FE            LD		(MVADDR+4), HL
-0748 CD B8 0E            CALL	PRINT_NEW_LINE
-074B 21 12 FE            ld		hl, MVADDR
-074E CD 72 07            call	GETP	; Fix BC contents from address, to size
-0751 DA 6C 07            jp		c, MERR
-0754 ED 5B 16 FE         ld		de, (MVADDR+4)
-0758 ED 52               sbc		hl, de
-075A 30 0B               jr		nc, MVUP
-075C EB          MVDN:	ex		de, hl
-075D 09                  add		hl, bc
-075E 2B                  dec		hl
-075F EB                  ex		de, hl
-0760 2A 14 FE            ld		hl, (MVADDR+2)
-0763 ED B8               lddr
-0765 13                  inc		de
-0766 C9                  RET
-0767 19          MVUP:		add		hl,de
-0768 ED B0               ldir
-076A 1B                  dec		de
-076B C9                  RET;
-076C 3E 02       MERR:		LD		A, E_PARAM
-076E 32 18 FE            LD		(ERRFLAG), A
-0771 C9                  RET;
-0772 5E          GETP:		ld		e, (hl) ; MVADDR
-0773 23                  inc		hl
-0774 56                  ld		d, (hl) ; MVADDR+1
-0775 23                  inc		hl
-0776 4E                  ld		c, (hl) ; MVADDR+2
-0777 23                  inc		hl
-0778 66                  ld		h, (hl) ; MVADDR+3
-0779 69                  ld		l, c
-077A B7                  or		a
-077B ED 52               sbc		hl, de
-077D 4D                  ld		c, l
-077E 44                  ld		b, h
-077F 03                  inc		bc
-0780 EB                  ex		de, hl
-0781 C9                  ret	
-0782 46 69 6C 6C 20 4D 65 6D 6F 72 79 0D 0A 00 MFC_1:	DEFB	"Fill Memory", 0Dh, 0Ah, EOS
-0790 44 61 74 61 20 76 61 6C 75 65 20 28 6F 6E 65 20 62 79 74 65 29 3A 20 00 MFC_D:	DEFB	"Data value (one byte): ", EOS
-07A8 21 82 07    FILL_COMMAND:	LD		HL, MFC_1	; Print some messages
-07AB CD 86 0E            CALL	PRINT_STRING
-07AE 21 CF 06            LD		HL, MVC_S	; Start msg.
-07B1 CD 86 0E            CALL	PRINT_STRING
-07B4 CD 21 0F            CALL	GETHEXWORD
-07B7 3A 18 FE            LD		A, (ERRFLAG)
-07BA FE 00               CP		E_NONE
-07BC C0                  RET		NZ
-07BD 22 12 FE            LD		(MVADDR), HL	; Start val.
-07C0 CD B8 0E            CALL	PRINT_NEW_LINE
-07C3 21 E0 06            LD		HL, MVC_E	; End msg.
-07C6 CD 86 0E            CALL	PRINT_STRING
-07C9 CD 21 0F            CALL	GETHEXWORD
-07CC 22 14 FE            LD		(MVADDR+2), HL	; End val.
-07CF 3A 18 FE            LD		A, (ERRFLAG)
-07D2 FE 00               CP		E_NONE
-07D4 C0                  RET		NZ
-07D5 ED 5B 12 FE         LD		DE, (MVADDR)	; Start
-07D9 ED 52               SBC		HL, DE		; Make sure end is past start...
-07DB 38 35               JR		C, F_ORDERR
-07DD 2A 14 FE            LD		HL, (MVADDR+2)
-07E0 CD B8 0E            CALL	PRINT_NEW_LINE
-07E3 21 90 07            LD		HL, MFC_D
-07E6 CD 86 0E            CALL	PRINT_STRING
-07E9 CD F9 0E            CALL	GETHEXBYTE
-07EC 32 16 FE            LD		(MVADDR+4), A
-07EF 3A 18 FE            LD		A, (ERRFLAG)
-07F2 FE 00               CP		E_NONE
-07F4 C0                  RET		NZ
-07F5 CD B8 0E            CALL	PRINT_NEW_LINE
-07F8 ED 5B 12 FE         LD		DE, (MVADDR)	; Start
-07FC 2A 14 FE            LD		HL, (MVADDR+2)	; End
-07FF ED 52               SBC		HL, DE			; Size
-0801 44                  LD		B, H
-0802 4D                  LD		C, L
-0803 3A 16 FE            LD		A, (MVADDR+4)	; Fill value
-0806 2A 12 FE            LD		HL, (MVADDR)	; First source location
-0809 77                  LD		(HL), A			; seed the fill block
-080A ED 5B 12 FE         LD		DE, (MVADDR)	; First dest. location
-080E 13                  INC		DE				; 
-080F ED B0               LDIR
-0811 C9                  RET
-0812 3E 02               LD		A, E_PARAM
-0814 32 18 FE            LD		(ERRFLAG), A
-0817 C9                  RET
-0818 21 2C 06    NEXTP_COMMAND:	LD 		HL,MDC_3	
-081B CD 86 0E            CALL    PRINT_STRING
-081E 2A 11 FE            LD		HL, (DMPADDR)
-0821 24                  INC		H
-0822 22 11 FE            LD		(DMPADDR), HL
-0825 C3 83 06            JP		MDNXTPR
-0828 21 2C 06    PREVP_COMMAND:	LD 		HL,MDC_3	
-082B CD 86 0E            CALL    PRINT_STRING
-082E 2A 11 FE            LD		HL, (DMPADDR)
-0831 25                  DEC		H
-0832 22 11 FE            LD		(DMPADDR), HL
-0835 C3 83 06            JP		MDNXTPR
-0838 21 CF 06    EDIT_COMMAND:	LD 		HL, MVC_S	; Start msg.
-083B CD 86 0E            CALL    PRINT_STRING
-083E CD 21 0F            CALL	GETHEXWORD	; Get first address
-0841 3A 18 FE            LD		A, (ERRFLAG)
-0844 FE 00               CP		E_NONE
-0846 C0                  RET		NZ
-0847 3E 3A       EDIT_LP:	LD		A, ":"
-0849 CD 91 0E            CALL	PRINT_CHAR
-084C 3E 20               LD		A, " "
-084E CD 91 0E            CALL	PRINT_CHAR
-0851 7E                  LD		A, (HL)		; Print original value
-0852 CD 59 0F            CALL	PRINTHBYTE
-0855 3E 3E               LD		A, ">"
-0857 CD 91 0E            CALL	PRINT_CHAR
-085A 3E 20               LD		A, " "
-085C CD 91 0E            CALL	PRINT_CHAR
-085F CD F9 0E            CALL	GETHEXBYTE
-0862 32 16 FE            LD		(MVADDR+4), A
-0865 3A 18 FE            LD		A, (ERRFLAG)
-0868 FE 00               CP		E_NONE
-086A C0                  RET		NZ
-086B 3A 16 FE            LD		A, (MVADDR+4)
-086E 77                  LD		(HL), A		; Write new value
-086F CD B8 0E            CALL	PRINT_NEW_LINE
-0872 23                  INC		HL
-0873 CD 6A 0F            CALL	PRINTHWORD
-0876 18 CF               JR		EDIT_LP		; Only way out is type a non-hex char...
-0878 50 6F 72 74 20 53 63 61 6E 0D 0A 00 PSC_1: DEFB "Port Scan", 0Dh, 0Ah, EOS
-0884 21 78 08    PSCOMMAND:	LD 		HL,PSC_1			;Print some messages 
-0887 CD 86 0E            CALL    PRINT_STRING
-088A 21 2C 06            LD 		HL,MDC_3			;Print some messages 
-088D CD 86 0E            CALL    PRINT_STRING
-0890 01 00 00            LD		BC, 0h
-0893 AF                  XOR     A
-0894 3E 20               LD		A, " "
-0896 CD 91 0E            CALL	PRINT_CHAR  ; address - contents separator
-0899 79                  LD      A,C
-089A CD 59 0F            CALL	PRINTHBYTE
-089D 3E 20               LD		A, " "
-089F CD 91 0E            CALL	PRINT_CHAR  ; address - contents separator
-08A2 CD 91 0E            CALL	PRINT_CHAR
-08A5 ED 78               IN		A, (C)
-08A7 CD 59 0F            CALL	PRINTHBYTE
-08AA 3E 20               LD		A, " "
-08AC CD 91 0E            CALL	PRINT_CHAR ; inter-port-contents separator
-08AF 03                  INC		BC
-08B0 AF                  XOR		A
-08B1 80                  ADD		A, B
-08B2 20 11               JR      NZ, PS_END  ; check for all ports done
-08B4 79                  LD		A, C
-08B5 E6 0F               AND		00Fh	; multiples of 16
-08B7 20 EC               JR      NZ, PS_LOOP	; line not yet full
-08B9 CD B8 0E            CALL	PRINT_NEW_LINE
-08BC 18 D6               JR		PS_NEWPL
-08BE 3E 20               LD		A, " "
-08C0 CD 91 0E            CALL	PRINT_CHAR
-08C3 18 E0               JR		PS_LOOP
-08C5 C9                  RET
-08C6 49 4F 20 52 65 61 64 0D 0A RIC_1: DEFB "IO Read", 0Dh, 0Ah
-08CF 45 6E 74 65 72 20 49 4F 20 61 64 64 72 65 73 73 2E 20 4F 6E 6C 79 20 24 30 30 6E 6E 20 73 75 70 70 6F 72 74 65 64 2E 20 27 45 4E 54 45 52 27 20 65 6E 64 73 0D 0A 00 RIC_2: DEFB "Enter IO address. Only $00nn supported. 'ENTER' ends", 0Dh, 0Ah, EOS
-0906 21 C6 08    RICOMMAND:        LD 		HL,RIC_1			;Print some messages 
-0909 CD 86 0E            CALL    PRINT_STRING
-090C CD F9 0E    RILOOP:        CALL    GETHEXBYTE
-090F 32 12 FE            LD      (MVADDR), A             ; Misuse Move address buffer to store port
-0912 3A 18 FE            LD      A, (ERRFLAG)
-0915 FE 00               CP      E_NONE
-0917 20 15               JR      NZ,RICOUT
-0919 3E 20               LD		A, " "
-091B CD 91 0E            CALL	PRINT_CHAR
-091E 3A 12 FE            LD      A, (MVADDR)
-0921 4F                  LD      C, A
-0922 06 00               LD      B, 0
-0924 ED 78               IN      A, (C)
-0926 CD 59 0F            CALL	PRINTHBYTE
-0929 CD B8 0E            CALL	PRINT_NEW_LINE
-092C 18 DE               JR      RILOOP
-092E CD B8 0E    RICOUT:        CALL	PRINT_NEW_LINE
-0931 C9                  RET
-0932 57 72 69 74 65 20 64 61 74 61 20 74 6F 20 70 6F 72 74 0D 0A MPW_1:  DEFB    "Write data to port", 0Dh, 0Ah
-0946 50 6F 72 74 20 26 20 64 61 74 61 3A 20 00 MPW_P:  DEFB    "Port & data: ", EOS
-0954 21 32 09    PW_COMMAND:	LD      HL, MPW_1
-0957 CD 86 0E            CALL    PRINT_STRING
-095A CD F9 0E            CALL    GETHEXBYTE
-095D 32 12 FE            LD      (MVADDR), A             ; Misuse Move address buffer to store port
-0960 3A 18 FE            LD      A, (ERRFLAG)
-0963 FE 00               CP      E_NONE
-0965 C0                  RET     NZ
-0966 3E 20               LD      A, " "
-0968 CD 91 0E            CALL    PRINT_CHAR
-096B CD F9 0E            CALL    GETHEXBYTE
-096E 32 13 FE            LD      (MVADDR+1), A
-0971 3A 18 FE            LD      A, (ERRFLAG)
-0974 FE 00               CP      E_NONE
-0976 C0                  RET     NZ
-0977 3A 12 FE            LD      A, (MVADDR)
-097A 4F                  LD      C, A
-097B 3A 13 FE            LD      A, (MVADDR+1)
-097E ED 79               OUT     (C), A
-0980 AF                  xor a			; zero A because upon return other commands will be tested for and value in a may trigger them
-0981 C9                  RET
-0982 45 78 65 63 75 74 65 20 70 72 6F 67 72 61 6D 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A 00 MGo_1:	DEFB	"Execute program in memory", 0Dh, 0Ah, EOS
-099E 4D 65 6D 6F 72 79 20 6C 6F 63 61 74 69 6F 6E 3A 20 00 MGo_2:	DEFB	"Memory location: ", EOS
-09B0 21 82 09    GO_COMMAND:	LD		HL, MGo_1	; Print some messages
-09B3 CD 86 0E            CALL	PRINT_STRING
-09B6 21 9E 09            LD		HL, MGo_2	; Print some messages
-09B9 CD 86 0E            CALL	PRINT_STRING
-09BC CD 21 0F            CALL	GETHEXWORD
-09BF 3A 18 FE            LD		A, (ERRFLAG)
-09C2 FE 00               CP		E_NONE
-09C4 C0                  RET		NZ
-09C5 E9                  JP       (HL)	; Jump
-09C6 43 61 6C 6C 20 70 72 6F 67 72 61 6D 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A 00 MCl_1:	DEFB	"Call program in memory", 0Dh, 0Ah, EOS
-09DF 21 C6 09    CL_COMMAND:	LD		HL, MCl_1	; Print some messages
-09E2 CD 86 0E            CALL	PRINT_STRING
-09E5 21 9E 09            LD		HL, MGo_2	; Print some messages
-09E8 CD 86 0E            CALL	PRINT_STRING
-09EB CD 21 0F            CALL	GETHEXWORD
-09EE 3A 18 FE            LD		A, (ERRFLAG)
-09F1 FE 00               CP		E_NONE
-09F3 C0                  RET		NZ
-09F4 11 A1 02            LD		DE, MON_COMMAND
-09F7 D5                  PUSH	DE			; Add a suitable return address to the stack
-09F8 E9                  JP	(HL)
-09F9 C9                  RET
-09FA 43 61 6C 63 75 6C 61 74 65 20 63 68 65 63 6B 73 75 6D 20 66 6F 72 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 0D 0A 00 CCKSM_1:	DEFB	"Calculate checksum for memory range", 0Dh, 0Ah, EOS
-0A20 53 74 61 72 74 20 6C 6F 63 61 74 69 6F 6E 3A 20 00 CCKSM_2:	DEFB	"Start location: ", EOS
-0A31 45 6E 64 20 6C 6F 63 61 74 69 6F 6E 3A 20 00 CCKSM_3:	DEFB	"End location: ", EOS
-0A40 43 68 65 63 6B 73 75 6D 3A 20 00 CCKSM_4:    DEFB    "Checksum: ", EOS
-0A4B 21 FA 09    CCKSM_COMMAND:	LD		HL, CCKSM_1
-0A4E CD 86 0E            CALL	PRINT_STRING
-0A51 21 20 0A            LD		HL, CCKSM_2	    ; start
-0A54 CD 86 0E            CALL	PRINT_STRING
-0A57 CD 21 0F            CALL	GETHEXWORD
-0A5A 3A 18 FE            LD		A, (ERRFLAG)
-0A5D FE 00               CP		E_NONE
-0A5F C0                  RET		NZ
-0A60 22 12 FE            LD      (MVADDR+0), HL
-0A63 CD B8 0E            CALL	PRINT_NEW_LINE
-0A66 21 31 0A            LD		HL, CCKSM_3     ; end
-0A69 CD 86 0E            CALL	PRINT_STRING
-0A6C CD 21 0F            CALL	GETHEXWORD
-0A6F 3A 18 FE            LD		A, (ERRFLAG)
-0A72 FE 00               CP		E_NONE
-0A74 C0                  RET		NZ
-0A75 22 14 FE            LD      (MVADDR+2), HL
-0A78 CD B8 0E            CALL	PRINT_NEW_LINE
-0A7B ED 4B 12 FE         LD      BC, (MVADDR+0)  ; starting point
-0A7F ED 5B 14 FE         LD      DE, (MVADDR+2)  ; end point
-0A83 21 00 00            LD      HL, 0           ; the checksum value
-0A86 3E 00               LD      A, 0
-0A88 32 24 FE            LD      (CHKSUM_C), A   ; checksum overflow
-0A8B 79                  LD      A, C
-0A8C BB                  CP      E
-0A8D 20 04               JR      NZ, CCSM_3      ; on no match in LSB, skip the MSB
-0A8F 78                  LD      A, B
-0A90 BA                  CP      D
-0A91 28 15               JR      Z, CCSM_4       ; MSB matches too
-0A93 0A                  LD      A, (BC)
-0A94 85                  ADD     A, L
-0A95 6F                  LD      L, A
-0A96 30 0D               JR      NC, CCSM_2      ; check carry in checksum LSB
-0A98 7C                  LD      A, H
-0A99 C6 01               ADD     A, 1
-0A9B 67                  LD      H, A
-0A9C 30 07               JR      NC, CCSM_2
-0A9E 3A 24 FE            LD      A, (CHKSUM_C)
-0AA1 3C                  INC     A
-0AA2 32 24 FE            LD      (CHKSUM_C), A
-0AA5 03                  INC     BC
-0AA6 18 E3               JR      CCSM_1
-0AA8 E5                  PUSH    HL
-0AA9 21 40 0A            LD		HL, CCKSM_4     ; end
-0AAC CD 86 0E            CALL	PRINT_STRING
-0AAF 3A 24 FE            LD      A, (CHKSUM_C)
-0AB2 CD 59 0F            CALL    PRINTHBYTE      ; checksum overflow first
-0AB5 E1                  POP     HL
-0AB6 CD 6A 0F            CALL    PRINTHWORD
-0AB9 CD B8 0E            CALL    PRINT_NEW_LINE
-0ABC C9                  RET
-0ABD 3E 01       HEXI_COMMAND:	LD      A, 1
-0ABF 32 19 FE            LD      (MUTE), A
-0AC2 21 2C FE            LD      HL, UPLOADBUF
-0AC5 22 20 FE            LD      (RX_READ_P), HL
-0AC8 22 22 FE            LD      (RX_WRITE_P), HL
-0ACB CD 89 03    HXI_LOOP:	CALL    UART_RX_RDY
-0ACE CD 97 03            CALL    UART_RX
-0AD1 2A 22 FE            LD      HL, (RX_WRITE_P)
-0AD4 77                  LD      (HL), A
-0AD5 23                  INC     HL
-0AD6 22 22 FE            LD      (RX_WRITE_P), HL
-0AD9 A7                  AND     A
-0ADA FE 0A               CP      LF
-0ADC 28 02               JR      Z, HXI_RCVD
-0ADE 18 EB               JR      HXI_LOOP
-0AE0 3E 00       HXI_RCVD:	LD      A, 0
-0AE2 32 19 FE            LD      (MUTE), A
-0AE5 21 2E FE            LD      HL, UPLOADBUF + 2       ; Point to the first address char.
-0AE8 06 04               LD      B, 4
-0AEA 7E          HXIADRLP:	LD      A, (HL)
-0AEB CD 91 0E            CALL    PRINT_CHAR
-0AEE 23                  INC     HL
-0AEF 10 F9               DJNZ    HXIADRLP
-0AF1 21 2C FE    HXI_PROC:	LD      HL, UPLOADBUF
-0AF4 CD A4 0F            CALL    CHARS2BYTE              ; get record size
-0AF7 32 1A FE            LD      (ULSIZE), A             ; store it
-0AFA CD A4 0F            CALL    CHARS2BYTE              ; get record address, MSB
-0AFD 32 1D FE            LD      (IECADDR+1), A          ; 
-0B00 CD A4 0F            CALL    CHARS2BYTE              ; get record address, LSB
-0B03 32 1C FE            LD      (IECADDR), A 
-0B06 CD A4 0F            CALL    CHARS2BYTE              ; get record type
-0B09 32 1E FE            LD      (IERECTYPE), A
-0B0C FE 01               CP      01h                     ; compare to end record
-0B0E 28 20               JR      Z, HXI_ENDR
-0B10 3A 1A FE            LD      A, (ULSIZE)
-0B13 47                  LD      B, A                    ; set up DJNZ loop
-0B14 ED 5B 1C FE         LD      DE, (IECADDR)
-0B18 CD A4 0F    HXD_LOOP:	CALL    CHARS2BYTE              ; get data byte
-0B1B 12                  LD      (DE), A                 ; store it at target location
-0B1C 13                  INC     DE
-0B1D 10 F9               DJNZ    HXD_LOOP                ; repeat for all data bytes
-0B1F 3E 20               ld a," "
-0B21 CD 91 0E            CALL    PRINT_CHAR
-0B24 CD A4 0F            CALL    CHARS2BYTE              ; Get checksum. Not that anyone checks it...
-0B27 CD 59 0F            call PRINTHBYTE
-0B2A 2B                  dec hl
-0B2B 77                  ld (hl),a			; in case anyone wants to use checksum, store it in last byte of data buffer
-0B2C CD B8 0E            CALL    PRINT_NEW_LINE
-0B2F AF                  xor a	; checksum being returned in A was matching command checks, so zero A
-0B30 C9          HXI_ENDR:	RET
-0B31 20 41 46 20 20 20 42 43 20 20 20 44 45 20 20 20 48 4C 20 20 20 49 58 20 20 20 49 59 20 20 20 41 46 27 20 20 42 43 27 20 20 44 45 27 20 20 48 4C 27 00 RDLN_1: DEFB    " AF   BC   DE   HL   IX   IY   AF", 027h, "  BC", 027h, "  DE", 027h, "  HL", 027h, EOS
-0B63 20 53 50 20 20 20 50 43 20 20 20 49 46 20 20 20 53 5A 2D 48 2D 50 4E 43 20 20 53 5A 2D 48 2D 50 4E 43 27 00 RDLN_3: DEFB    " SP   PC   IF   SZ-H-PNC  SZ-H-PNC", 027h  , EOS
-0B87 21 31 0B    REGDUMP_COMMAND:	LD      HL, RDLN_1
-0B8A CD 86 0E            CALL    PRINT_STRING
-0B8D CD B8 0E            CALL    PRINT_NEW_LINE
-0B90 2A BC 1F            LD      HL, (USERAF)
-0B93 CD 6A 0F            CALL    PRINTHWORD
-0B96 3E 20               LD      A, " "
-0B98 CD 91 0E            CALL    PRINT_CHAR
-0B9B 2A BE 1F            LD      HL, (USERBC)
-0B9E CD 6A 0F            CALL    PRINTHWORD
-0BA1 3E 20               LD      A, " "
-0BA3 CD 91 0E            CALL    PRINT_CHAR
-0BA6 2A C0 1F            LD      HL, (USERDE)
-0BA9 CD 6A 0F            CALL    PRINTHWORD
-0BAC 3E 20               LD      A, " "
-0BAE CD 91 0E            CALL    PRINT_CHAR
-0BB1 2A C2 1F            LD      HL, (USERHL)
-0BB4 CD 6A 0F            CALL    PRINTHWORD
-0BB7 3E 20               LD      A, " "
-0BB9 CD 91 0E            CALL    PRINT_CHAR
-0BBC 2A CC 1F            LD      HL, (USERIX)
-0BBF CD 6A 0F            CALL    PRINTHWORD
-0BC2 3E 20               LD      A, " "
-0BC4 CD 91 0E            CALL    PRINT_CHAR
-0BC7 2A CE 1F            LD      HL, (USERIY)
-0BCA CD 6A 0F            CALL    PRINTHWORD
-0BCD 3E 20               LD      A, " "
-0BCF CD 91 0E            CALL    PRINT_CHAR
-0BD2 2A C4 1F            LD      HL, (UAFP)
-0BD5 CD 6A 0F            CALL    PRINTHWORD
-0BD8 3E 20               LD      A, " "
-0BDA CD 91 0E            CALL    PRINT_CHAR
-0BDD 2A C6 1F            LD      HL, (UBCP)
-0BE0 CD 6A 0F            CALL    PRINTHWORD
-0BE3 3E 20               LD      A, " "
-0BE5 CD 91 0E            CALL    PRINT_CHAR
-0BE8 2A C8 1F            LD      HL, (UDEP)
-0BEB CD 6A 0F            CALL    PRINTHWORD
-0BEE 3E 20               LD      A, " "
-0BF0 CD 91 0E            CALL    PRINT_CHAR
-0BF3 2A CA 1F            LD      HL, (UHLP)
-0BF6 CD 6A 0F            CALL    PRINTHWORD
-0BF9 3E 20               LD      A, " "
-0BFB CD 91 0E            CALL    PRINT_CHAR
-0BFE CD B8 0E            CALL    PRINT_NEW_LINE
-0C01 21 63 0B            LD      HL, RDLN_3
-0C04 CD 86 0E            CALL    PRINT_STRING
-0C07 CD B8 0E            CALL    PRINT_NEW_LINE
-0C0A 2A D0 1F            LD      HL, (USERSP)
-0C0D CD 6A 0F            CALL    PRINTHWORD
-0C10 3E 20               LD      A, " "
-0C12 CD 91 0E            CALL    PRINT_CHAR
-0C15 2A DC 1F            LD      HL, (USERPC)
-0C18 CD 6A 0F            CALL    PRINTHWORD
-0C1B 3E 20               LD      A, " "
-0C1D CD 91 0E            CALL    PRINT_CHAR
-0C20 2A D2 1F            LD      HL, (USERIF)
-0C23 CD 6A 0F            CALL    PRINTHWORD
-0C26 3E 20               LD      A, " "
-0C28 CD 91 0E            CALL    PRINT_CHAR
-0C2B CD 91 0E            CALL    PRINT_CHAR
-0C2E 3A BD 1F            LD      A, (USERAF+1)
-0C31 CD 94 0F            CALL    PRT8BIT
-0C34 3E 20               LD      A, " "
-0C36 CD 91 0E            CALL    PRINT_CHAR
-0C39 3E 20               LD      A, " "
-0C3B CD 91 0E            CALL    PRINT_CHAR
-0C3E 3A C5 1F            LD      A, (UAFP+1)
-0C41 CD 94 0F            CALL    PRT8BIT
-0C44 C9                  RET
-0C45 CD 87 0B            CALL    REGDUMP_COMMAND
-0C48 C3 00 00            JP      MPFMON  ; return to monitor
-0C4B 52 41 4D 20 54 65 73 74 0D 0A 00 TRC_1: DEFB "RAM Test", 0Dh, 0Ah, EOS
-0C56 4C 6F 63 61 74 69 6F 6E 20 74 6F 20 73 74 61 72 74 20 69 6E 20 34 20 64 69 67 69 74 20 48 45 58 3A 20 00 TRC_2: DEFB "Location to start in 4 digit HEX: ", EOS
-0C79 0D 0A 4C 6F 63 61 74 69 6F 6E 20 74 6F 20 65 6E 64 20 69 6E 20 34 20 64 69 67 69 74 20 48 45 58 3A 20 00 TRC_3: DEFB 0Dh, 0Ah, "Location to end in 4 digit HEX: ", EOS
-0C9C 0D 0A 53 74 61 72 74 20 61 64 64 72 65 73 73 20 73 68 6F 75 6C 64 20 62 65 20 62 65 66 6F 72 65 20 45 6E 64 20 61 64 64 72 65 73 73 00 TRC_4: DEFB 0Dh, 0Ah, "Start address should be before End address", EOS
-0CC9 21 4B 0C    TRAM_COMMAND:	LD      HL,TRC_1        ;Print some messages 
-0CCC CD 86 0E            CALL    PRINT_STRING
-0CCF 21 56 0C            LD      HL,TRC_2
-0CD2 CD 86 0E            CALL    PRINT_STRING
-0CD5 CD 21 0F            CALL    GETHEXWORD              ;HL now points to databyte location	
-0CD8 22 12 FE            LD      (MVADDR), HL
-0CDB 21 79 0C            LD      HL,TRC_3
-0CDE CD 86 0E            CALL    PRINT_STRING
-0CE1 CD 21 0F            CALL    GETHEXWORD              ;HL now points to databyte location	
-0CE4 22 14 FE            LD      (MVADDR+2), HL
-0CE7 3A 15 FE            LD      A, (MVADDR+3)   ; End MSB
-0CEA 21 13 FE            LD      HL, MVADDR+1    ; (Start MSB)
-0CED BE                  CP      (HL)            ; A - (HL)
-0CEE 28 07               JR      Z, _TC_ZERO     ; When MSBs are on same page, test LSBs
-0CF0 38 13               JR      C, _TC_NEGM      ; When Start MSB > End MSB, report error, exit
-0CF2 CD 9F 0D            CALL    MTEST           ; When End page (MSB) is larger than Start (MSB), go to test
-0CF5 18 16               JR      _TC_DONE
-0CF7 3A 14 FE            LD      A, (MVADDR+2)   ; End LSB
-0CFA 21 12 FE            LD      HL, MVADDR+0    ; (Start LSB)
-0CFD BE                  CP      (HL)            ; A - (HL)
-0CFE 38 05               JR      C, _TC_NEGL      ; When Start LSB > End LSB, report error, exit
-0D00 CD 9F 0D            CALL    MTEST           ; When End page (LSB) is larger than Start (LSB), go to test
-0D03 18 08               JR      _TC_DONE
-0D05 21 9C 0C            LD      HL, TRC_4
-0D08 CD 86 0E            CALL    PRINT_STRING
-0D0B 18 00               JR      _TC_DONE
-0D0D C9                  RET
-0D0E 0D 0A 20 50 61 73 73 20 31 3A 20 3F 3F 68 20 74 6F 20 30 30 68 20 00 MTC_1: DEFB 0Dh, 0Ah, " Pass 1: ??h to 00h ", EOS
-0D25 0D 0A 20 50 61 73 73 20 32 3A 20 30 30 68 20 74 6F 20 35 35 68 20 00 MTC_2: DEFB 0Dh, 0Ah, " Pass 2: 00h to 55h ", EOS
-0D3C 0D 0A 20 50 61 73 73 20 33 3A 20 35 35 68 20 74 6F 20 41 41 68 20 00 MTC_3: DEFB 0Dh, 0Ah, " Pass 3: 55h to AAh ", EOS
-0D53 0D 0A 20 50 61 73 73 20 34 3A 20 41 41 68 20 74 6F 20 46 46 68 20 00 MTC_4: DEFB 0Dh, 0Ah, " Pass 4: AAh to FFh ", EOS
-0D6A 0D 0A 20 4D 65 6D 6F 72 79 20 4F 4B 00 MTC_5: DEFB 0Dh, 0Ah, " Memory OK", EOS
-0D77 20 45 72 72 6F 72 20 61 74 3A 20 00 MTCER1: DEFB " Error at: ", EOS
-0D83 20 76 61 6C 75 65 20 65 78 70 65 63 74 65 64 3A 20 00 MTCER2: DEFB " value expected: ", EOS
-0D95 2C 20 66 6F 75 6E 64 3A 20 00 MTCER3: DEFB ", found: ", EOS
-0D9F DD 21 12 FE MTEST:	LD      IX, MVADDR
-0DA3 21 0E 0D            LD      HL, MTC_1
-0DA6 CD 86 0E            CALL    PRINT_STRING
-0DA9 2A 12 FE            LD      HL, (MVADDR+0)
-0DAC ED 4B 14 FE         LD      BC, (MVADDR+2)
-0DB0 1E 40               LD      E, 64
-0DB2 16 00               LD      D, 000h
-0DB4 3E 01               LD      A, 1
-0DB6 32 1F FE            LD      (MTPHFLAG), A
-0DB9 CD 0A 0E            CALL    MCHECK
-0DBC 38 4B               JR      C, _MTDONE      ; skip other tests on error
-0DBE 21 25 0D            LD      HL, MTC_2
-0DC1 CD 86 0E            CALL    PRINT_STRING
-0DC4 2A 12 FE            LD      HL, (MVADDR+0)  ; reset start address
-0DC7 1E 00               LD      E, 000h         ; old value
-0DC9 16 55               LD      D, 055h         ; new value
-0DCB 3E 02               LD      A, 2
-0DCD 32 1F FE            LD      (MTPHFLAG), A
-0DD0 CD 0A 0E            CALL    MCHECK
-0DD3 38 34               JR      C, _MTDONE      ; skip other tests on error
-0DD5 21 3C 0D            LD      HL, MTC_3
-0DD8 CD 86 0E            CALL    PRINT_STRING
-0DDB 2A 12 FE            LD      HL, (MVADDR+0)  ; reset start address
-0DDE 1E 55               LD      E, 055h         ; old value
-0DE0 16 AA               LD      D, 0AAh         ; new value
-0DE2 3E 03               LD      A, 3
-0DE4 32 1F FE            LD      (MTPHFLAG), A
-0DE7 CD 0A 0E            CALL    MCHECK
-0DEA 38 1D               JR      C, _MTDONE      ; skip other tests on error
-0DEC 21 53 0D            LD      HL, MTC_4
-0DEF CD 86 0E            CALL    PRINT_STRING
-0DF2 2A 12 FE            LD      HL, (MVADDR+0)  ; reset start address
-0DF5 1E AA               LD      E, 0AAh         ; old value
-0DF7 16 FF               LD      D, 0FFh         ; new value
-0DF9 3E 04               LD      A, 4
-0DFB 32 1F FE            LD      (MTPHFLAG), A
-0DFE CD 0A 0E            CALL    MCHECK
-0E01 38 06               JR      C, _MTDONE      ; skip other tests on error
-0E03 21 6A 0D            LD      HL, MTC_5       ; Ok text
-0E06 CD 86 0E            CALL    PRINT_STRING        
-0E09 C9                  RET
-0E0A 3A 1F FE            LD      A, (MTPHFLAG)
-0E0D FE 01               CP      1
-0E0F 28 0D               JR      Z, _MCSKIPOLD   ; Skip old value check for pass 1
-0E11 7B                  LD      A, E
-0E12 DD 77 05            LD      (IX+5), A       ; store expected value
-0E15 7E                  LD      A, (HL)         ; read mem
-0E16 DD 77 04            LD      (IX+4), A       ; store actual value
-0E19 DD BE 05            CP      (IX+5)          ; compare with expected
-0E1C 20 19               JR      NZ, _MTLPER1    ; jump to error when unequal
-0E1E 7A                  LD      A, D
-0E1F 77                  LD      (HL), A         ; write new value
-0E20 DD 77 05            LD      (IX+5), A       ; store expected value
-0E23 7E                  LD      A, (HL)         ; read new value
-0E24 DD 77 04            LD      (IX+4), A       ; store actual value
-0E27 DD BE 05            CP      (IX+5)          ; compare with expected
-0E2A 20 1C               JR      NZ, _MTLPER2    ; jump to error when unequal
-0E2C CD 7F 0E            CALL    CPADDR          ; 
-0E2F 23                  INC     HL              ; 
-0E30 20 D8               JR      NZ, _MCLOOP     ; 
-0E32 A7                  AND     A               ; "Clear Carry flag"
-0E33 3E 01               LD      A, 1
-0E35 18 47               JR      _MCDONE
-0E37 F5                  PUSH    AF
-0E38 CD B8 0E            CALL    PRINT_NEW_LINE
-0E3B 3E 31               LD      A, "1"
-0E3D CD 91 0E            CALL    PRINT_CHAR
-0E40 3E 2E               LD      A, "."
-0E42 CD 91 0E            CALL    PRINT_CHAR
-0E45 F1                  POP     AF
-0E46 18 0F               JR      _MTLPER
-0E48 F5                  PUSH    AF
-0E49 CD B8 0E            CALL    PRINT_NEW_LINE
-0E4C 3E 32               LD      A, "2"
-0E4E CD 91 0E            CALL    PRINT_CHAR
-0E51 3E 2E               LD      A, "."
-0E53 CD 91 0E            CALL    PRINT_CHAR
-0E56 F1                  POP     AF
-0E57 E5                  PUSH    HL              ; keep actual location
-0E58 21 77 0D            LD      HL, MTCER1      ; at text
-0E5B CD 86 0E            CALL    PRINT_STRING
-0E5E E1                  POP     HL
-0E5F CD 6A 0F            CALL    PRINTHWORD
-0E62 21 83 0D            LD      HL, MTCER2      ; expected text
-0E65 CD 86 0E            CALL    PRINT_STRING
-0E68 3A 17 FE            LD      A, (MVADDR+5)   ; expected value
-0E6B CD 59 0F            CALL    PRINTHBYTE
-0E6E 21 95 0D            LD      HL, MTCER3      ; actual found text
-0E71 CD 86 0E            CALL    PRINT_STRING
-0E74 3A 16 FE            LD      A, (MVADDR+4)   ; actual value
-0E77 CD 59 0F            CALL    PRINTHBYTE
-0E7A CD B8 0E            CALL    PRINT_NEW_LINE
-0E7D 37                  SCF                     ; Flag the error for calling routine
-0E7E C9                  RET
-0E7F 78          CPADDR:	LD      A, B        ; End MSB
-0E80 BC                  CP      H           ; end MSB - current MSB : B - H
-0E81 20 02               JR      NZ, _CPDONE ; When MSBs are unequal
-0E83 79                  LD      A, C        ; End LSB
-0E84 BD                  CP      L           ; end LSB - current LSB ; C - L
-0E85 C9                  RET
-# End of file C:\zeus\mintz80_monitor\MONCommands.asm
-# File C:\zeus\mintz80_monitor\CONIO.asm
-0E86 CD 6C 03            CALL    UART_PRNT_STR
-0E89 C9                  RET
-0E8A CD 97 03    GET_CHAR:	CALL    UART_RX         ;Get char into Acc
-0E8D CD A3 0E            CALL    TO_UPPER        ;Character has to be upper case
-0E90 C9                  RET
-0E91 CD 83 03    PRINT_CHAR:	CALL UART_TX    ;Echo character to terminal
-0E94 C9                  RET
-0E95 4F                  LD      C, A
-0E96 3A 19 FE            LD      A, (MUTE)
-0E99 FE 01               CP      MUTEON  ; compare with 1=true
-0E9B 28 04               JR      Z, PRTSKIP
-0E9D 79                  LD      A, C
-0E9E CD 91 0E            CALL    PRINT_CHAR
-0EA1 79                  LD      A, C
-0EA2 C9                  RET
-0EA3 FE 61               CP      "a"     ; Nothing to do if not lower case
-0EA5 D8                  RET     C
-0EA6 FE 7B               CP      "z" + 1 ; > "z"?
-0EA8 D0                  RET     NC      ; Nothing to do, either
-0EA9 E6 5F               AND     5Fh     ; Convert to upper case
-0EAB C9                  RET
-0EAC FE 20               CP      LOWPRTV
-0EAE 38 05               JR      C, ADDOT
-0EB0 FE 7E               CP      HIGPRTV
-0EB2 30 01               JR      NC, ADDOT
-0EB4 C9                  RET
-0EB5 3E 2E               LD      A, "."
-0EB7 C9                  RET
-0EB8 F5                  PUSH    af
-0EB9 3E 0D               LD      A, $0d
-0EBB CD 91 0E            CALL    PRINT_CHAR
-0EBE 3E 0A               LD      A, $0a
-0EC0 CD 91 0E            CALL    PRINT_CHAR
-0EC3 F1                  POP     af
-0EC4 C9                  RET
-0EC5 FE 47               CP      "F" + 1         ;(Acc) > "F"? 
-0EC7 D0                  RET     NC              ;Yes - Return / No - Continue
-0EC8 FE 30               CP      "0"             ;(Acc) < "0"?
-0ECA D2 CF 0E            JP      NC,CIH1         ;Yes - Jump / No - Continue
-0ECD 3F                  CCF                     ;Complement carry (clear it)
-0ECE C9                  RET
-0ECF FE 3A               CP      "9" + 1         ;(Acc) < "9" + 1?
-0ED1 D8                  RET     C               ;Yes - Return / No - Continue (meaning Acc between "0" and "9")
-0ED2 FE 41               CP      "A"             ;(Acc) > "A"?
-0ED4 D2 D9 0E            JP      NC,CIH2         ;Yes - Jump / No - Continue
-0ED7 3F                  CCF                     ;Complement carry (clear it)
-0ED8 C9                  RET
-0ED9 37                  SCF                     ;Set carry flag to indicate the char is a hex digit
-0EDA C9                  RET
-0EDB CD 8A 0E            CALL    GET_CHAR
-0EDE CD C5 0E            CALL    CHAR_ISHEX      ; Is it a hex digit?
-0EE1 D2 F3 0E            JP      NC,NONHEXNIB    ; Yes - Continue / No - Exit
-0EE4 CD 95 0E            CALL    OPRINTCHAR
-0EE7 FE 3A               CP      "9" + 1         ; Is it a digit less or equal "9" + 1?
-0EE9 DA EE 0E            JP      C,IS_NUM        ; Yes - Jump / No - Continue
-0EEC D6 07               SUB     07h             ; Adjust for A-F digits
-0EEE D6 30               SUB     "0"             ; Subtract to get nib between 0->15
-0EF0 E6 0F               AND     0Fh             ; Only return lower 4 bits
-0EF2 C9                  RET
-0EF3 3E 01               LD      A, E_NOHEX
-0EF5 32 18 FE            LD      (ERRFLAG), A    ; Error flag
-0EF8 C9                  RET
-0EF9 CD DB 0E            CALL    GETHEXNIB       ; Get high nibble
-0EFC D5                  PUSH	DE
-0EFD F5                  PUSH	AF
-0EFE 3A 18 FE            LD	A, (ERRFLAG)
-0F01 FE 00               CP	E_NONE
-0F03 20 19               JR	NZ, GHB_ERR
-0F05 F1                  POP	AF
-0F06 CB 07               RLC     A               ; Rotate nibble into high nibble
-0F08 CB 07               RLC     A
-0F0A CB 07               RLC     A
-0F0C CB 07               RLC     A
-0F0E 57                  LD      D,A             ; Save upper four bits
-0F0F CD DB 0E            CALL    GETHEXNIB       ; Get lower nibble
-0F12 F5                  PUSH	AF
-0F13 3A 18 FE            LD	A, (ERRFLAG)
-0F16 FE 00               CP	E_NONE
-0F18 20 04               JR	NZ, GHB_ERR  
-0F1A F1                  POP	AF          
-0F1B B2                  OR      D               ; Combine both nibbles
-0F1C D1                  POP	DE
-0F1D C9                  RET
-0F1E F1                  POP	AF
-0F1F D1                  POP	DE
-0F20 C9                  RET
-0F21 CD F9 0E            CALL    GETHEXBYTE	;Get high byte
-0F24 F5                  PUSH	AF
-0F25 3A 18 FE            LD		A, (ERRFLAG)
-0F28 FE 00               CP		E_NONE
-0F2A 20 10               JR		NZ, GHW_ERR
-0F2C F1                  POP		AF
-0F2D 67                  LD		H,A
-0F2E CD F9 0E            CALL    GETHEXBYTE    	;Get low byte
-0F31 F5                  PUSH	AF
-0F32 3A 18 FE            LD		A, (ERRFLAG)
-0F35 FE 00               CP		E_NONE
-0F37 20 03               JR		NZ, GHW_ERR
-0F39 F1                  POP     AF
-0F3A 6F                  LD      L,A
-0F3B C9                  RET
-0F3C F1                  POP		AF
-0F3D C9                  RET
-0F3E E6 0F               AND     0Fh             	;Only low nibble in byte
-0F40 C6 30               ADD     A,"0"             	;Adjust for char offset
-0F42 FE 3A               CP      "9" + 1         	;Is the hex digit > 9?
-0F44 38 02               JR      C,N2C1				;Yes - Jump / No - Continue
-0F46 C6 07               ADD     A,"A" - "0" - 0Ah 	;Adjust for A-F
-0F48 C9                  RET
-0F49 E6 F0               AND     0F0h
-0F4B 0F                  RRCA
-0F4C 0F                  RRCA
-0F4D 0F                  RRCA
-0F4E 0F                  RRCA
-0F4F C9                  RET
-0F50 F5                  PUSH    AF
-0F51 CD 3E 0F            CALL    NIB2CHAR
-0F54 CD 91 0E            CALL    PRINT_CHAR        	;Print the nibble
-0F57 F1                  POP     AF
-0F58 C9                  RET
-0F59 F5                  PUSH    AF      ;Save registers
-0F5A D5                  PUSH    DE
-0F5B 57                  LD      D,A     ;Save for low nibble
-0F5C 0F                  RRCA            ;Rotate high nibble into low nibble
-0F5D 0F                  RRCA
-0F5E 0F                  RRCA
-0F5F 0F                  RRCA
-0F60 CD 50 0F            CALL    PRINTHNIB       ;Print high nibble
-0F63 7A                  LD      A,D             ;Restore for low nibble
-0F64 CD 50 0F            CALL    PRINTHNIB       ;Print low nibble
-0F67 D1                  POP     DE
-0F68 F1                  POP     AF
-0F69 C9                  RET
-0F6A F5                  PUSH    AF
-0F6B 7C                  LD      A,H
-0F6C CD 59 0F            CALL    PRINTHBYTE      ;Print high byte
-0F6F 7D                  LD      A,L
-0F70 CD 59 0F            CALL    PRINTHBYTE      ;Print low byte
-0F73 F1                  POP     AF
-0F74 C9                  RET
-0F75 D6 30               SUB     "0"
-0F77 FE 0A               CP      0ah
-0F79 38 08               JR      C, C2N_DONE
-0F7B D6 07               SUB     007h
-0F7D FE 10               CP      010h			; need to deduct 20h if it was lower case letter
-0F7F 38 02               JR      C, C2N_DONE
-0F81 D6 20               SUB     020h
-0F83 E6 0F               AND     0Fh
-0F85 C9                  RET
-0F86 38 04               JR      C, PB0
-0F88 3E 31               LD      A, "1"
-0F8A 18 04               JR      PBPRT
-0F8C 3E 30               LD      A, "0"
-0F8E 18 00               JR      PBPRT 
-0F90 CD 91 0E            CALL    PRINT_CHAR
-0F93 C9                  RET
-0F94 4F                  LD      C, A
-0F95 06 08               LD      B, 8
-0F97 CB 07               RLC     A
-0F99 4F                  LD      C, A
-0F9A CD 86 0F            CALL    PRTBIT
-0F9D 05                  DEC     B
-0F9E 28 03               JR      Z, P8B_RET
-0FA0 79                  LD      A, C
-0FA1 18 F4               JR      P8B1
-0FA3 C9                  RET
-0FA4 C5                  PUSH    BC
-0FA5 7E                  LD      A, (HL)
-0FA6 23                  INC     HL
-0FA7 CD 75 0F            CALL    CHAR2NIB        ; get upper nibble from char
-0FAA CB 07               RLC     A
-0FAC CB 07               RLC     A
-0FAE CB 07               RLC     A
-0FB0 CB 07               RLC     A
-0FB2 47                  LD      B, A
-0FB3 7E                  LD      A, (HL)
-0FB4 23                  INC     HL
-0FB5 CD 75 0F            CALL    CHAR2NIB        ; get lower nibble from char
-0FB8 B0                  OR      B
-0FB9 C1                  POP     BC
-0FBA C9                  RET
-# End of file C:\zeus\mintz80_monitor\CONIO.asm
-# File C:\zeus\mintz80_monitor\CFDriver.asm
-0FBB CD FD 0F    	CALL	CF_LP_BUSY
-0FBE 3E 01       	LD		A,01h						;LD features register to enable 8 bit
-0FC0 D3 91       	OUT		(CFFEAT),A
-0FC2 CD FD 0F    	CALL	CF_LP_BUSY
-0FC5 3E EF       	LD		A,0EFh						;Send set features command
-0FC7 D3 97       	OUT		(CFCMD),A
-0FC9 CD FD 0F    	CALL	CF_LP_BUSY
-0FCC 3E 00       	LD		A, 00h
-0FCE 32 28 FE    	LD		(CF_LBA0), A
-0FD1 32 29 FE    	LD		(CF_LBA1), A
-0FD4 32 2A FE    	LD		(CF_LBA2), A
-0FD7 32 2B FE    	LD		(CF_LBA3), A
-0FDA 3C          	INC		A
-0FDB 32 27 FE    	LD		(CF_SECCNT), A
-0FDE 21 E5 0F    	LD 		HL,CF_MSG_i					;Print some messages 
-0FE1 CD 86 0E    	CALL    PRINT_STRING
-0FE4 C9          	RET
-0FE5 0D 0A 43 46 20 43 61 72 64 20 49 6E 69 74 69 61 6C 69 7A 65 64 0D 0A 00 CF_MSG_i: DEFB 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
-0FFD DB 97       	IN		A, (CFSTAT)					;Read status
-0FFF E6 80       	AND		010000000b					;Mask busy bit
-1001 C2 FD 0F    	JP		NZ,CF_LP_BUSY				;Loop until busy(7) is 0
-1004 C9          	RET
-1005 DB 97       	IN		A,(CFSTAT)					;Read status
-1007 E6 C0       	AND		011000000b					;mask off busy and rdy bits
-1009 EE 40       	XOR		001000000b					;we want busy(7) to be 0 and drvrdy(6) to be 1
-100B C2 05 10    	JP		NZ,CF_LP_CMD_RDY
-100E C9          	RET
-100F DB 97       	IN		A,(CFSTAT)					;Read status
-1011 E6 88       	AND		010001000b					;mask off busy and drq bits
-1013 EE 08       	XOR		000001000b					;we want busy(7) to be 0 and drq(3) to be 1
-1015 C2 0F 10    	JP		NZ,CF_LP_DAT_RDY
-1018 C9          	RET
-1019 CD 05 10    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
-101C 3E 20       	LD		A,020h						;Prepare read command
-101E D3 97       	OUT		(CFCMD),A					;Send read command
-1020 CD 0F 10    	CALL	CF_LP_DAT_RDY				;Wait until data is ready to be read
-1023 DB 97       	IN		A,(CFSTAT)					;Read status
-1025 E6 01       	AND		000000001b					;mask off error bit
-1027 C2 19 10    	JP		NZ,CF_RD_CMD				;Try again if error
-102A 21 00 F0    	LD 		HL,CFSECT_BUFF
-102D 06 00       	LD 		B,0							;read 256 words (512 bytes per sector)
-102F CD 0F 10    	CALL	CF_LP_DAT_RDY	
-1032 DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
-1034 77          	LD 		(HL),A
-1035 23          	INC 	HL
-1036 CD 0F 10    	CALL	CF_LP_DAT_RDY
-1039 DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
-103B 77          	LD 		(HL),A
-103C 23          	INC 	HL
-103D 10 F0       	DJNZ 	CF_RD_SECT
-103F C9          	RET
-1040 0D 0A 43 46 20 43 61 72 64 20 52 65 61 64 0D 0A 00 CF_MSG1:  DEFB 0Dh, 0Ah, "CF Card Read", 0Dh, 0Ah, EOS
-1051 52 65 61 64 69 6E 67 20 73 65 63 74 6F 72 20 CF_MSG21: DEFB "Reading sector "
-1060 30 30 30 30 30 30 30 30 CF_MSG2h: DEFB "00000000"
-1068 68 20 69 6E 74 6F 20 52 41 4D 20 62 75 66 66 65 72 2E 2E 2E 0D 0A 00 CF_MSG22: DEFB "h into RAM buffer...", 0Dh, 0Ah, EOS
-107F 53 65 63 74 6F 72 20 CF_MSG31: DEFB "Sector "
-1086 30 30 30 30 30 30 30 30 CF_MSG3h: DEFB "00000000"
-108E 68 20 72 65 61 64 2E 2E 2E 0D 0A 00 CF_MSG32: DEFB  "h read...", 0Dh, 0Ah, EOS
-109A 21 40 10    	LD 		HL, CF_MSG1					;Print some messages 
-109D CD 86 0E    	CALL    PRINT_STRING
-10A0 CD 0E 11    	CALL	CF_MKMS2
-10A3 21 2C FE    	LD		HL, MSGBUF
-10A6 CD 86 0E    	CALL    PRINT_STRING
-10A9 CD FD 0F    	CALL 	CF_LP_BUSY
-10AC 3A 27 FE    	LD 		A,(CF_SECCNT)
-10AF D3 92       	OUT 	(CFSECCO),A					;Number of sectors at a time (512 bytes)
-10B1 CD FD 0F    	CALL 	CF_LP_BUSY
-10B4 3A 28 FE    	LD      A,(CF_LBA0)
-10B7 D3 93       	OUT		(CFLBA0),A					;LBA 0:7
-10B9 CD FD 0F    	CALL 	CF_LP_BUSY
-10BC 3A 29 FE    	LD      A,(CF_LBA1)
-10BF D3 94       	OUT		(CFLBA1),A					;LBA 8:15
-10C1 CD FD 0F    	CALL 	CF_LP_BUSY
-10C4 3A 2A FE    	LD      A,(CF_LBA2)
-10C7 D3 95       	OUT 	(CFLBA2),A					;LBA 16:23
-10C9 CD FD 0F    	CALL 	CF_LP_BUSY
-10CC 3A 2B FE    	LD      A,(CF_LBA3)
-10CF E6 0F       	AND		00Fh						; Only LBA 24:27
-10D1 F6 E0       	OR		0E0h						;Selects CF as master
-10D3 D3 96       	OUT 	(CFLBA3),A					;LBA 24:27 + DRV 0 selected + bits 5:7=111
-10D5 CD 19 10    	CALL	CF_RD_CMD
-10D8 CD F9 10    	CALL	CF_MKMS3
-10DB 21 2C FE    	LD		HL, MSGBUF
-10DE CD 86 0E    	CALL    PRINT_STRING
-10E1 C9          	RET
-10E2 43 46 3E 20 00 CF_PROMPT: DEFB	"CF> ", EOS
-10E7 3E 20       	LD		A, " "
-10E9 21 2C FE    	LD		HL, MSGBUF
-10EC 77          	LD		(HL), A
-10ED 11 2C FE    	LD		DE, MSGBUF
-10F0 13          	INC		DE
-10F1 06 00       	LD		B, 0
-10F3 0E 50       	LD		C, ULBUFSIZE
-10F5 0D          	DEC		C
-10F6 ED B0       	LDIR
-10F8 C9          	RET
-10F9 CD E7 10    	CALL	CF_CLMSB
-10FC 21 7F 10    	LD		HL, CF_MSG31
-10FF 11 2C FE    	LD		DE, MSGBUF
-1102 01 1B 00    	LD		BC, CF_MSG3E - CF_MSG31
-1105 ED B0       	LDIR
-1107 21 33 FE    	LD		HL, MSGBUF + (CF_MSG3h - CF_MSG31)	; first digit position for CF_MSG31 in MSGBUF
-110A CD 23 11    	CALL	CFSECDG
-110D C9          	RET
-110E CD E7 10    	CALL	CF_CLMSB
-1111 21 51 10    	LD		HL, CF_MSG21
-1114 11 2C FE    	LD		DE, MSGBUF
-1117 01 2E 00    	LD		BC, CF_MSG2E - CF_MSG21
-111A ED B0       	LDIR
-111C 21 3B FE    	LD		HL, MSGBUF + (CF_MSG2h - CF_MSG21)	; first digit position for CF_MSG21 in MSGBUF
-111F CD 23 11    	CALL    CFSECDG
-1122 C9          	RET
-1123 3A 2B FE    	LD		A,(CF_LBA3)
-1126 F5          	PUSH	AF
-1127 CD 49 0F    	CALL	SHFTNIB
-112A CD 3E 0F    	CALL	NIB2CHAR
-112D 77          	LD		(HL), A
-112E 23          	INC		HL
-112F F1          	POP		AF
-1130 CD 3E 0F    	CALL	NIB2CHAR
-1133 77          	LD		(HL), A
-1134 23          	INC		HL
-1135 3A 2A FE    	LD		A,(CF_LBA2)
-1138 F5          	PUSH	AF
-1139 CD 49 0F    	CALL	SHFTNIB
-113C CD 3E 0F    	CALL	NIB2CHAR
-113F 77          	LD		(HL), A
-1140 23          	INC		HL
-1141 F1          	POP		AF
-1142 CD 3E 0F    	CALL	NIB2CHAR
-1145 77          	LD		(HL), A
-1146 23          	INC		HL
-1147 3A 29 FE    	LD		A,(CF_LBA1)
-114A F5          	PUSH	AF
-114B CD 49 0F    	CALL	SHFTNIB
-114E CD 3E 0F    	CALL	NIB2CHAR
-1151 77          	LD		(HL), A
-1152 23          	INC		HL
-1153 F1          	POP		AF
-1154 CD 3E 0F    	CALL	NIB2CHAR
-1157 77          	LD		(HL), A
-1158 23          	INC		HL
-1159 3A 28 FE    	LD		A,(CF_LBA0)
-115C F5          	PUSH	AF
-115D CD 49 0F    	CALL	SHFTNIB
-1160 CD 3E 0F    	CALL	NIB2CHAR
-1163 77          	LD		(HL), A
-1164 23          	INC		HL
-1165 F1          	POP		AF
-1166 CD 3E 0F    	CALL	NIB2CHAR
-1169 77          	LD		(HL), A
-116A C9          	RET
-116B 0D 0A 43 46 20 43 61 72 64 20 49 64 65 6E 74 69 66 79 20 44 72 69 76 65 0D 0A 00 CF_MSGID:	DEFB 0Dh, 0Ah, "CF Card Identify Drive", 0Dh, 0Ah, EOS
-1186 21 6B 11    	LD		HL, CF_MSGID
-1189 CD 86 0E    	CALL    PRINT_STRING
-118C CD FD 0F    	CALL 	CF_LP_BUSY
-118F CD 05 10    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
-1192 3E EC       	LD		A,0ECh						;Prepare ID drive command
-1194 D3 97       	OUT		(CFCMD),A					;Send ID drive command
-1196 CD 0F 10    	CALL	CF_LP_DAT_RDY				;Wait until data is ready to be read
-1199 DB 97       	IN		A,(CFSTAT)					;Read status
-119B E6 01       	AND		000000001b					;mask off error bit
-119D C2 86 11    	JP		NZ,CF_ID_CMD				;Try again if error
-11A0 21 00 F0    	LD 		HL,CFSECT_BUFF
-11A3 06 00       	LD 		B,0							;read 256 words (512 bytes per sector)
-11A5 CD 0F 10    	CALL	CF_LP_DAT_RDY	
-11A8 DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
-11AA 77          	LD 		(HL),A
-11AB 23          	INC 	HL
-11AC CD 0F 10    	CALL	CF_LP_DAT_RDY
-11AF DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
-11B1 77          	LD 		(HL),A
-11B2 23          	INC 	HL
-11B3 10 F0       	DJNZ 	CF_ID1
-11B5 C9          	RET
-11B6 CD 05 10    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
-11B9 3E E8       	LD		A,0E8h						;Prepare fill buffer command
-11BB D3 97       	OUT		(CFCMD),A					;Send write buffer command
-11BD CD 05 10    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
-11C0 3E 30       	LD		A,030h						;Prepare write command
-11C2 D3 97       	OUT		(CFCMD),A					;Send write buffer command
-11C4 CD 0F 10    	CALL	CF_LP_DAT_RDY				;Wait until drive is ready to be written
-11C7 DB 97       	IN		A,(CFSTAT)					;Read status
-11C9 E6 01       	AND		000000001b					;mask off error bit
-11CB C2 B6 11    	JP		NZ,CF_WR_CMD				;Try again if error
-11CE C9          	ret
-# End of file C:\zeus\mintz80_monitor\CFDriver.asm
-# File C:\zeus\mintz80_monitor\Z80Monitor.asm
-11CF 0C 00       MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed) 
-11D1 3E 00       del00:	ld a,$00		; delay loop
-11D3 F5          delay:	push af			; count delay
-11D4 3D          del1:	dec a
-11D5 20 FD       	jr nz,del1		; repeat till 0
-11D7 F1          	pop af
-11D8 3D          	dec a
-11D9 20 F8       	jr nz,delay
-11DB C9          	ret
-11DC F5          beep:	push af
-11DD D3 D1       bep1:	out (beepr),a
-11DF F1          	pop af
-11E0 F5          	push af
-11E1 CD D3 11    	call delay
-11E4 0B          	dec bc
-11E5 78          	ld a,b
-11E6 B1          	or c
-11E7 20 F4       	jr nz,bep1
-11E9 F1          	pop af
-11EA C9          	ret
-11EB 0E D0       dmpio:	ld c,$d0
-11ED 06 00       		ld b,$0
-11EF CD B8 0E    		CALL	PRINT_NEW_LINE
-11F2 ED 78       dmpio1:	IN      A, (C)
-11F4 CD 59 0F    		CALL	PRINTHBYTE
-11F7 0C          		inc c
-11F8 79          		ld a,c
-11F9 FE E0       		cp $e0
-11FB 20 F5       		jr nz,dmpio1
-11FD CD B8 0E    		CALL	PRINT_NEW_LINE
-1200 C9          		ret
-1201 DB D1       memmap_init:	in a,(beepr)	; unlock memmap
-1203 3E 00       	ld a,0		; init mem map
-1205 D3 D8       	out ($d8),a
-1207 3E 01       	ld a,1
-1209 D3 D9       	out ($d9),a
-120B D3 DA       	out ($da),a
-120D D3 DB       	out ($db),a
-120F D3 DC       	out ($dc),a
-1211 D3 DD       	out ($dd),a
-1213 D3 DE       	out ($de),a
-1215 D3 DF       	out ($df),a
-1217 D3 D1       	out (beepr),a	; lock memmap
-1219 C9          	ret
-121A F5          JUMPTAB_INIT:	push AF
-121B E5          			push HL
-121C D5          			push DE
-121D C5          			push BC
-121E 21 18 00    			ld hl,JUMPTABR
-1221 11 00 FD    			ld de,JUMPTAB
-1224 01 C3 00    			ld bc,JUMPTAB_END-JUMPTABR
-1227 ED B0       			ldir
-1229 C1          			pop BC
-122A D1          			pop DE
-122B E1          			pop HL
-122C F1          			pop AF
-122D C9          			ret
-# End of file C:\zeus\mintz80_monitor\Z80Monitor.asm
 # File C:\zeus\mintz80_monitor\PIODriver.asm
-122E 3E CF       PIO_INIT:	ld a,11001111b      ; mode 3 (bit control)
-1230 D3 1F               out (PIO_CB),a
-1232 3E FF               ld a,$ff      ; set pins of port A to INPUT
-1234 D3 1F               out (PIO_CB),a
-1236 3E CF               ld a,11001111b      ; mode 3 (bit control)
-1238 D3 1D               out (PIO_CA),a
-123A 3E FF               ld a,$FF      ; set pins of port A to INPUT
-123C D3 1D               out (PIO_CA),a
-123E C9                  ret
+0018 3E CF       PIO_INIT:	ld a,11001111b      ; mode 3 (bit control)
+001A D3 1F               out (PIO_CB),a
+001C 3E FF               ld a,$ff      ; set pins of port A to INPUT
+001E D3 1F               out (PIO_CB),a
+0020 3E CF               ld a,11001111b      ; mode 3 (bit control)
+0022 D3 1D               out (PIO_CA),a
+0024 3E FF               ld a,$FF      ; set pins of port A to INPUT
+0026 D3 1D               out (PIO_CA),a
+0028 C9                  ret
 # End of file C:\zeus\mintz80_monitor\PIODriver.asm
 # File C:\zeus\mintz80_monitor\CTCDriver.asm
-123F F5          CTC_INIT_ALL: push af
-1240 CD 71 12    		call CTC_TC_INIT
-1243 CD 51 12    		call CTC0_INIT
-1246 CD 5A 12    		call CTC1_INIT
-1249 CD 5E 12    		call CTC2_INIT
-124C CD 67 12    		call CTC3_INIT
-124F F1          		pop af
-1250 C9          		ret
-1251 3E 27       CTC0_INIT:	ld a,00100111b      ; interrupt off; timer mode; prescaler=256; don't care ext; automatic trigger;
-1253 D3 10               out (CTC_CH0),a
-1255 3A FC FE            ld a,(CTC_CH0_TC)           ; time constant
-1258 D3 10               out (CTC_CH0),a
-125A 3E 03       CTC1_INIT:	ld a,00000011b      ; interrupt off, timer mode, prescaler=16, don't care ext. TRG edge,
-125C D3 11               out (CTC_CH1),a         ; CH1 is halted
-125E 3E 77       CTC2_INIT:	ld a,01110111b      ; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
-1260 D3 12               out (CTC_CH2),a
-1262 3A FE FE            ld A,(CTC_CH2_TC)           ; time constant 56d
-1265 D3 12               out (CTC_CH2),a         ; loaded into channel 2
-1267 3E 77       CTC3_INIT:	ld a,01110111b      ; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
-1269 D3 13               out (CTC_CH3),a
-126B 3A FF FE            ld A,(CTC_CH3_TC)           ; time constant 56d
-126E D3 13               out (CTC_CH3),a         ; loaded into channel 3
-1270 C9                  ret
-1271 3E 9C       CTC_TC_INIT: ld a,$9c
-1273 32 FC FE    		ld (CTC_CH0_TC),a
-1276 3E 9C       		ld a,$9c
-1278 32 FD FE    		ld (CTC_CH1_TC),a
-127B 3E D0       		ld a,$d0
-127D 32 FE FE    		ld (CTC_CH2_TC),a
-1280 3E D0       		ld a,$d0
-1282 32 FF FE    		ld (CTC_CH3_TC),a
-1285 C9          		ret
+0029 F5          CTC_INIT_ALL: push af
+002A CD 5B 00    		call CTC_TC_INIT
+002D CD 3B 00    		call CTC0_INIT
+0030 CD 44 00    		call CTC1_INIT
+0033 CD 48 00    		call CTC2_INIT
+0036 CD 51 00    		call CTC3_INIT
+0039 F1          		pop af
+003A C9          		ret
+003B 3E 27       CTC0_INIT:	ld a,00100111b      ; interrupt off; timer mode; prescaler=256; don't care ext; automatic trigger;
+003D D3 10               out (CTC_CH0),a
+003F 3A FC FE            ld a,(CTC_CH0_TC)           ; time constant
+0042 D3 10               out (CTC_CH0),a
+0044 3E 03       CTC1_INIT:	ld a,00000011b      ; interrupt off, timer mode, prescaler=16, don't care ext. TRG edge,
+0046 D3 11               out (CTC_CH1),a         ; CH1 is halted
+0048 3E 77       CTC2_INIT:	ld a,01110111b      ; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
+004A D3 12               out (CTC_CH2),a
+004C 3A FE FE            ld A,(CTC_CH2_TC)           ; time constant 56d
+004F D3 12               out (CTC_CH2),a         ; loaded into channel 2
+0051 3E 77       CTC3_INIT:	ld a,01110111b      ; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
+0053 D3 13               out (CTC_CH3),a
+0055 3A FF FE            ld A,(CTC_CH3_TC)           ; time constant 56d
+0058 D3 13               out (CTC_CH3),a         ; loaded into channel 3
+005A C9                  ret
+005B 3E 9C       CTC_TC_INIT: ld a,$9c
+005D 32 FC FE    		ld (CTC_CH0_TC),a
+0060 3E 9C       		ld a,$9c
+0062 32 FD FE    		ld (CTC_CH1_TC),a
+0065 3E D0       		ld a,$d0
+0067 32 FE FE    		ld (CTC_CH2_TC),a
+006A 3E D0       		ld a,$d0
+006C 32 FF FE    		ld (CTC_CH3_TC),a
+006F C9          		ret
 # End of file C:\zeus\mintz80_monitor\CTCDriver.asm
 # File C:\zeus\mintz80_monitor\SIODriver.asm
-1286 3E 30       SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
-1288 D3 19               out (SIO_CA),a
-128A 3E 18               ld a,00011000b      ; write into WR0: channel reset
-128C D3 19               out (SIO_CA),a
-128E 3E 04               ld a,00000100b      ; write into WR0: select WR4
-1290 D3 19               out (SIO_CA),a
-1292 3E 04               ld a,00000100b      ; write into WR4: presc. 1x, 1 stop bit, no parity
-1294 D3 19               out (SIO_CA),a
-1296 3E 05               ld a,00000101b      ; write into WR0: select WR5
-1298 D3 19               out (SIO_CA),a
-129A 3E E8               ld a,11101000b      ; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
-129C D3 19               out (SIO_CA),a
-129E C9          		ret
-129F CD 86 12    SIO_INIT:	call SIOA_INIT	; first init SIO A
-12A2 3E 01       SIOB_INIT:	ld a,00000001b      ; write into WR0: select WR1
-12A4 D3 1B               out (SIO_CB),a
-12A6 3E 04               ld a,00000100b      ; write into WR0: status affects interrupt vectors
-12A8 D3 1B               out (SIO_CB),a
-12AA 3E 02               ld a,00000010b      ; write into WR0: select WR2
-12AC D3 1B               out (SIO_CB),a
-12AE 3E 00               ld a,0h             ; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
-12B0 D3 1B               out (SIO_CB),a
-12B2 C9          		ret
-12B3 3E 01               ld a,01h            ; write into WR0: select WR1
-12B5 D3 19               out (SIO_CA),a
-12B7 3E 18               ld a,00011000b      ; interrupts on every RX char; parity is no special condition;
-12B9 D3 19               out (SIO_CA),a
-12BB C9          		ret
-12BC 3E 05       SIOA_RTS_OFF:	ld a,00000101b      ; write into WR0: select WR5
-12BE D3 19               out (SIO_CA),a
-12C0 3E E8               ld a,11101000b      ; 8 bits/TX char; TX enable; RTS disable
-12C2 D3 19               out (SIO_CA),a
-12C4 C9                  ret
-12C5 3E 05       SIOA_RTS_ON:	ld a,00000101b      ; write into WR0: select WR5
-12C7 D3 19               out (SIO_CA),a
-12C9 3E EA               ld a,11101010b      ; 8 bits/TX char; TX enable; RTS enable
-12CB D3 19               out (SIO_CA),a
-12CD C9                  ret
-12CE 3E 03       SIO_A_DI:	ld a,00000011b      ; write into WR0: select WR3
-12D0 D3 19               out (SIO_CA),a
-12D2 3E 0C               ld a,00001100b      ; write into WR3: RX disable;
-12D4 D3 19               out (SIO_CA),a
-12D6 C9                  ret
-12D7 3E 03       SIO_A_EI:	ld a,00000011b      ; write into WR0: select WR3
-12D9 D3 19               out (SIO_CA),a
-12DB 3E C1               ld a,11000001b      ; 8 bits/RX char; auto enable OFF; RX enable
-12DD D3 19               out (SIO_CA),a
-12DF C9                  ret
-12E0 E1          SIOA_PRNT_SP:	pop HL
-12E1 CD E7 12    			call SIOA_PRNT_STR
-12E4 23          			inc hl
-12E5 E5          			push hl
-12E6 C9          			ret
-12E7 F5          SIOA_PRNT_STR:	PUSH	AF
-12E8 7E          SIOAPRNTSTRLP:	LD		A,(HL)
-12E9 FE 00       		CP		EOS					;Test for end byte
-12EB 28 06       		JR		Z,SIOA_END_PRNT_STR	;Jump if end byte is found
-12ED CD 02 13    		CALL	SIOA_TX
-12F0 23          		INC		HL					;Increment pointer to next char
-12F1 18 F5       		JR		SIOAPRNTSTRLP	;Transmit loop
-12F3 F1          SIOA_END_PRNT_STR:	POP		AF
-12F4 C9          		RET	 
-12F5 F5          SIOA_TX_RDY:	PUSH 	AF
-12F6 3E 01       SIOA_TX_RD1:	ld a,1
-12F8 D3 19       		out (SIO_CA),a
-12FA DB 19       		in a,(SIO_CA)
-12FC CB 47       		bit 0,a
-12FE 28 F6       		jr z,SIOA_TX_RD1
-1300 F1          		POP     AF
-1301 C9          		RET
-1302 CD F5 12    SIOA_TX:		CALL  SIOA_TX_RDY			;Make sure UART is ready to receive
-1305 D3 18       			out (SIO_DA),a      			;Transmit character in A to UART
-1307 C9          			RET
-1308 F5          SIOA_RX_WAIT:	PUSH 	AF					
-1309 97          SIOA_RX_WAIT_LP:	sub a               ;clear a, write into WR0: select RR0
-130A D3 19       		out (SIO_CA),a
-130C DB 19       		in a,(SIO_CA)       ;read RRx
-130E CB 47       		bit 0,a
-1310 28 F7       		jr z,SIOA_RX_WAIT_LP	;if any rx char left in rx buffer
-1312 F1          			POP     AF
-1313 C9          			RET
-1314 97          SIOA_RX_CHK:	sub a               ;clear a, write into WR0: select RR0
-1315 D3 19       		out (SIO_CA),a
-1317 DB 19       		in a,(SIO_CA)       ;read RRx
-1319 CB 47       		bit 0,a
-131B C8          		ret z			;if any rx char left in rx buffer
-131C DB 18       		in a,(SIO_DA)       ;read that char
-131E C9          		ret			; return status
-131F CD 08 13    SIOA_RX:	CALL  SIOA_RX_WAIT			;wait to receive char
-1322 DB 18       SIOA_RX1:	in a,(SIO_DA)       ;read that char
-1324 C9          		RET			
+0070 3E 30       SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
+0072 D3 19               out (SIO_CA),a
+0074 3E 18               ld a,00011000b      ; write into WR0: channel reset
+0076 D3 19               out (SIO_CA),a
+0078 3E 04               ld a,00000100b      ; write into WR0: select WR4
+007A D3 19               out (SIO_CA),a
+007C 3E 04               ld a,00000100b      ; write into WR4: presc. 1x, 1 stop bit, no parity
+007E D3 19               out (SIO_CA),a
+0080 3E 05               ld a,00000101b      ; write into WR0: select WR5
+0082 D3 19               out (SIO_CA),a
+0084 3E E8               ld a,11101000b      ; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
+0086 D3 19               out (SIO_CA),a
+0088 C9          		ret
+0089 CD 70 00    SIO_INIT:	call SIOA_INIT	; first init SIO A
+008C 3E 01       SIOB_INIT:	ld a,00000001b      ; write into WR0: select WR1
+008E D3 1B               out (SIO_CB),a
+0090 3E 04               ld a,00000100b      ; write into WR0: status affects interrupt vectors
+0092 D3 1B               out (SIO_CB),a
+0094 3E 02               ld a,00000010b      ; write into WR0: select WR2
+0096 D3 1B               out (SIO_CB),a
+0098 3E 00               ld a,0h             ; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
+009A D3 1B               out (SIO_CB),a
+009C C9          		ret
+009D 3E 01               ld a,01h            ; write into WR0: select WR1
+009F D3 19               out (SIO_CA),a
+00A1 3E 18               ld a,00011000b      ; interrupts on every RX char; parity is no special condition;
+00A3 D3 19               out (SIO_CA),a
+00A5 C9          		ret
+00A6 3E 05       SIOA_RTS_OFF:	ld a,00000101b      ; write into WR0: select WR5
+00A8 D3 19               out (SIO_CA),a
+00AA 3E E8               ld a,11101000b      ; 8 bits/TX char; TX enable; RTS disable
+00AC D3 19               out (SIO_CA),a
+00AE C9                  ret
+00AF 3E 05       SIOA_RTS_ON:	ld a,00000101b      ; write into WR0: select WR5
+00B1 D3 19               out (SIO_CA),a
+00B3 3E EA               ld a,11101010b      ; 8 bits/TX char; TX enable; RTS enable
+00B5 D3 19               out (SIO_CA),a
+00B7 C9                  ret
+00B8 3E 03       SIO_A_DI:	ld a,00000011b      ; write into WR0: select WR3
+00BA D3 19               out (SIO_CA),a
+00BC 3E 0C               ld a,00001100b      ; write into WR3: RX disable;
+00BE D3 19               out (SIO_CA),a
+00C0 C9                  ret
+00C1 3E 03       SIO_A_EI:	ld a,00000011b      ; write into WR0: select WR3
+00C3 D3 19               out (SIO_CA),a
+00C5 3E C1               ld a,11000001b      ; 8 bits/RX char; auto enable OFF; RX enable
+00C7 D3 19               out (SIO_CA),a
+00C9 C9                  ret
+00CA E1          SIOA_PRNT_SP:	pop HL
+00CB CD D1 00    			call SIOA_PRNT_STR
+00CE 23          			inc hl
+00CF E5          			push hl
+00D0 C9          			ret
+00D1 F5          SIOA_PRNT_STR:	PUSH	AF
+00D2 7E          SIOAPRNTSTRLP:	LD		A,(HL)
+00D3 FE 00       		CP		EOS					;Test for end byte
+00D5 28 06       		JR		Z,SIOA_END_PRNT_STR	;Jump if end byte is found
+00D7 CD EC 00    		CALL	SIOA_TX
+00DA 23          		INC		HL					;Increment pointer to next char
+00DB 18 F5       		JR		SIOAPRNTSTRLP	;Transmit loop
+00DD F1          SIOA_END_PRNT_STR:	POP		AF
+00DE C9          		RET	 
+00DF F5          SIOA_TX_RDY:	PUSH 	AF
+00E0 3E 01       SIOA_TX_RD1:	ld a,1
+00E2 D3 19       		out (SIO_CA),a
+00E4 DB 19       		in a,(SIO_CA)
+00E6 CB 47       		bit 0,a
+00E8 28 F6       		jr z,SIOA_TX_RD1
+00EA F1          		POP     AF
+00EB C9          		RET
+00EC CD DF 00    SIOA_TX:		CALL  SIOA_TX_RDY			;Make sure UART is ready to receive
+00EF D3 18       			out (SIO_DA),a      			;Transmit character in A to UART
+00F1 C9          			RET
+00F2 F5          SIOA_RX_WAIT:	PUSH 	AF					
+00F3 97          SIOA_RX_WAIT_LP:	sub a               ;clear a, write into WR0: select RR0
+00F4 D3 19       		out (SIO_CA),a
+00F6 DB 19       		in a,(SIO_CA)       ;read RRx
+00F8 CB 47       		bit 0,a
+00FA 28 F7       		jr z,SIOA_RX_WAIT_LP	;if any rx char left in rx buffer
+00FC F1          			POP     AF
+00FD C9          			RET
+00FE 97          SIOA_RX_CHK:	sub a               ;clear a, write into WR0: select RR0
+00FF D3 19       		out (SIO_CA),a
+0101 DB 19       		in a,(SIO_CA)       ;read RRx
+0103 CB 47       		bit 0,a
+0105 C8          		ret z			;if any rx char left in rx buffer
+0106 DB 18       		in a,(SIO_DA)       ;read that char
+0108 C9          		ret			; return status
+0109 CD F2 00    SIOA_RX:	CALL  SIOA_RX_WAIT			;wait to receive char
+010C DB 18       SIOA_RX1:	in a,(SIO_DA)       ;read that char
+010E C9          		RET			
 # End of file C:\zeus\mintz80_monitor\SIODriver.asm
 # File C:\zeus\mintz80_monitor\ymzdrvr.asm
-1325 E5          ymzinit:	push hl
-1326 C5          	push bc
-1327 F5          	push af
-1328 21 53 13    	ld hl,ymztab+13
-132B 06 0D       	ld b,$0d
-132D 78          ymz1:	ld a,b
-132E CD 3A 13    	call ymzwr
-1331 2B          	dec hl
-1332 05          	dec b
-1333 F2 2D 13    	jp p,ymz1
-1336 F1          	pop af
-1337 C1          	pop bc
-1338 E1          	pop hl
-1339 C9          	ret
-133A D3 02       ymzwr:	out (ymbase),a
-133C 7E          	ld a,(hl)
-133D D3 03       	out (ymbase+1),a
-133F C9          	ret
-1340 D3 02       ymzsetreg: out (ymbase),a
-1342 79          	ld a,c
-1343 D3 03       	out (ymbase+1),a
-1345 C9          	ret
-1346 40 00 20 00 10 00 00 F8 0F 0F 0F 00 00 00 ymztab:	defb $40,0,$20,0,$10,0,0,$f8,$f,$f,$f,0,0,0
+010F E5          ymzinit:	push hl
+0110 C5          	push bc
+0111 F5          	push af
+0112 21 3D 01    	ld hl,ymztab+13
+0115 06 0D       	ld b,$0d
+0117 78          ymz1:	ld a,b
+0118 CD 24 01    	call ymzwr
+011B 2B          	dec hl
+011C 05          	dec b
+011D F2 17 01    	jp p,ymz1
+0120 F1          	pop af
+0121 C1          	pop bc
+0122 E1          	pop hl
+0123 C9          	ret
+0124 D3 02       ymzwr:	out (ymbase),a
+0126 7E          	ld a,(hl)
+0127 D3 03       	out (ymbase+1),a
+0129 C9          	ret
+012A D3 02       ymzsetreg: out (ymbase),a
+012C 79          	ld a,c
+012D D3 03       	out (ymbase+1),a
+012F C9          	ret
+0130 40 00 20 00 10 00 00 F8 0F 0F 0F 00 00 00 ymztab:	defb $40,0,$20,0,$10,0,0,$f8,$f,$f,$f,0,0,0
 # End of file C:\zeus\mintz80_monitor\ymzdrvr.asm
 # File C:\zeus\mintz80_monitor\eeprom_prog.asm
-1354 0D 0A 41 64 64 72 65 73 73 20 6F 66 20 73 6F 75 72 63 65 20 64 61 74 61 20 00 epp_srcaddr:	db $0d,$0a,"Address of source data ",0
-136E 0D 0A 41 64 64 72 65 73 73 20 6F 66 20 64 65 73 74 69 6E 61 74 69 6F 6E 20 00 epp_tgtaddr:	db $0d,$0a,"Address of destination ",0
-1388 0D 0A 44 61 74 61 20 6C 65 6E 67 74 68 20 00 epp_numbyte:	db $0d,$0a,"Data length ",0
-1397 0D 0A 50 61 67 65 20 74 6F 20 77 72 69 74 65 20 74 6F 20 28 30 30 20 6F 72 20 30 32 29 20 00 epp_page:		db $0d,$0a,"Page to write to (00 or 02) ",0
-13B6 E5          epp_prep	push hl
-13B7 D5          		push de
-13B8 C5          		push bc
-13B9 21 1D 14    		ld hl,epp_prog
-13BC 11 00 FF    		ld de,epp_tmp
-13BF 01 54 00    		ld bc,epp_end-epp_prog
-13C2 ED B0       		ldir
-13C4 C1          		pop bc
-13C5 D1          		pop de
-13C6 E1          		pop hl
-13C7 C9          		ret
-13C8 E5          epp_upda:	push hl
-13C9 F5          		push af
-13CA 21 54 13    		ld hl,epp_srcaddr
-13CD CD 86 0E    		call PRINT_STRING
-13D0 CD 21 0F    		call GETHEXWORD
-13D3 3A 18 FE    		LD A, (ERRFLAG)
-13D6 FE 00       		CP E_NONE
-13D8 C0          		RET NZ
-13D9 22 0C FF    		ld (epp_tmp+epp_srca-epp_prog+1),hl
-13DC 21 6E 13    		ld hl,epp_tgtaddr
-13DF CD 86 0E    		call PRINT_STRING
-13E2 CD 21 0F    		call GETHEXWORD
-13E5 3A 18 FE    		LD A, (ERRFLAG)
-13E8 FE 00       		CP E_NONE
-13EA 20 03       		jr NZ,epp_upd1		; skip if invalid entry
-13EC 22 09 FF    		ld (epp_tmp+epp_tgta-epp_prog+1),hl
-13EF 21 88 13    epp_upd1:	ld hl,epp_numbyte
-13F2 CD 86 0E    		call PRINT_STRING
-13F5 CD 21 0F    		call GETHEXWORD
-13F8 3A 18 FE    		LD A, (ERRFLAG)
-13FB FE 00       		CP E_NONE
-13FD 20 03       		jr NZ,epp_upd2		; skip if invalid entry
-13FF 22 0F FF    		ld (epp_tmp+epp_lena-epp_prog+1),hl
-1402 21 97 13    epp_upd2:	ld hl,epp_page
-1405 CD 86 0E    		call PRINT_STRING
-1408 CD F9 0E    		call GETHEXBYTE
-140B 6F          		ld l,a			; save temporarily
-140C 3A 18 FE    		LD A, (ERRFLAG)
-140F FE 00       		CP E_NONE
-1411 20 07       		jr NZ,epp_upd3		; skip if invalid entry
-1413 7D          		ld a,l			; restore
-1414 32 05 FF    		ld (epp_tmp+epp_banka-epp_prog+1),a
-1417 32 4E FF    		ld (epp_tmp+epp_jmp_bnk-epp_prog+1),a
-141A F1          epp_upd3:	pop af
-141B E1          		pop hl
-141C C9          		ret
-141D E5          epp_prog:	push hl
-141E D5          		push de
-141F C5          		push bc
-1420 F5          		push af
-1421 3E 02       epp_banka:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
-1423 D3 D8       		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
-1425 21 00 00    epp_tgta:	ld hl,epp_tgt	; source of data to be programmed
-1428 11 00 20    epp_srca:	ld de,epp_src	; target address
-142B 01 00 20    epp_lena:	ld bc,epp_len	; number of bytes
-142E 78          epp_p1:	ld a,b		; check if remaining bytes = 0
-142F B1          		or c
-1430 28 1A       		jr z,epp_exit	; yes, end the procedure
-1432 1A          		ld a,(de)		; no, fetch next byte
-1433 77          		ld (hl),a		; store it in target address
-1434 18 0C       		jr epp_p3
-1436 F5          epp_p2:	push af		; save programmed byte
-1437 3E 1B       		ld a,epp_del	; delay before reading back byte
-1439 F5          epp_delay:	push af			; count delay
-143A 3D          epp_del1:	dec a
-143B 20 FD       		jr nz,epp_del1		; repeat till 0
-143D F1          		pop af
-143E 3D          		dec a
-143F 20 F8       		jr nz,epp_delay
-1441 F1          		pop af		; restore programmed byte
-1442 D3 D1       epp_p3:	out (beepr),a
-1444 BE          		cp (hl)		; compare with EEPROM content
-1445 20 EF       		jr nz,epp_p2	; repeat till readback = programmed data
-1447 23          		inc hl
-1448 13          		inc de
-1449 0B          		dec bc
-144A 18 E2       		jr epp_p1
-144C 22 60 FF    epp_exit:	ld ($ff60),hl
-144F ED 53 62 FF 		ld ($ff62),de
-1453 ED 43 64 FF 		ld ($ff64),bc
-1457 32 66 FF    		ld ($ff66),a
-145A F1          		pop af
-145B C1          		pop bc
-145C D1          		pop de
-145D E1          		pop hl
-145E C3 00 00    		jp $0000		; since we've potentially changed the location of code that got us here, just start over
-1461 DB D8       epp_switch:	in a,(memmap)	; call this at $ffnn after executing epp_prep
-1463 EE 02       		xor a,$02
-1465 D3 D8       		out (memmap),a
-1467 C3 00 00    		jp $0
-146A 3E 02       epp_jmp_bnk:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
-146C D3 D8       		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
-146E C3 00 00    		jp $0000		; since we've potentially changed the location of code that got us here, just start over
+013E 0D 0A 41 64 64 72 65 73 73 20 6F 66 20 73 6F 75 72 63 65 20 64 61 74 61 20 00 epp_srcaddr:	db $0d,$0a,"Address of source data ",0
+0158 0D 0A 41 64 64 72 65 73 73 20 6F 66 20 64 65 73 74 69 6E 61 74 69 6F 6E 20 00 epp_tgtaddr:	db $0d,$0a,"Address of destination ",0
+0172 0D 0A 44 61 74 61 20 6C 65 6E 67 74 68 20 00 epp_numbyte:	db $0d,$0a,"Data length ",0
+0181 0D 0A 50 61 67 65 20 74 6F 20 77 72 69 74 65 20 74 6F 20 28 30 30 20 6F 72 20 30 32 29 20 00 epp_page:		db $0d,$0a,"Page to write to (00 or 02) ",0
+01A0 E5          epp_prep	push hl
+01A1 D5          		push de
+01A2 C5          		push bc
+01A3 21 07 02    		ld hl,epp_prog
+01A6 11 00 FF    		ld de,epp_tmp
+01A9 01 54 00    		ld bc,epp_end-epp_prog
+01AC ED B0       		ldir
+01AE C1          		pop bc
+01AF D1          		pop de
+01B0 E1          		pop hl
+01B1 C9          		ret
+01B2 E5          epp_upda:	push hl
+01B3 F5          		push af
+01B4 21 3E 01    		ld hl,epp_srcaddr
+01B7 CD 13 11    		call PRINT_STRING
+01BA CD AE 11    		call GETHEXWORD
+01BD 3A 18 FE    		LD A, (ERRFLAG)
+01C0 FE 00       		CP E_NONE
+01C2 C0          		RET NZ
+01C3 22 0C FF    		ld (epp_tmp+epp_srca-epp_prog+1),hl
+01C6 21 58 01    		ld hl,epp_tgtaddr
+01C9 CD 13 11    		call PRINT_STRING
+01CC CD AE 11    		call GETHEXWORD
+01CF 3A 18 FE    		LD A, (ERRFLAG)
+01D2 FE 00       		CP E_NONE
+01D4 20 03       		jr NZ,epp_upd1		; skip if invalid entry
+01D6 22 09 FF    		ld (epp_tmp+epp_tgta-epp_prog+1),hl
+01D9 21 72 01    epp_upd1:	ld hl,epp_numbyte
+01DC CD 13 11    		call PRINT_STRING
+01DF CD AE 11    		call GETHEXWORD
+01E2 3A 18 FE    		LD A, (ERRFLAG)
+01E5 FE 00       		CP E_NONE
+01E7 20 03       		jr NZ,epp_upd2		; skip if invalid entry
+01E9 22 0F FF    		ld (epp_tmp+epp_lena-epp_prog+1),hl
+01EC 21 81 01    epp_upd2:	ld hl,epp_page
+01EF CD 13 11    		call PRINT_STRING
+01F2 CD 86 11    		call GETHEXBYTE
+01F5 6F          		ld l,a			; save temporarily
+01F6 3A 18 FE    		LD A, (ERRFLAG)
+01F9 FE 00       		CP E_NONE
+01FB 20 07       		jr NZ,epp_upd3		; skip if invalid entry
+01FD 7D          		ld a,l			; restore
+01FE 32 05 FF    		ld (epp_tmp+epp_banka-epp_prog+1),a
+0201 32 4E FF    		ld (epp_tmp+epp_jmp_bnk-epp_prog+1),a
+0204 F1          epp_upd3:	pop af
+0205 E1          		pop hl
+0206 C9          		ret
+0207 E5          epp_prog:	push hl
+0208 D5          		push de
+0209 C5          		push bc
+020A F5          		push af
+020B 3E 02       epp_banka:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
+020D D3 D8       		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
+020F 21 00 00    epp_tgta:	ld hl,epp_tgt	; source of data to be programmed
+0212 11 00 20    epp_srca:	ld de,epp_src	; target address
+0215 01 00 20    epp_lena:	ld bc,epp_len	; number of bytes
+0218 78          epp_p1:	ld a,b		; check if remaining bytes = 0
+0219 B1          		or c
+021A 28 1A       		jr z,epp_exit	; yes, end the procedure
+021C 1A          		ld a,(de)		; no, fetch next byte
+021D 77          		ld (hl),a		; store it in target address
+021E 18 0C       		jr epp_p3
+0220 F5          epp_p2:	push af		; save programmed byte
+0221 3E 1B       		ld a,epp_del	; delay before reading back byte
+0223 F5          epp_delay:	push af			; count delay
+0224 3D          epp_del1:	dec a
+0225 20 FD       		jr nz,epp_del1		; repeat till 0
+0227 F1          		pop af
+0228 3D          		dec a
+0229 20 F8       		jr nz,epp_delay
+022B F1          		pop af		; restore programmed byte
+022C D3 D1       epp_p3:	out (beepr),a
+022E BE          		cp (hl)		; compare with EEPROM content
+022F 20 EF       		jr nz,epp_p2	; repeat till readback = programmed data
+0231 23          		inc hl
+0232 13          		inc de
+0233 0B          		dec bc
+0234 18 E2       		jr epp_p1
+0236 22 60 FF    epp_exit:	ld ($ff60),hl
+0239 ED 53 62 FF 		ld ($ff62),de
+023D ED 43 64 FF 		ld ($ff64),bc
+0241 32 66 FF    		ld ($ff66),a
+0244 F1          		pop af
+0245 C1          		pop bc
+0246 D1          		pop de
+0247 E1          		pop hl
+0248 C3 00 00    		jp $0000		; since we've potentially changed the location of code that got us here, just start over
+024B DB D8       epp_switch:	in a,(memmap)	; call this at $ffnn after executing epp_prep
+024D EE 02       		xor a,$02
+024F D3 D8       		out (memmap),a
+0251 C3 00 00    		jp $0
+0254 3E 02       epp_jmp_bnk:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
+0256 D3 D8       		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
+0258 C3 00 00    		jp $0000		; since we've potentially changed the location of code that got us here, just start over
 # End of file C:\zeus\mintz80_monitor\eeprom_prog.asm
+# File C:\zeus\mintz80_monitor\Z80Monitor.asm
+025B 3E 00       del00:	ld a,$00		; delay loop
+025D F5          delay:	push af			; count delay
+025E 3D          del1:	dec a
+025F 20 FD       	jr nz,del1		; repeat till 0
+0261 F1          	pop af
+0262 3D          	dec a
+0263 20 F8       	jr nz,delay
+0265 C9          	ret
+0266 F5          beep:	push af
+0267 D3 D1       bep1:	out (beepr),a
+0269 F1          	pop af
+026A F5          	push af
+026B CD 5D 02    	call delay
+026E 0B          	dec bc
+026F 78          	ld a,b
+0270 B1          	or c
+0271 20 F4       	jr nz,bep1
+0273 F1          	pop af
+0274 C9          	ret
+0275 DB D1       memmap_init:	in a,(beepr)	; unlock memmap
+0277 3E 00       	ld a,0		; init mem map
+0279 D3 D8       	out ($d8),a
+027B 3E 01       	ld a,1
+027D D3 D9       	out ($d9),a
+027F D3 DA       	out ($da),a
+0281 D3 DB       	out ($db),a
+0283 D3 DC       	out ($dc),a
+0285 D3 DD       	out ($dd),a
+0287 D3 DE       	out ($de),a
+0289 D3 DF       	out ($df),a
+028B D3 D1       	out (beepr),a	; lock memmap
+028D C9          	ret
+028E F5          JUMPTAB_INIT:	push AF
+028F E5          			push HL
+0290 D5          			push DE
+0291 C5          			push BC
+0292 21 A2 02    			ld hl,JUMPTABR
+0295 11 00 FD    			ld de,JUMPTAB
+0298 01 C6 00    			ld bc,JUMPTAB_END-JUMPTABR
+029B ED B0       			ldir
+029D C1          			pop BC
+029E D1          			pop DE
+029F E1          			pop HL
+02A0 F1          			pop AF
+02A1 C9          			ret
+# End of file C:\zeus\mintz80_monitor\Z80Monitor.asm
+# File C:\zeus\mintz80_monitor\jumptab.asm
+02A2 C3 8E 02    jJUMPTAB_INIT	jp JUMPTAB_INIT
+02A5 C3 DD 11    jPRINTHNIB		jp PRINTHNIB
+02A8 C3 E6 11    jPRINTHBYTE:	jp PRINTHBYTE
+02AB C3 F7 11    jPRINTHWORD	jp PRINTHWORD
+02AE C3 1E 11    jPRINT_CHAR:	jp PRINT_CHAR
+02B1 C3 13 11    jPRINT_STRING:	jp PRINT_STRING
+02B4 C3 45 11    jPRINT_NEW_LINE	jp PRINT_NEW_LINE
+02B7 C3 68 11    jGETHEXNIB		jp GETHEXNIB
+02BA C3 86 11    jGETHEXBYTE	jp GETHEXBYTE
+02BD C3 AE 11    jGETHEXWORD	jp GETHEXWORD
+02C0 C3 17 11    jGET_CHAR		jp GET_CHAR
+02C3 C3 31 12    jCHARS2BYTE	jp CHARS2BYTE
+02C6 C3 16 06    jUART_RX_RDY	jp UART_RX_RDY
+02C9 C3 24 06    jUART_RX		jp UART_RX
+02CC C3 1F 06    jRX_CHK		jp RX_CHK
+02CF C3 07 06    jUART_TX_RDY	jp UART_TX_RDY
+02D2 C3 10 06    jUART_TX		jp UART_TX
+02D5 C3 F2 05    jUART_PRNT_SP	jp UART_PRNT_SP
+02D8 C3 F9 05    jUART_PRNT_STR	jp UART_PRNT_STR
+02DB C3 30 11    jTO_UPPER		jp TO_UPPER
+02DE C3 52 11    jCHAR_ISHEX	jp CHAR_ISHEX
+02E1 C3 D6 11    jSHFTNIB		jp SHFTNIB
+02E4 C3 CB 11    jNIB2CHAR		jp NIB2CHAR
+02E7 C3 02 12    jCHAR2NIB		jp CHAR2NIB
+02EA C3 5B 02    jdel00:		jp del00
+02ED C3 5D 02    jdelay:		jp delay
+02F0 C3 66 02    jbeep:		jp beep
+02F3 C3 0F 01    jymzinit		jp ymzinit
+02F6 C3 24 01    jymzwr		jp ymzwr
+02F9 C3 2A 01    jymzsetreg		jp ymzsetreg
+02FC C3 A0 01    jepp_prep		jp epp_prep
+02FF C3 B2 01    jepp_upda		jp epp_upda
+0302 C3 07 02    jepp_prog		jp epp_prog
+0305 C3 29 00    jCTC_INIT_ALL	jp CTC_INIT_ALL
+0308 C3 3B 00    jCTC0_INIT		jp CTC0_INIT
+030B C3 3B 00    jCTC1_INIT		jp CTC0_INIT
+030E C3 3B 00    jCTC2_INIT		jp CTC0_INIT
+0311 C3 3B 00    jCTC3_INIT		jp CTC0_INIT
+0314 C3 5B 00    jCTC_TC_INIT	jp CTC_TC_INIT
+0317 C3 89 00    jSIO_INIT		jp SIO_INIT
+031A C3 70 00    jSIOA_INIT		jp SIOA_INIT
+031D C3 8C 00    jSIOB_INIT		jp SIOB_INIT
+0320 C3 9D 00    jSIO_A_INT_SET	jp SIO_A_INT_SET
+0323 C3 A6 00    jSIOA_RTS_OFF	jp SIOA_RTS_OFF
+0326 C3 AF 00    jSIOA_RTS_ON	jp SIOA_RTS_ON
+0329 C3 B8 00    jSIO_A_DI		jp SIO_A_DI
+032C C3 C1 00    jSIO_A_EI		jp SIO_A_EI
+032F C3 CA 00    jSIOA_PRNT_SP	jp SIOA_PRNT_SP
+0332 C3 D1 00    jSIOA_PRNT_STR	jp SIOA_PRNT_STR
+0335 C3 DF 00    jSIOA_TX_RDY	jp SIOA_TX_RDY
+0338 C3 EC 00    jSIOA_TX		jp SIOA_TX
+033B C3 F2 00    jSIOA_RX_WAIT	jp SIOA_RX_WAIT
+033E C3 FE 00    jSIOA_RX_CHK	jp SIOA_RX_CHK
+0341 C3 09 01    jSIOA_RX		jp SIOA_RX
+0344 C3 18 00    jPIO_INIT		jp PIO_INIT
+0347 C3 48 12    jCF_INIT:		jp CF_INIT
+034A C3 8A 12    jCF_LP_BUSY:	jp CF_LP_BUSY
+034D C3 92 12    jCF_LP_CMD_RDY:	jp CF_LP_CMD_RDY
+0350 C3 9C 12    jCF_LP_DAT_RDY:	jp CF_LP_DAT_RDY
+0353 C3 A6 12    jCF_RD_CMD:	jp CF_RD_CMD
+0356 C3 BC 12    jCF_RD_SECT:	jp CF_RD_SECT
+0359 C3 43 14    jCF_WR_CMD:	jp CF_WR_CMD
+035C C3 00 00    jj:	jp 0
+035F DB D8       epp_toggle:	in a,(memmap)	; call this at $ffnn after executing epp_prep
+0361 EE 02       		xor a,$02
+0363 D3 D8       		out (memmap),a
+0365 C3 00 00    		jp $0
+# End of file C:\zeus\mintz80_monitor\jumptab.asm
+# File C:\zeus\mintz80_monitor\Z80Monitor.asm
+0368 F3          	di
+0369 3E 7B       	ld a,$7b	; disable wdt
+036B D3 F0       	out ($f0),a
+036D 3E B1       	ld a,$b1
+036F D3 F1       	out ($f1),a
+0371 31 FF FF    	ld sp,RAM_TOP
+0374 3E 20       	ld a,$20
+0376 CD 5D 02    	call delay		; looks like Z80 needs this delay to successfully write to IO ports
+0379 3E 01       	ld a,$01		; (SYSCLK MHz/2/(value+1))
+037B D3 D0       	out (turbo),a
+037D CD 0F 01    	call ymzinit
+0380 01 00 02    	ld bc,$0200	; bc = duration
+0383 3E 06       	ld a,$06		; a = pitch
+0385 CD 66 02    	call beep
+0388 CD 8E 02    	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
+038B CD 18 00    	call PIO_INIT		; init PIO
+038E CD 29 00    	call CTC_INIT_ALL     ; init CTC
+0391 CD 89 00    	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
+0394 CD 9D 00    	call SIO_A_INT_SET	; initialize SIOA interrupts
+0397 CD C1 00    	call SIO_A_EI		; more interrupt code
+039A 21 A5 03    dio:	ld hl,hellostr
+039D CD 13 11    	call PRINT_STRING
+03A0 CD 5E 14    	call dmpio
+03A3 18 19       	jr gomain
+03A5 0D 0A 48 65 6C 6C 6F 72 6C 64 0D 0A 43 50 4C 44 20 63 6F 6E 66 69 67 3A 00 hellostr:	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
+03BE 31 FF FF    gomain:	LD SP,RAM_TOP		;Load the stack pointer for stack operations.
+03C1 CD DD 05    	CALL UART_INIT		;Initialize UART
+03C4 CD C9 04    	CALL PRINT_MON_HDR	;Print the monitor header info
+03C7 3E 00       	LD A, 00h
+03C9 32 11 FE    	LD (DMPADDR), A
+03CC 3E FF       	LD A, 0FFh		; FF00h and next should result in 0000h
+03CE 32 12 FE    	LD (DMPADDR+1), A
+03D1 CD D5 05    	CALL CLEAR_ERROR
+03D4 CD 0E 05    	CALL MON_PRMPT_LOOP	;Monitor user prompt loop
+03D7 76          	HALT
+03D8 21 5C 14    	LD HL,MON_CLS
+03DB CD 13 11    	CALL PRINT_STRING
+03DE C9          	RET
+03DF C3 00 00    	JP MPFMON		;Jumps to 0000 (MPF-1 monitor re-entry)	
+03E2 0D 0A 4D 69 6E 74 5A 38 30 20 43 6F 6D 70 75 74 65 72 09 09 09 32 30 31 35 20 4D 43 6F 6F 6B MNMSG1:     DEFB    0DH, 0Ah, "MintZ80 Computer", 09h, 09h, 09h, "2015 MCook"
+0401 0D 0A 20 61 64 61 70 74 61 74 69 6F 6E 20 74 6F 20 4D 50 46 2D 31 20 2F 20 5A 38 30 20 44 41 52 54 09 32 30 32 32 20 46 2E 4A 2E 4B 72 61 61 6E 0D 0A MNMSG2:     DEFB    0DH, 0Ah, " adaptation to MPF-1 / Z80 DART", 09h, "2022 F.J.Kraan", 0Dh, 0Ah
+0433 41 64 61 70 74 61 74 69 6F 6E 20 74 6F 20 4D 69 6E 74 5A 38 30 20 32 30 32 35 20 41 72 74 75 72 27 73 20 4C 61 62 0D 0A             DEFB    "Adaptation to MintZ80 2025 Artur's Lab", 0Dh, 0Ah
+045B 4D 6F 6E 69 74 6F 72 20 76 31 2E 31 2C 20 52 4F 4D 3A 20 00 MNMSG3A:    DEFB    "Monitor v", VERSMYR, ".", VERSMIN, ", ROM: ", EOS
+046F 68 2C 20 52 41 4D 3A 20 00 MNMSG3B:    DEFB    "h, RAM: ", EOS
+0478 68 2C 20 50 49 4F 3A 20 00 MNMSG3C:    DEFB    "h, PIO: ", EOS
+0481 68 2C 20 43 54 43 3A 20 00 MNMSG3D:    DEFB    "h, CTC: ", EOS
+048A 68 2C 20 53 49 4F 3A 20 00 MNMSG3E:    DEFB    "h, SIO: ", EOS
+0493 68 0D 0A 0D 0A MNMSG3F:    DEFB    "h", 0Dh, 0AH, 0Dh, 0AH
+0498 09 20 49 6E 70 75 74 20 3F 20 66 6F 72 20 63 6F 6D 6D 61 6E 64 20 6C 69 73 74 0D 0A 00 MONHLP:     DEFB    09h," Input ? for command list", 0Dh, 0AH, EOS
+04B5 0D 0A 45 72 72 6F 72 20 69 6E 20 70 61 72 61 6D 73 3A 20 00 MONERR:     DEFB    0Dh, 0AH, "Error in params: ", EOS
+04C9 CD D8 03            CALL    CLEAR_SCREEN        ;Clear the terminal screen
+04CC 21 E2 03            LD      HL, MNMSG1          ;Print some messages
+04CF CD 13 11            CALL    PRINT_STRING
+04D2 21 00 00            LD      HL, ROM_BOTTOM
+04D5 CD F7 11            CALL    PRINTHWORD
+04D8 21 6F 04            LD      HL, MNMSG3B         ; 2nd part, RAM
+04DB CD 13 11            CALL    PRINT_STRING
+04DE 21 00 20            LD      HL, RAM_BOTTOM
+04E1 CD F7 11            CALL    PRINTHWORD
+04E4 21 78 04            LD      HL, MNMSG3C         ; 3rd part PIO
+04E7 CD 13 11            CALL    PRINT_STRING
+04EA 3E 1C               LD      A, PIO_BASE
+04EC CD E6 11            CALL    PRINTHBYTE
+04EF 21 81 04            LD      HL, MNMSG3D         ; 4th part CTC
+04F2 CD 13 11            CALL    PRINT_STRING
+04F5 3E 10               LD      A, CTC_BASE
+04F7 CD E6 11            CALL    PRINTHBYTE
+04FA 21 8A 04            LD      HL, MNMSG3E         ; 5th part SIO
+04FD CD 13 11            CALL    PRINT_STRING
+0500 3E 18               LD      A, SIO_BASE
+0502 CD E6 11            CALL    PRINTHBYTE
+0505 21 93 04            LD      HL, MNMSG3F         ; 6th part, line ending
+0508 CD 13 11            CALL    PRINT_STRING
+050B C9                  RET
+050C 3E 00       MON_PROMPT: DEFB ">", EOS
+050E 3E 00               LD      A, 00h
+0510 32 19 FE            LD      (MUTE), A       ; Enables echo of received chars
+0513 21 0C 05            LD      HL,MON_PROMPT   ; Print monitor prompt
+0516 CD 13 11            CALL    PRINT_STRING
+0519 CD 17 11            CALL    GET_CHAR        ; Get a character from user into Acc
+051C CD 1E 11            CALL    PRINT_CHAR
+051F FE 0D               CP      CR
+0521 28 03               JR      Z, _MPL_CR
+0523 CD 45 11            CALL    PRINT_NEW_LINE  ; Print a new line
+0526 CD 2E 05            CALL    MON_COMMAND     ; Respond to user input
+0529 CD 45 11            CALL    PRINT_NEW_LINE  ; Print a new line
+052C 18 E0               JR      MON_PRMPT_LOOP
+052E CD D5 05            CALL    CLEAR_ERROR
+0531 FE 3F               CP      "?"
+0533 CC 80 08            CALL    Z,HELP_COMMAND
+0536 FE 44               CP      "D"
+0538 CC F0 08            CALL    Z,MDCMD
+053B FE 43               CP      "C"
+053D CC D8 03            CALL    Z,CLEAR_SCREEN
+0540 FE 4E               CP      "N"
+0542 CC 93 0B            CALL    Z,RICOMMAND
+0545 FE 4F               CP      "O"
+0547 CC E1 0B            CALL    Z,PW_COMMAND
+054A FE 50               CP      "P"
+054C CC 11 0B            CALL    Z,PSCOMMAND
+054F FE 51               CP      "Q"
+0551 CC 94 05            CALL    Z,UTERMTST
+0554 FE 52               CP      "R"
+0556 CC DF 03            CALL    Z,RESET_COMMAND
+0559 FE 4D               CP      "M"
+055B CC 93 09            CALL    Z,MOVE_COMMAND
+055E FE 46               CP      "F"
+0560 CC 35 0A            CALL    Z,FILL_COMMAND
+0563 FE 47               CP      "G"
+0565 CC 3D 0C            CALL    Z,GO_COMMAND
+0568 FE 4B               CP      "K"
+056A CC 6C 0C            CALL    Z,CL_COMMAND
+056D FE 2B               CP      "+"
+056F CC A5 0A            CALL    Z,NEXTP_COMMAND
+0572 FE 2D               CP      "-"
+0574 CC B5 0A            CALL    Z,PREVP_COMMAND
+0577 FE 45               CP      "E"
+0579 CC C5 0A            CALL    Z,EDIT_COMMAND
+057C FE 3A               CP      ":"
+057E CC 4A 0D            CALL    Z,HEXI_COMMAND
+0581 FE 53               CP      "S"
+0583 CC D8 0C            CALL    Z,CCKSM_COMMAND
+0586 FE 54               CP      "T"
+0588 CC 56 0F            CALL    Z, TRAM_COMMAND
+058B FE 5A               CP      "Z"
+058D CC 14 0E            CALL    Z,REGDUMP_COMMAND
+0590 CD C0 05            CALL    ERROR_CHK
+0593 C9                  RET
+0594 CD 1F 06    UTERMTST:	CALL    RX_CHK
+0597 C0                  RET     NZ      ; Return on serial received char
+0598 DD 21 BA 05         LD      IX, SCTXT
+059C CD FE 05            CALL    SCAN
+059F FE 10               CP      010h    ; A - 010h
+05A1 38 0A               JR      C, _UTHEX
+05A3 CD E6 11            CALL    PRINTHBYTE
+05A6 3E 20               LD      A, " "
+05A8 CD 1E 11            CALL    PRINT_CHAR
+05AB 18 E7               JR      UTERMTST
+05AD CD CB 11            CALL    NIB2CHAR
+05B0 CD 1E 11            CALL    PRINT_CHAR
+05B3 3E 20               LD      A, " "
+05B5 CD 1E 11            CALL    PRINT_CHAR
+05B8 18 DA               JR      UTERMTST
+05BA 87          SCTXT   DB      10000111b    ; t
+05BB AE                  DB      10101110b    ; S
+05BC 87                  DB      10000111b    ; t
+05BD 43                  DB      01000011b    ; r.
+05BE 8F                  DB      10001111b    ; E
+05BF AE                  DB      10101110b    ; S
+05C0 3A 18 FE    ERROR_CHK:	LD      A, (ERRFLAG)
+05C3 FE 00               CP      E_NONE
+05C5 C8                  RET     Z
+05C6 21 B5 04            LD      HL, MONERR
+05C9 CD 13 11            CALL    PRINT_STRING
+05CC 3A 18 FE            LD      A, (ERRFLAG)
+05CF CD E6 11            CALL    PRINTHBYTE
+05D2 CD 45 11            CALL    PRINT_NEW_LINE
+05D5 F5          CLEAR_ERROR:	PUSH    AF
+05D6 3E 00               LD      A, E_NONE
+05D8 32 18 FE            LD      (ERRFLAG), A
+05DB F1                  POP     AF
+05DC C9                  RET
+# End of file C:\zeus\mintz80_monitor\Z80Monitor.asm
+# File C:\zeus\mintz80_monitor\UARTDriver.asm
+05DD 3E 80       UART_INIT:		LD     A,80h				;Mask to Set DLAB Flag
+05DF D3 0B       			OUT    (UART3),A
+05E1 3E 0C       			LD     A,12					;Divisor = 12 @ 9600bps w/ 1.8432 Mhz
+05E3 D3 08       			OUT    (UART0),A			;Set BAUD rate to 9600
+05E5 3E 00       			LD     A,00
+05E7 D3 09       			OUT    (UART1),A			;Set BAUD rate to 9600
+05E9 3E 03       			LD     A,03h
+05EB D3 0B       			OUT    (UART3),A			;Set 8-bit data, 1 stop bit, reset DLAB Flag
+05ED 3E 00       			LD	   A,00h
+05EF D3 09       			OUT    (UART1),A			;no interrupts
+05F1 C9          			RET		
+05F2 E1          UART_PRNT_SP:	pop HL
+05F3 CD F9 05    			call UART_PRNT_STR
+05F6 23          			inc hl
+05F7 E5          			push hl
+05F8 C9          			ret
+05F9 F5          UART_PRNT_STR:	PUSH	AF
+05FA 7E          			LD		A,(HL)
+05FB FE 00                   CP		EOS					;Test for end byte
+05FD 28 06                   JR		Z,UART_END_PRNT_STR	;Jump if end byte is found
+05FF CD 10 06    			CALL	UART_TX
+0602 23                      INC		HL					;Increment pointer to next char
+0603 18 F5                   JR		UARTPRNTSTRLP	;Transmit loop
+0605 F1          			POP		AF
+0606 C9          			RET	 
+0607 F5          UART_TX_RDY:	PUSH 	AF
+0608 DB 0D       			IN		A,(UART5)			;Fetch the control register
+060A CB 6F       			BIT 	5,A					;Bit will be set if UART is ready to send
+060C 28 FA       			JR		Z,UARTTXRDY_LP		
+060E F1          			POP     AF
+060F C9          			RET
+0610 CD 07 06    UART_TX:		CALL  UART_TX_RDY			;Make sure UART is ready to receive
+0613 D3 08       			OUT   (UART0),A				;Transmit character in A to UART
+0615 C9          			RET
+0616 F5          UART_RX_RDY:	PUSH 	AF					
+0617 DB 0D       			IN		A,(UART5)			;Fetch the control register
+0619 CB 47       			BIT 	0,A					;Bit will be set if UART is ready to receive
+061B 28 FA       			JR		Z,UART_RXRDY_LP		
+061D F1          			POP     AF
+061E C9          			RET
+061F DB 0D       RX_CHK:		IN		A,(UART5)			;Fetch the control register
+0621 E6 01       			AND	1					;Mask other bits, has some char arrived?
+0623 C9          			RET
+0624 CD 16 06    UART_RX:		CALL  UART_RX_RDY			;Make sure UART is ready to receive
+0627 DB 08       			IN    A,(UART0)				;Receive character in UART to A
+0629 C9          			RET			
+062A 3E 55       uart_test	ld a,$55
+062C D3 0F       	out (UART7),a
+062E DB 0F       	in a,(UART7)
+0630 FE 55       	cp a,$55
+0632 20 0A       	jr nz,ut1
+0634 3E AA       	ld a,$aa
+0636 D3 0F       	out (UART7),a
+0638 DB 0F       	in a,(UART7)
+063A FE AA       	cp a,$aa
+063C 28 08       	jr z,ut2
+063E 01 00 04    ut1:	ld bc,$0400	; bc = duration
+0641 3E 04       	ld a,$04		; a = pitch
+0643 CD 66 02    	call beep
+0646 C9          ut2:	ret
+# End of file C:\zeus\mintz80_monitor\UARTDriver.asm
+# File C:\zeus\mintz80_monitor\MONCommands.asm
+0647 5A 4D 43 38 30 20 4D 6F 6E 69 74 6F 72 20 43 6F 6D 6D 61 6E 64 20 4C 69 73 74 0D 0A HLPMSG1: DEFB "ZMC80 Monitor Command List", 0Dh, 0Ah
+0663 3F 20 2D 20 76 69 65 77 20 63 6F 6D 6D 61 6E 64 20 6C 69 73 74 0D 0A HLPMSG2: DEFB "? - view command list", 0Dh, 0Ah
+067A 43 20 2D 20 63 6C 65 61 72 20 73 63 72 65 65 6E 0D 0A HLPMSGc: DEFB "C - clear screen", 0Dh, 0Ah
+068C 44 20 2D 20 70 72 69 6E 74 20 31 30 30 68 20 62 79 74 65 73 20 66 72 6F 6D 20 73 70 65 63 69 66 69 65 64 20 6C 6F 63 61 74 69 6F 6E 0D 0A HLPMSGd: DEFB "D - print 100h bytes from specified location", 0Dh, 0Ah
+06BA 45 20 2D 20 65 64 69 74 20 62 79 74 65 73 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A HLPMSGe: DEFB "E - edit bytes in memory", 0Dh, 0Ah
+06D4 46 20 2D 20 66 69 6C 6C 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 20 77 69 74 68 20 76 61 6C 75 65 0D 0A HLPMSGf: DEFB "F - fill memory range with value", 0Dh, 0Ah
+06F6 47 20 2D 20 6A 75 6D 70 20 74 6F 20 6D 65 6D 6F 72 79 20 61 64 64 72 65 73 73 0D 0A HLPMSGg: DEFB "G - jump to memory address", 0Dh, 0Ah
+0712 4B 20 2D 20 63 61 6C 6C 20 74 6F 20 6D 65 6D 6F 72 79 20 61 64 64 72 65 73 73 0D 0A HLPMSGk: DEFB "K - call to memory address", 0Dh, 0Ah
+072E 4D 20 2D 20 63 6F 70 79 20 62 79 74 65 73 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A HLPMSGm: DEFB "M - copy bytes in memory", 0Dh, 0Ah
+0748 4E 20 2D 20 72 65 61 64 20 49 4F 20 70 6F 72 74 0D 0A          DEFB "N - read IO port", 0Dh, 0Ah
+075A 4F 20 2D 20 77 72 69 74 65 20 62 79 74 65 20 74 6F 20 6F 75 74 70 75 74 20 70 6F 72 74 0D 0A HLPMSGo: DEFB "O - write byte to output port", 0Dh, 0Ah
+0779 50 20 2D 20 70 72 69 6E 74 20 70 6F 72 74 20 73 63 61 6E 20 28 30 30 2D 46 46 29 0D 0A HLPMSGp: DEFB "P - print port scan (00-FF)", 0Dh, 0Ah
+0796 51 20 2D 20 74 65 73 74 20 4D 50 46 20 6B 65 79 62 6F 61 72 64 0D 0A HLPMSGq: DEFB "Q - test MPF keyboard", 0Dh, 0Ah
+07AD 52 20 2D 20 6D 6F 6E 69 74 6F 72 20 72 65 73 65 74 0D 0A HLPMSGr: DEFB "R - monitor reset", 0Dh, 0Ah
+07C0 53 20 2D 20 63 61 6C 63 75 6C 61 74 65 20 63 68 65 63 6B 73 75 6D 20 66 6F 72 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 0D 0A HLPMSGs: DEFB "S - calculate checksum for memory range", 0Dh, 0Ah
+07E9 54 20 2D 20 74 65 73 74 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 0D 0A HLPMSGt: DEFB "T - test memory range", 0Dh, 0Ah
+0800 5A 20 2D 20 64 75 6D 70 20 75 73 65 72 20 72 65 67 69 73 74 65 72 73 20 28 53 54 45 50 29 0D 0A HLPMSGz: DEFB "Z - dump user registers (STEP)", 0Dh, 0Ah
+0820 2B 20 2D 20 70 72 69 6E 74 20 6E 65 78 74 20 62 6C 6F 63 6B 20 6F 66 20 6D 65 6D 6F 72 79 0D 0A HLPMSG8: DEFB "+ - print next block of memory", 0Dh, 0Ah
+0840 2D 20 2D 20 70 72 69 6E 74 20 70 72 65 76 69 6F 75 73 20 62 6C 6F 63 6B 20 6F 66 20 6D 65 6D 6F 72 79 0D 0A HLPMSG9: DEFB "- - print previous block of memory", 0Dh, 0Ah
+0864 3A 20 2D 20 4C 6F 61 64 20 68 65 78 2D 69 6E 74 65 6C 20 72 65 63 6F 72 64 0D 0A 00 HLPMSGA: DEFB ": - Load hex-intel record", 0DH, 0AH, EOS
+0880 21 47 06            LD      HL, HLPMSG1     ;Print some messages
+0883 CD 13 11            CALL    PRINT_STRING
+0886 3E 00               LD      A, EOS          ;Load $FF into Acc so MON_COMMAND finishes
+0888 C9                  RET
+0889 4D 65 6D 6F 72 79 20 44 75 6D 70 0D 0A MDC_1: DEFB "Memory Dump", 0Dh, 0Ah
+0896 4C 6F 63 61 74 69 6F 6E 20 74 6F 20 73 74 61 72 74 20 69 6E 20 34 20 64 69 67 69 74 20 48 45 58 3A 20 00 MDC_2: DEFB "Location to start in 4 digit HEX: ",EOS
+08B9 20 20 20 20 20 20 30 20 20 31 20 20 32 20 20 33 20 20 34 20 20 35 20 20 36 20 20 37 20 20 38 20 20 39 20 20 41 20 20 42 20 20 43 20 20 44 20 20 45 20 20 46 0D 0A 00 MDC_3: DEFB "      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EOS
+08F0 21 89 08    			LD 		HL,MDC_1			;Print some messages 
+08F3 CD 13 11    			CALL    PRINT_STRING
+08F6 CD AE 11    			CALL    GETHEXWORD			;HL now points to databyte location	
+08F9 3A 18 FE    			LD		A, (ERRFLAG)
+08FC FE 00       			CP		E_NONE
+08FE C0          			RET		NZ
+08FF 22 11 FE    			LD		(DMPADDR), HL		;Keep address for next/prev.
+0902 E5          			PUSH	HL					;Save HL that holds databyte location on stack
+0903 CD 45 11    			CALL    PRINT_NEW_LINE		;Print some messages
+0906 CD 45 11    			CALL    PRINT_NEW_LINE
+0909 21 B9 08    			LD 		HL, MDC_3	
+090C CD 13 11    			CALL    PRINT_STRING
+090F E1          			POP		HL					;Restore HL that holds databyte location on stack
+0910 0E 11       MDNXTPR:	LD		C,HEXLINES			;Register C holds counter of dump lines to print
+0912 11 00 FE    			LD		DE,	ASCDMPBUF
+0915 06 10       			LD		B,16				;Register B holds counter of dump bytes to print
+0917 CD F7 11    			CALL	PRINTHWORD			;Print dump line address in hex form
+091A 3E 20       			LD		A," "				;Print spacer
+091C CD 1E 11    			CALL	PRINT_CHAR
+091F 0D          			DEC		C					;Decrement C to keep track of number of lines printed
+0920 7E          			LD		A,(HL)				;Load Acc with databyte HL points to
+0921 CD E6 11    			CALL	PRINTHBYTE  		;Print databyte in HEX form 
+0924 CD 4A 09    			CALL	CHAR2BUF			;Store ASCII char
+0927 3E 20       			LD		A," "				;Print spacer
+0929 CD 1E 11    			CALL	PRINT_CHAR	
+092C 23          			INC 	HL					;Increase HL to next address pointer
+092D 10 F1       			DJNZ	MDBYTES				;Print 16 bytes out since B holds 16
+092F 3E 20       			LD		A," "				;Print spacer
+0931 CD 1E 11    			CALL	PRINT_CHAR			;
+0934 3E 00       			LD		A, EOS
+0936 32 10 FE    			LD		(ASCDMPEND), A		;Make sure there is a EOS
+0939 E5          			PUSH	HL
+093A 21 00 FE    			LD		HL, ASCDMPBUF		;Point HL to ASCII buffer
+093D CD 13 11    			CALL    PRINT_STRING		;Print buffer
+0940 E1          			POP		HL
+0941 41          			LD		B,C					;Load B with C to keep track of number of lines printed
+0942 CD 45 11    			CALL    PRINT_NEW_LINE		;Get ready for next dump line
+0945 10 CB       			DJNZ	MDLINE				;Print 16 line out since C holds 16 and we load B with C
+0947 3E 00       			LD		A,EOS				;Load $FF into Acc so MON_COMMAND finishes
+0949 C9          			RET
+094A CD 39 11    			CALL	MKPRINT
+094D 12          			LD		(DE), A
+094E 13          			INC		DE
+094F C9          			RET
+0950 4D 6F 76 65 20 44 61 74 61 0D 0A 00 MVC_1:	DEFB	"Move Data", 0Dh, 0Ah, EOS
+095C 53 74 61 72 74 20 4C 6F 63 61 74 69 6F 6E 3A 20 00 MVC_S:	DEFB	"Start Location: ", EOS
+096D 45 6E 64 20 4C 6F 63 61 74 69 6F 6E 3A 20 00 MVC_E:	DEFB	"End Location: ", EOS
+097C 44 65 73 74 69 6E 61 74 69 6F 6E 20 4C 6F 63 61 74 69 6F 6E 3A 20 00 MVC_D:	DEFB	"Destination Location: ", EOS
+0993 21 50 09    MOVE_COMMAND:	LD		HL, MVC_1	; Print some messages
+0996 CD 13 11            CALL	PRINT_STRING
+0999 21 5C 09            LD		HL, MVC_S
+099C CD 13 11            CALL	PRINT_STRING
+099F CD AE 11            CALL	GETHEXWORD
+09A2 3A 18 FE            LD		A, (ERRFLAG)
+09A5 FE 00               CP		E_NONE
+09A7 C0                  RET		NZ
+09A8 22 12 FE            LD		(MVADDR), HL
+09AB CD 45 11            CALL	PRINT_NEW_LINE
+09AE 21 6D 09            LD		HL, MVC_E
+09B1 CD 13 11            CALL	PRINT_STRING
+09B4 CD AE 11            CALL	GETHEXWORD
+09B7 3A 18 FE            LD		A, (ERRFLAG)
+09BA FE 00               CP		E_NONE
+09BC C0                  RET		NZ
+09BD 22 14 FE            LD		(MVADDR+2), HL
+09C0 CD 45 11            CALL	PRINT_NEW_LINE
+09C3 21 7C 09            LD		HL, MVC_D
+09C6 CD 13 11            CALL	PRINT_STRING
+09C9 CD AE 11            CALL	GETHEXWORD
+09CC 3A 18 FE            LD		A, (ERRFLAG)
+09CF FE 00               CP		E_NONE
+09D1 C0                  RET		NZ
+09D2 22 16 FE            LD		(MVADDR+4), HL
+09D5 CD 45 11            CALL	PRINT_NEW_LINE
+09D8 21 12 FE            ld		hl, MVADDR
+09DB CD FF 09            call	GETP	; Fix BC contents from address, to size
+09DE DA F9 09            jp		c, MERR
+09E1 ED 5B 16 FE         ld		de, (MVADDR+4)
+09E5 ED 52               sbc		hl, de
+09E7 30 0B               jr		nc, MVUP
+09E9 EB          MVDN:	ex		de, hl
+09EA 09                  add		hl, bc
+09EB 2B                  dec		hl
+09EC EB                  ex		de, hl
+09ED 2A 14 FE            ld		hl, (MVADDR+2)
+09F0 ED B8               lddr
+09F2 13                  inc		de
+09F3 C9                  RET
+09F4 19          MVUP:		add		hl,de
+09F5 ED B0               ldir
+09F7 1B                  dec		de
+09F8 C9                  RET;
+09F9 3E 02       MERR:		LD		A, E_PARAM
+09FB 32 18 FE            LD		(ERRFLAG), A
+09FE C9                  RET;
+09FF 5E          GETP:		ld		e, (hl) ; MVADDR
+0A00 23                  inc		hl
+0A01 56                  ld		d, (hl) ; MVADDR+1
+0A02 23                  inc		hl
+0A03 4E                  ld		c, (hl) ; MVADDR+2
+0A04 23                  inc		hl
+0A05 66                  ld		h, (hl) ; MVADDR+3
+0A06 69                  ld		l, c
+0A07 B7                  or		a
+0A08 ED 52               sbc		hl, de
+0A0A 4D                  ld		c, l
+0A0B 44                  ld		b, h
+0A0C 03                  inc		bc
+0A0D EB                  ex		de, hl
+0A0E C9                  ret	
+0A0F 46 69 6C 6C 20 4D 65 6D 6F 72 79 0D 0A 00 MFC_1:	DEFB	"Fill Memory", 0Dh, 0Ah, EOS
+0A1D 44 61 74 61 20 76 61 6C 75 65 20 28 6F 6E 65 20 62 79 74 65 29 3A 20 00 MFC_D:	DEFB	"Data value (one byte): ", EOS
+0A35 21 0F 0A    FILL_COMMAND:	LD		HL, MFC_1	; Print some messages
+0A38 CD 13 11            CALL	PRINT_STRING
+0A3B 21 5C 09            LD		HL, MVC_S	; Start msg.
+0A3E CD 13 11            CALL	PRINT_STRING
+0A41 CD AE 11            CALL	GETHEXWORD
+0A44 3A 18 FE            LD		A, (ERRFLAG)
+0A47 FE 00               CP		E_NONE
+0A49 C0                  RET		NZ
+0A4A 22 12 FE            LD		(MVADDR), HL	; Start val.
+0A4D CD 45 11            CALL	PRINT_NEW_LINE
+0A50 21 6D 09            LD		HL, MVC_E	; End msg.
+0A53 CD 13 11            CALL	PRINT_STRING
+0A56 CD AE 11            CALL	GETHEXWORD
+0A59 22 14 FE            LD		(MVADDR+2), HL	; End val.
+0A5C 3A 18 FE            LD		A, (ERRFLAG)
+0A5F FE 00               CP		E_NONE
+0A61 C0                  RET		NZ
+0A62 ED 5B 12 FE         LD		DE, (MVADDR)	; Start
+0A66 ED 52               SBC		HL, DE		; Make sure end is past start...
+0A68 38 35               JR		C, F_ORDERR
+0A6A 2A 14 FE            LD		HL, (MVADDR+2)
+0A6D CD 45 11            CALL	PRINT_NEW_LINE
+0A70 21 1D 0A            LD		HL, MFC_D
+0A73 CD 13 11            CALL	PRINT_STRING
+0A76 CD 86 11            CALL	GETHEXBYTE
+0A79 32 16 FE            LD		(MVADDR+4), A
+0A7C 3A 18 FE            LD		A, (ERRFLAG)
+0A7F FE 00               CP		E_NONE
+0A81 C0                  RET		NZ
+0A82 CD 45 11            CALL	PRINT_NEW_LINE
+0A85 ED 5B 12 FE         LD		DE, (MVADDR)	; Start
+0A89 2A 14 FE            LD		HL, (MVADDR+2)	; End
+0A8C ED 52               SBC		HL, DE			; Size
+0A8E 44                  LD		B, H
+0A8F 4D                  LD		C, L
+0A90 3A 16 FE            LD		A, (MVADDR+4)	; Fill value
+0A93 2A 12 FE            LD		HL, (MVADDR)	; First source location
+0A96 77                  LD		(HL), A			; seed the fill block
+0A97 ED 5B 12 FE         LD		DE, (MVADDR)	; First dest. location
+0A9B 13                  INC		DE				; 
+0A9C ED B0               LDIR
+0A9E C9                  RET
+0A9F 3E 02               LD		A, E_PARAM
+0AA1 32 18 FE            LD		(ERRFLAG), A
+0AA4 C9                  RET
+0AA5 21 B9 08    NEXTP_COMMAND:	LD 		HL,MDC_3	
+0AA8 CD 13 11            CALL    PRINT_STRING
+0AAB 2A 11 FE            LD		HL, (DMPADDR)
+0AAE 24                  INC		H
+0AAF 22 11 FE            LD		(DMPADDR), HL
+0AB2 C3 10 09            JP		MDNXTPR
+0AB5 21 B9 08    PREVP_COMMAND:	LD 		HL,MDC_3	
+0AB8 CD 13 11            CALL    PRINT_STRING
+0ABB 2A 11 FE            LD		HL, (DMPADDR)
+0ABE 25                  DEC		H
+0ABF 22 11 FE            LD		(DMPADDR), HL
+0AC2 C3 10 09            JP		MDNXTPR
+0AC5 21 5C 09    EDIT_COMMAND:	LD 		HL, MVC_S	; Start msg.
+0AC8 CD 13 11            CALL    PRINT_STRING
+0ACB CD AE 11            CALL	GETHEXWORD	; Get first address
+0ACE 3A 18 FE            LD		A, (ERRFLAG)
+0AD1 FE 00               CP		E_NONE
+0AD3 C0                  RET		NZ
+0AD4 3E 3A       EDIT_LP:	LD		A, ":"
+0AD6 CD 1E 11            CALL	PRINT_CHAR
+0AD9 3E 20               LD		A, " "
+0ADB CD 1E 11            CALL	PRINT_CHAR
+0ADE 7E                  LD		A, (HL)		; Print original value
+0ADF CD E6 11            CALL	PRINTHBYTE
+0AE2 3E 3E               LD		A, ">"
+0AE4 CD 1E 11            CALL	PRINT_CHAR
+0AE7 3E 20               LD		A, " "
+0AE9 CD 1E 11            CALL	PRINT_CHAR
+0AEC CD 86 11            CALL	GETHEXBYTE
+0AEF 32 16 FE            LD		(MVADDR+4), A
+0AF2 3A 18 FE            LD		A, (ERRFLAG)
+0AF5 FE 00               CP		E_NONE
+0AF7 C0                  RET		NZ
+0AF8 3A 16 FE            LD		A, (MVADDR+4)
+0AFB 77                  LD		(HL), A		; Write new value
+0AFC CD 45 11            CALL	PRINT_NEW_LINE
+0AFF 23                  INC		HL
+0B00 CD F7 11            CALL	PRINTHWORD
+0B03 18 CF               JR		EDIT_LP		; Only way out is type a non-hex char...
+0B05 50 6F 72 74 20 53 63 61 6E 0D 0A 00 PSC_1: DEFB "Port Scan", 0Dh, 0Ah, EOS
+0B11 21 05 0B    PSCOMMAND:	LD 		HL,PSC_1			;Print some messages 
+0B14 CD 13 11            CALL    PRINT_STRING
+0B17 21 B9 08            LD 		HL,MDC_3			;Print some messages 
+0B1A CD 13 11            CALL    PRINT_STRING
+0B1D 01 00 00            LD		BC, 0h
+0B20 AF                  XOR     A
+0B21 3E 20               LD		A, " "
+0B23 CD 1E 11            CALL	PRINT_CHAR  ; address - contents separator
+0B26 79                  LD      A,C
+0B27 CD E6 11            CALL	PRINTHBYTE
+0B2A 3E 20               LD		A, " "
+0B2C CD 1E 11            CALL	PRINT_CHAR  ; address - contents separator
+0B2F CD 1E 11            CALL	PRINT_CHAR
+0B32 ED 78               IN		A, (C)
+0B34 CD E6 11            CALL	PRINTHBYTE
+0B37 3E 20               LD		A, " "
+0B39 CD 1E 11            CALL	PRINT_CHAR ; inter-port-contents separator
+0B3C 03                  INC		BC
+0B3D AF                  XOR		A
+0B3E 80                  ADD		A, B
+0B3F 20 11               JR      NZ, PS_END  ; check for all ports done
+0B41 79                  LD		A, C
+0B42 E6 0F               AND		00Fh	; multiples of 16
+0B44 20 EC               JR      NZ, PS_LOOP	; line not yet full
+0B46 CD 45 11            CALL	PRINT_NEW_LINE
+0B49 18 D6               JR		PS_NEWPL
+0B4B 3E 20               LD		A, " "
+0B4D CD 1E 11            CALL	PRINT_CHAR
+0B50 18 E0               JR		PS_LOOP
+0B52 C9                  RET
+0B53 49 4F 20 52 65 61 64 0D 0A RIC_1: DEFB "IO Read", 0Dh, 0Ah
+0B5C 45 6E 74 65 72 20 49 4F 20 61 64 64 72 65 73 73 2E 20 4F 6E 6C 79 20 24 30 30 6E 6E 20 73 75 70 70 6F 72 74 65 64 2E 20 27 45 4E 54 45 52 27 20 65 6E 64 73 0D 0A 00 RIC_2: DEFB "Enter IO address. Only $00nn supported. 'ENTER' ends", 0Dh, 0Ah, EOS
+0B93 21 53 0B    RICOMMAND:        LD 		HL,RIC_1			;Print some messages 
+0B96 CD 13 11            CALL    PRINT_STRING
+0B99 CD 86 11    RILOOP:        CALL    GETHEXBYTE
+0B9C 32 12 FE            LD      (MVADDR), A             ; Misuse Move address buffer to store port
+0B9F 3A 18 FE            LD      A, (ERRFLAG)
+0BA2 FE 00               CP      E_NONE
+0BA4 20 15               JR      NZ,RICOUT
+0BA6 3E 20               LD		A, " "
+0BA8 CD 1E 11            CALL	PRINT_CHAR
+0BAB 3A 12 FE            LD      A, (MVADDR)
+0BAE 4F                  LD      C, A
+0BAF 06 00               LD      B, 0
+0BB1 ED 78               IN      A, (C)
+0BB3 CD E6 11            CALL	PRINTHBYTE
+0BB6 CD 45 11            CALL	PRINT_NEW_LINE
+0BB9 18 DE               JR      RILOOP
+0BBB CD 45 11    RICOUT:        CALL	PRINT_NEW_LINE
+0BBE C9                  RET
+0BBF 57 72 69 74 65 20 64 61 74 61 20 74 6F 20 70 6F 72 74 0D 0A MPW_1:  DEFB    "Write data to port", 0Dh, 0Ah
+0BD3 50 6F 72 74 20 26 20 64 61 74 61 3A 20 00 MPW_P:  DEFB    "Port & data: ", EOS
+0BE1 21 BF 0B    PW_COMMAND:	LD      HL, MPW_1
+0BE4 CD 13 11            CALL    PRINT_STRING
+0BE7 CD 86 11            CALL    GETHEXBYTE
+0BEA 32 12 FE            LD      (MVADDR), A             ; Misuse Move address buffer to store port
+0BED 3A 18 FE            LD      A, (ERRFLAG)
+0BF0 FE 00               CP      E_NONE
+0BF2 C0                  RET     NZ
+0BF3 3E 20               LD      A, " "
+0BF5 CD 1E 11            CALL    PRINT_CHAR
+0BF8 CD 86 11            CALL    GETHEXBYTE
+0BFB 32 13 FE            LD      (MVADDR+1), A
+0BFE 3A 18 FE            LD      A, (ERRFLAG)
+0C01 FE 00               CP      E_NONE
+0C03 C0                  RET     NZ
+0C04 3A 12 FE            LD      A, (MVADDR)
+0C07 4F                  LD      C, A
+0C08 3A 13 FE            LD      A, (MVADDR+1)
+0C0B ED 79               OUT     (C), A
+0C0D AF                  xor a			; zero A because upon return other commands will be tested for and value in a may trigger them
+0C0E C9                  RET
+0C0F 45 78 65 63 75 74 65 20 70 72 6F 67 72 61 6D 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A 00 MGo_1:	DEFB	"Execute program in memory", 0Dh, 0Ah, EOS
+0C2B 4D 65 6D 6F 72 79 20 6C 6F 63 61 74 69 6F 6E 3A 20 00 MGo_2:	DEFB	"Memory location: ", EOS
+0C3D 21 0F 0C    GO_COMMAND:	LD		HL, MGo_1	; Print some messages
+0C40 CD 13 11            CALL	PRINT_STRING
+0C43 21 2B 0C            LD		HL, MGo_2	; Print some messages
+0C46 CD 13 11            CALL	PRINT_STRING
+0C49 CD AE 11            CALL	GETHEXWORD
+0C4C 3A 18 FE            LD		A, (ERRFLAG)
+0C4F FE 00               CP		E_NONE
+0C51 C0                  RET		NZ
+0C52 E9                  JP       (HL)	; Jump
+0C53 43 61 6C 6C 20 70 72 6F 67 72 61 6D 20 69 6E 20 6D 65 6D 6F 72 79 0D 0A 00 MCl_1:	DEFB	"Call program in memory", 0Dh, 0Ah, EOS
+0C6C 21 53 0C    CL_COMMAND:	LD		HL, MCl_1	; Print some messages
+0C6F CD 13 11            CALL	PRINT_STRING
+0C72 21 2B 0C            LD		HL, MGo_2	; Print some messages
+0C75 CD 13 11            CALL	PRINT_STRING
+0C78 CD AE 11            CALL	GETHEXWORD
+0C7B 3A 18 FE            LD		A, (ERRFLAG)
+0C7E FE 00               CP		E_NONE
+0C80 C0                  RET		NZ
+0C81 11 2E 05            LD		DE, MON_COMMAND
+0C84 D5                  PUSH	DE			; Add a suitable return address to the stack
+0C85 E9                  JP	(HL)
+0C86 C9                  RET
+0C87 43 61 6C 63 75 6C 61 74 65 20 63 68 65 63 6B 73 75 6D 20 66 6F 72 20 6D 65 6D 6F 72 79 20 72 61 6E 67 65 0D 0A 00 CCKSM_1:	DEFB	"Calculate checksum for memory range", 0Dh, 0Ah, EOS
+0CAD 53 74 61 72 74 20 6C 6F 63 61 74 69 6F 6E 3A 20 00 CCKSM_2:	DEFB	"Start location: ", EOS
+0CBE 45 6E 64 20 6C 6F 63 61 74 69 6F 6E 3A 20 00 CCKSM_3:	DEFB	"End location: ", EOS
+0CCD 43 68 65 63 6B 73 75 6D 3A 20 00 CCKSM_4:    DEFB    "Checksum: ", EOS
+0CD8 21 87 0C    CCKSM_COMMAND:	LD		HL, CCKSM_1
+0CDB CD 13 11            CALL	PRINT_STRING
+0CDE 21 AD 0C            LD		HL, CCKSM_2	    ; start
+0CE1 CD 13 11            CALL	PRINT_STRING
+0CE4 CD AE 11            CALL	GETHEXWORD
+0CE7 3A 18 FE            LD		A, (ERRFLAG)
+0CEA FE 00               CP		E_NONE
+0CEC C0                  RET		NZ
+0CED 22 12 FE            LD      (MVADDR+0), HL
+0CF0 CD 45 11            CALL	PRINT_NEW_LINE
+0CF3 21 BE 0C            LD		HL, CCKSM_3     ; end
+0CF6 CD 13 11            CALL	PRINT_STRING
+0CF9 CD AE 11            CALL	GETHEXWORD
+0CFC 3A 18 FE            LD		A, (ERRFLAG)
+0CFF FE 00               CP		E_NONE
+0D01 C0                  RET		NZ
+0D02 22 14 FE            LD      (MVADDR+2), HL
+0D05 CD 45 11            CALL	PRINT_NEW_LINE
+0D08 ED 4B 12 FE         LD      BC, (MVADDR+0)  ; starting point
+0D0C ED 5B 14 FE         LD      DE, (MVADDR+2)  ; end point
+0D10 21 00 00            LD      HL, 0           ; the checksum value
+0D13 3E 00               LD      A, 0
+0D15 32 24 FE            LD      (CHKSUM_C), A   ; checksum overflow
+0D18 79                  LD      A, C
+0D19 BB                  CP      E
+0D1A 20 04               JR      NZ, CCSM_3      ; on no match in LSB, skip the MSB
+0D1C 78                  LD      A, B
+0D1D BA                  CP      D
+0D1E 28 15               JR      Z, CCSM_4       ; MSB matches too
+0D20 0A                  LD      A, (BC)
+0D21 85                  ADD     A, L
+0D22 6F                  LD      L, A
+0D23 30 0D               JR      NC, CCSM_2      ; check carry in checksum LSB
+0D25 7C                  LD      A, H
+0D26 C6 01               ADD     A, 1
+0D28 67                  LD      H, A
+0D29 30 07               JR      NC, CCSM_2
+0D2B 3A 24 FE            LD      A, (CHKSUM_C)
+0D2E 3C                  INC     A
+0D2F 32 24 FE            LD      (CHKSUM_C), A
+0D32 03                  INC     BC
+0D33 18 E3               JR      CCSM_1
+0D35 E5                  PUSH    HL
+0D36 21 CD 0C            LD		HL, CCKSM_4     ; end
+0D39 CD 13 11            CALL	PRINT_STRING
+0D3C 3A 24 FE            LD      A, (CHKSUM_C)
+0D3F CD E6 11            CALL    PRINTHBYTE      ; checksum overflow first
+0D42 E1                  POP     HL
+0D43 CD F7 11            CALL    PRINTHWORD
+0D46 CD 45 11            CALL    PRINT_NEW_LINE
+0D49 C9                  RET
+0D4A 3E 01       HEXI_COMMAND:	LD      A, 1
+0D4C 32 19 FE            LD      (MUTE), A
+0D4F 21 2C FE            LD      HL, UPLOADBUF
+0D52 22 20 FE            LD      (RX_READ_P), HL
+0D55 22 22 FE            LD      (RX_WRITE_P), HL
+0D58 CD 16 06    HXI_LOOP:	CALL    UART_RX_RDY
+0D5B CD 24 06            CALL    UART_RX
+0D5E 2A 22 FE            LD      HL, (RX_WRITE_P)
+0D61 77                  LD      (HL), A
+0D62 23                  INC     HL
+0D63 22 22 FE            LD      (RX_WRITE_P), HL
+0D66 A7                  AND     A
+0D67 FE 0A               CP      LF
+0D69 28 02               JR      Z, HXI_RCVD
+0D6B 18 EB               JR      HXI_LOOP
+0D6D 3E 00       HXI_RCVD:	LD      A, 0
+0D6F 32 19 FE            LD      (MUTE), A
+0D72 21 2E FE            LD      HL, UPLOADBUF + 2       ; Point to the first address char.
+0D75 06 04               LD      B, 4
+0D77 7E          HXIADRLP:	LD      A, (HL)
+0D78 CD 1E 11            CALL    PRINT_CHAR
+0D7B 23                  INC     HL
+0D7C 10 F9               DJNZ    HXIADRLP
+0D7E 21 2C FE    HXI_PROC:	LD      HL, UPLOADBUF
+0D81 CD 31 12            CALL    CHARS2BYTE              ; get record size
+0D84 32 1A FE            LD      (ULSIZE), A             ; store it
+0D87 CD 31 12            CALL    CHARS2BYTE              ; get record address, MSB
+0D8A 32 1D FE            LD      (IECADDR+1), A          ; 
+0D8D CD 31 12            CALL    CHARS2BYTE              ; get record address, LSB
+0D90 32 1C FE            LD      (IECADDR), A 
+0D93 CD 31 12            CALL    CHARS2BYTE              ; get record type
+0D96 32 1E FE            LD      (IERECTYPE), A
+0D99 FE 01               CP      01h                     ; compare to end record
+0D9B 28 20               JR      Z, HXI_ENDR
+0D9D 3A 1A FE            LD      A, (ULSIZE)
+0DA0 47                  LD      B, A                    ; set up DJNZ loop
+0DA1 ED 5B 1C FE         LD      DE, (IECADDR)
+0DA5 CD 31 12    HXD_LOOP:	CALL    CHARS2BYTE              ; get data byte
+0DA8 12                  LD      (DE), A                 ; store it at target location
+0DA9 13                  INC     DE
+0DAA 10 F9               DJNZ    HXD_LOOP                ; repeat for all data bytes
+0DAC 3E 20               ld a," "
+0DAE CD 1E 11            CALL    PRINT_CHAR
+0DB1 CD 31 12            CALL    CHARS2BYTE              ; Get checksum. Not that anyone checks it...
+0DB4 CD E6 11            call PRINTHBYTE
+0DB7 2B                  dec hl
+0DB8 77                  ld (hl),a			; in case anyone wants to use checksum, store it in last byte of data buffer
+0DB9 CD 45 11            CALL    PRINT_NEW_LINE
+0DBC AF                  xor a	; checksum being returned in A was matching command checks, so zero A
+0DBD C9          HXI_ENDR:	RET
+0DBE 20 41 46 20 20 20 42 43 20 20 20 44 45 20 20 20 48 4C 20 20 20 49 58 20 20 20 49 59 20 20 20 41 46 27 20 20 42 43 27 20 20 44 45 27 20 20 48 4C 27 00 RDLN_1: DEFB    " AF   BC   DE   HL   IX   IY   AF", 027h, "  BC", 027h, "  DE", 027h, "  HL", 027h, EOS
+0DF0 20 53 50 20 20 20 50 43 20 20 20 49 46 20 20 20 53 5A 2D 48 2D 50 4E 43 20 20 53 5A 2D 48 2D 50 4E 43 27 00 RDLN_3: DEFB    " SP   PC   IF   SZ-H-PNC  SZ-H-PNC", 027h  , EOS
+0E14 21 BE 0D    REGDUMP_COMMAND:	LD      HL, RDLN_1
+0E17 CD 13 11            CALL    PRINT_STRING
+0E1A CD 45 11            CALL    PRINT_NEW_LINE
+0E1D 2A BC 1F            LD      HL, (USERAF)
+0E20 CD F7 11            CALL    PRINTHWORD
+0E23 3E 20               LD      A, " "
+0E25 CD 1E 11            CALL    PRINT_CHAR
+0E28 2A BE 1F            LD      HL, (USERBC)
+0E2B CD F7 11            CALL    PRINTHWORD
+0E2E 3E 20               LD      A, " "
+0E30 CD 1E 11            CALL    PRINT_CHAR
+0E33 2A C0 1F            LD      HL, (USERDE)
+0E36 CD F7 11            CALL    PRINTHWORD
+0E39 3E 20               LD      A, " "
+0E3B CD 1E 11            CALL    PRINT_CHAR
+0E3E 2A C2 1F            LD      HL, (USERHL)
+0E41 CD F7 11            CALL    PRINTHWORD
+0E44 3E 20               LD      A, " "
+0E46 CD 1E 11            CALL    PRINT_CHAR
+0E49 2A CC 1F            LD      HL, (USERIX)
+0E4C CD F7 11            CALL    PRINTHWORD
+0E4F 3E 20               LD      A, " "
+0E51 CD 1E 11            CALL    PRINT_CHAR
+0E54 2A CE 1F            LD      HL, (USERIY)
+0E57 CD F7 11            CALL    PRINTHWORD
+0E5A 3E 20               LD      A, " "
+0E5C CD 1E 11            CALL    PRINT_CHAR
+0E5F 2A C4 1F            LD      HL, (UAFP)
+0E62 CD F7 11            CALL    PRINTHWORD
+0E65 3E 20               LD      A, " "
+0E67 CD 1E 11            CALL    PRINT_CHAR
+0E6A 2A C6 1F            LD      HL, (UBCP)
+0E6D CD F7 11            CALL    PRINTHWORD
+0E70 3E 20               LD      A, " "
+0E72 CD 1E 11            CALL    PRINT_CHAR
+0E75 2A C8 1F            LD      HL, (UDEP)
+0E78 CD F7 11            CALL    PRINTHWORD
+0E7B 3E 20               LD      A, " "
+0E7D CD 1E 11            CALL    PRINT_CHAR
+0E80 2A CA 1F            LD      HL, (UHLP)
+0E83 CD F7 11            CALL    PRINTHWORD
+0E86 3E 20               LD      A, " "
+0E88 CD 1E 11            CALL    PRINT_CHAR
+0E8B CD 45 11            CALL    PRINT_NEW_LINE
+0E8E 21 F0 0D            LD      HL, RDLN_3
+0E91 CD 13 11            CALL    PRINT_STRING
+0E94 CD 45 11            CALL    PRINT_NEW_LINE
+0E97 2A D0 1F            LD      HL, (USERSP)
+0E9A CD F7 11            CALL    PRINTHWORD
+0E9D 3E 20               LD      A, " "
+0E9F CD 1E 11            CALL    PRINT_CHAR
+0EA2 2A DC 1F            LD      HL, (USERPC)
+0EA5 CD F7 11            CALL    PRINTHWORD
+0EA8 3E 20               LD      A, " "
+0EAA CD 1E 11            CALL    PRINT_CHAR
+0EAD 2A D2 1F            LD      HL, (USERIF)
+0EB0 CD F7 11            CALL    PRINTHWORD
+0EB3 3E 20               LD      A, " "
+0EB5 CD 1E 11            CALL    PRINT_CHAR
+0EB8 CD 1E 11            CALL    PRINT_CHAR
+0EBB 3A BD 1F            LD      A, (USERAF+1)
+0EBE CD 21 12            CALL    PRT8BIT
+0EC1 3E 20               LD      A, " "
+0EC3 CD 1E 11            CALL    PRINT_CHAR
+0EC6 3E 20               LD      A, " "
+0EC8 CD 1E 11            CALL    PRINT_CHAR
+0ECB 3A C5 1F            LD      A, (UAFP+1)
+0ECE CD 21 12            CALL    PRT8BIT
+0ED1 C9                  RET
+0ED2 CD 14 0E            CALL    REGDUMP_COMMAND
+0ED5 C3 00 00            JP      MPFMON  ; return to monitor
+0ED8 52 41 4D 20 54 65 73 74 0D 0A 00 TRC_1: DEFB "RAM Test", 0Dh, 0Ah, EOS
+0EE3 4C 6F 63 61 74 69 6F 6E 20 74 6F 20 73 74 61 72 74 20 69 6E 20 34 20 64 69 67 69 74 20 48 45 58 3A 20 00 TRC_2: DEFB "Location to start in 4 digit HEX: ", EOS
+0F06 0D 0A 4C 6F 63 61 74 69 6F 6E 20 74 6F 20 65 6E 64 20 69 6E 20 34 20 64 69 67 69 74 20 48 45 58 3A 20 00 TRC_3: DEFB 0Dh, 0Ah, "Location to end in 4 digit HEX: ", EOS
+0F29 0D 0A 53 74 61 72 74 20 61 64 64 72 65 73 73 20 73 68 6F 75 6C 64 20 62 65 20 62 65 66 6F 72 65 20 45 6E 64 20 61 64 64 72 65 73 73 00 TRC_4: DEFB 0Dh, 0Ah, "Start address should be before End address", EOS
+0F56 21 D8 0E    TRAM_COMMAND:	LD      HL,TRC_1        ;Print some messages 
+0F59 CD 13 11            CALL    PRINT_STRING
+0F5C 21 E3 0E            LD      HL,TRC_2
+0F5F CD 13 11            CALL    PRINT_STRING
+0F62 CD AE 11            CALL    GETHEXWORD              ;HL now points to databyte location	
+0F65 22 12 FE            LD      (MVADDR), HL
+0F68 21 06 0F            LD      HL,TRC_3
+0F6B CD 13 11            CALL    PRINT_STRING
+0F6E CD AE 11            CALL    GETHEXWORD              ;HL now points to databyte location	
+0F71 22 14 FE            LD      (MVADDR+2), HL
+0F74 3A 15 FE            LD      A, (MVADDR+3)   ; End MSB
+0F77 21 13 FE            LD      HL, MVADDR+1    ; (Start MSB)
+0F7A BE                  CP      (HL)            ; A - (HL)
+0F7B 28 07               JR      Z, _TC_ZERO     ; When MSBs are on same page, test LSBs
+0F7D 38 13               JR      C, _TC_NEGM      ; When Start MSB > End MSB, report error, exit
+0F7F CD 2C 10            CALL    MTEST           ; When End page (MSB) is larger than Start (MSB), go to test
+0F82 18 16               JR      _TC_DONE
+0F84 3A 14 FE            LD      A, (MVADDR+2)   ; End LSB
+0F87 21 12 FE            LD      HL, MVADDR+0    ; (Start LSB)
+0F8A BE                  CP      (HL)            ; A - (HL)
+0F8B 38 05               JR      C, _TC_NEGL      ; When Start LSB > End LSB, report error, exit
+0F8D CD 2C 10            CALL    MTEST           ; When End page (LSB) is larger than Start (LSB), go to test
+0F90 18 08               JR      _TC_DONE
+0F92 21 29 0F            LD      HL, TRC_4
+0F95 CD 13 11            CALL    PRINT_STRING
+0F98 18 00               JR      _TC_DONE
+0F9A C9                  RET
+0F9B 0D 0A 20 50 61 73 73 20 31 3A 20 3F 3F 68 20 74 6F 20 30 30 68 20 00 MTC_1: DEFB 0Dh, 0Ah, " Pass 1: ??h to 00h ", EOS
+0FB2 0D 0A 20 50 61 73 73 20 32 3A 20 30 30 68 20 74 6F 20 35 35 68 20 00 MTC_2: DEFB 0Dh, 0Ah, " Pass 2: 00h to 55h ", EOS
+0FC9 0D 0A 20 50 61 73 73 20 33 3A 20 35 35 68 20 74 6F 20 41 41 68 20 00 MTC_3: DEFB 0Dh, 0Ah, " Pass 3: 55h to AAh ", EOS
+0FE0 0D 0A 20 50 61 73 73 20 34 3A 20 41 41 68 20 74 6F 20 46 46 68 20 00 MTC_4: DEFB 0Dh, 0Ah, " Pass 4: AAh to FFh ", EOS
+0FF7 0D 0A 20 4D 65 6D 6F 72 79 20 4F 4B 00 MTC_5: DEFB 0Dh, 0Ah, " Memory OK", EOS
+1004 20 45 72 72 6F 72 20 61 74 3A 20 00 MTCER1: DEFB " Error at: ", EOS
+1010 20 76 61 6C 75 65 20 65 78 70 65 63 74 65 64 3A 20 00 MTCER2: DEFB " value expected: ", EOS
+1022 2C 20 66 6F 75 6E 64 3A 20 00 MTCER3: DEFB ", found: ", EOS
+102C DD 21 12 FE MTEST:	LD      IX, MVADDR
+1030 21 9B 0F            LD      HL, MTC_1
+1033 CD 13 11            CALL    PRINT_STRING
+1036 2A 12 FE            LD      HL, (MVADDR+0)
+1039 ED 4B 14 FE         LD      BC, (MVADDR+2)
+103D 1E 40               LD      E, 64
+103F 16 00               LD      D, 000h
+1041 3E 01               LD      A, 1
+1043 32 1F FE            LD      (MTPHFLAG), A
+1046 CD 97 10            CALL    MCHECK
+1049 38 4B               JR      C, _MTDONE      ; skip other tests on error
+104B 21 B2 0F            LD      HL, MTC_2
+104E CD 13 11            CALL    PRINT_STRING
+1051 2A 12 FE            LD      HL, (MVADDR+0)  ; reset start address
+1054 1E 00               LD      E, 000h         ; old value
+1056 16 55               LD      D, 055h         ; new value
+1058 3E 02               LD      A, 2
+105A 32 1F FE            LD      (MTPHFLAG), A
+105D CD 97 10            CALL    MCHECK
+1060 38 34               JR      C, _MTDONE      ; skip other tests on error
+1062 21 C9 0F            LD      HL, MTC_3
+1065 CD 13 11            CALL    PRINT_STRING
+1068 2A 12 FE            LD      HL, (MVADDR+0)  ; reset start address
+106B 1E 55               LD      E, 055h         ; old value
+106D 16 AA               LD      D, 0AAh         ; new value
+106F 3E 03               LD      A, 3
+1071 32 1F FE            LD      (MTPHFLAG), A
+1074 CD 97 10            CALL    MCHECK
+1077 38 1D               JR      C, _MTDONE      ; skip other tests on error
+1079 21 E0 0F            LD      HL, MTC_4
+107C CD 13 11            CALL    PRINT_STRING
+107F 2A 12 FE            LD      HL, (MVADDR+0)  ; reset start address
+1082 1E AA               LD      E, 0AAh         ; old value
+1084 16 FF               LD      D, 0FFh         ; new value
+1086 3E 04               LD      A, 4
+1088 32 1F FE            LD      (MTPHFLAG), A
+108B CD 97 10            CALL    MCHECK
+108E 38 06               JR      C, _MTDONE      ; skip other tests on error
+1090 21 F7 0F            LD      HL, MTC_5       ; Ok text
+1093 CD 13 11            CALL    PRINT_STRING        
+1096 C9                  RET
+1097 3A 1F FE            LD      A, (MTPHFLAG)
+109A FE 01               CP      1
+109C 28 0D               JR      Z, _MCSKIPOLD   ; Skip old value check for pass 1
+109E 7B                  LD      A, E
+109F DD 77 05            LD      (IX+5), A       ; store expected value
+10A2 7E                  LD      A, (HL)         ; read mem
+10A3 DD 77 04            LD      (IX+4), A       ; store actual value
+10A6 DD BE 05            CP      (IX+5)          ; compare with expected
+10A9 20 19               JR      NZ, _MTLPER1    ; jump to error when unequal
+10AB 7A                  LD      A, D
+10AC 77                  LD      (HL), A         ; write new value
+10AD DD 77 05            LD      (IX+5), A       ; store expected value
+10B0 7E                  LD      A, (HL)         ; read new value
+10B1 DD 77 04            LD      (IX+4), A       ; store actual value
+10B4 DD BE 05            CP      (IX+5)          ; compare with expected
+10B7 20 1C               JR      NZ, _MTLPER2    ; jump to error when unequal
+10B9 CD 0C 11            CALL    CPADDR          ; 
+10BC 23                  INC     HL              ; 
+10BD 20 D8               JR      NZ, _MCLOOP     ; 
+10BF A7                  AND     A               ; "Clear Carry flag"
+10C0 3E 01               LD      A, 1
+10C2 18 47               JR      _MCDONE
+10C4 F5                  PUSH    AF
+10C5 CD 45 11            CALL    PRINT_NEW_LINE
+10C8 3E 31               LD      A, "1"
+10CA CD 1E 11            CALL    PRINT_CHAR
+10CD 3E 2E               LD      A, "."
+10CF CD 1E 11            CALL    PRINT_CHAR
+10D2 F1                  POP     AF
+10D3 18 0F               JR      _MTLPER
+10D5 F5                  PUSH    AF
+10D6 CD 45 11            CALL    PRINT_NEW_LINE
+10D9 3E 32               LD      A, "2"
+10DB CD 1E 11            CALL    PRINT_CHAR
+10DE 3E 2E               LD      A, "."
+10E0 CD 1E 11            CALL    PRINT_CHAR
+10E3 F1                  POP     AF
+10E4 E5                  PUSH    HL              ; keep actual location
+10E5 21 04 10            LD      HL, MTCER1      ; at text
+10E8 CD 13 11            CALL    PRINT_STRING
+10EB E1                  POP     HL
+10EC CD F7 11            CALL    PRINTHWORD
+10EF 21 10 10            LD      HL, MTCER2      ; expected text
+10F2 CD 13 11            CALL    PRINT_STRING
+10F5 3A 17 FE            LD      A, (MVADDR+5)   ; expected value
+10F8 CD E6 11            CALL    PRINTHBYTE
+10FB 21 22 10            LD      HL, MTCER3      ; actual found text
+10FE CD 13 11            CALL    PRINT_STRING
+1101 3A 16 FE            LD      A, (MVADDR+4)   ; actual value
+1104 CD E6 11            CALL    PRINTHBYTE
+1107 CD 45 11            CALL    PRINT_NEW_LINE
+110A 37                  SCF                     ; Flag the error for calling routine
+110B C9                  RET
+110C 78          CPADDR:	LD      A, B        ; End MSB
+110D BC                  CP      H           ; end MSB - current MSB : B - H
+110E 20 02               JR      NZ, _CPDONE ; When MSBs are unequal
+1110 79                  LD      A, C        ; End LSB
+1111 BD                  CP      L           ; end LSB - current LSB ; C - L
+1112 C9                  RET
+# End of file C:\zeus\mintz80_monitor\MONCommands.asm
+# File C:\zeus\mintz80_monitor\CONIO.asm
+1113 CD F9 05            CALL    UART_PRNT_STR
+1116 C9                  RET
+1117 CD 24 06    GET_CHAR:	CALL    UART_RX         ;Get char into Acc
+111A CD 30 11            CALL    TO_UPPER        ;Character has to be upper case
+111D C9                  RET
+111E CD 10 06    PRINT_CHAR:	CALL UART_TX    ;Echo character to terminal
+1121 C9                  RET
+1122 4F                  LD      C, A
+1123 3A 19 FE            LD      A, (MUTE)
+1126 FE 01               CP      MUTEON  ; compare with 1=true
+1128 28 04               JR      Z, PRTSKIP
+112A 79                  LD      A, C
+112B CD 1E 11            CALL    PRINT_CHAR
+112E 79                  LD      A, C
+112F C9                  RET
+1130 FE 61               CP      "a"     ; Nothing to do if not lower case
+1132 D8                  RET     C
+1133 FE 7B               CP      "z" + 1 ; > "z"?
+1135 D0                  RET     NC      ; Nothing to do, either
+1136 E6 5F               AND     5Fh     ; Convert to upper case
+1138 C9                  RET
+1139 FE 20               CP      LOWPRTV
+113B 38 05               JR      C, ADDOT
+113D FE 7E               CP      HIGPRTV
+113F 30 01               JR      NC, ADDOT
+1141 C9                  RET
+1142 3E 2E               LD      A, "."
+1144 C9                  RET
+1145 F5                  PUSH    af
+1146 3E 0D               LD      A, $0d
+1148 CD 1E 11            CALL    PRINT_CHAR
+114B 3E 0A               LD      A, $0a
+114D CD 1E 11            CALL    PRINT_CHAR
+1150 F1                  POP     af
+1151 C9                  RET
+1152 FE 47               CP      "F" + 1         ;(Acc) > "F"? 
+1154 D0                  RET     NC              ;Yes - Return / No - Continue
+1155 FE 30               CP      "0"             ;(Acc) < "0"?
+1157 D2 5C 11            JP      NC,CIH1         ;Yes - Jump / No - Continue
+115A 3F                  CCF                     ;Complement carry (clear it)
+115B C9                  RET
+115C FE 3A               CP      "9" + 1         ;(Acc) < "9" + 1?
+115E D8                  RET     C               ;Yes - Return / No - Continue (meaning Acc between "0" and "9")
+115F FE 41               CP      "A"             ;(Acc) > "A"?
+1161 D2 66 11            JP      NC,CIH2         ;Yes - Jump / No - Continue
+1164 3F                  CCF                     ;Complement carry (clear it)
+1165 C9                  RET
+1166 37                  SCF                     ;Set carry flag to indicate the char is a hex digit
+1167 C9                  RET
+1168 CD 17 11            CALL    GET_CHAR
+116B CD 52 11            CALL    CHAR_ISHEX      ; Is it a hex digit?
+116E D2 80 11            JP      NC,NONHEXNIB    ; Yes - Continue / No - Exit
+1171 CD 22 11            CALL    OPRINTCHAR
+1174 FE 3A               CP      "9" + 1         ; Is it a digit less or equal "9" + 1?
+1176 DA 7B 11            JP      C,IS_NUM        ; Yes - Jump / No - Continue
+1179 D6 07               SUB     07h             ; Adjust for A-F digits
+117B D6 30               SUB     "0"             ; Subtract to get nib between 0->15
+117D E6 0F               AND     0Fh             ; Only return lower 4 bits
+117F C9                  RET
+1180 3E 01               LD      A, E_NOHEX
+1182 32 18 FE            LD      (ERRFLAG), A    ; Error flag
+1185 C9                  RET
+1186 CD 68 11            CALL    GETHEXNIB       ; Get high nibble
+1189 D5                  PUSH	DE
+118A F5                  PUSH	AF
+118B 3A 18 FE            LD	A, (ERRFLAG)
+118E FE 00               CP	E_NONE
+1190 20 19               JR	NZ, GHB_ERR
+1192 F1                  POP	AF
+1193 CB 07               RLC     A               ; Rotate nibble into high nibble
+1195 CB 07               RLC     A
+1197 CB 07               RLC     A
+1199 CB 07               RLC     A
+119B 57                  LD      D,A             ; Save upper four bits
+119C CD 68 11            CALL    GETHEXNIB       ; Get lower nibble
+119F F5                  PUSH	AF
+11A0 3A 18 FE            LD	A, (ERRFLAG)
+11A3 FE 00               CP	E_NONE
+11A5 20 04               JR	NZ, GHB_ERR  
+11A7 F1                  POP	AF          
+11A8 B2                  OR      D               ; Combine both nibbles
+11A9 D1                  POP	DE
+11AA C9                  RET
+11AB F1                  POP	AF
+11AC D1                  POP	DE
+11AD C9                  RET
+11AE CD 86 11            CALL    GETHEXBYTE	;Get high byte
+11B1 F5                  PUSH	AF
+11B2 3A 18 FE            LD		A, (ERRFLAG)
+11B5 FE 00               CP		E_NONE
+11B7 20 10               JR		NZ, GHW_ERR
+11B9 F1                  POP		AF
+11BA 67                  LD		H,A
+11BB CD 86 11            CALL    GETHEXBYTE    	;Get low byte
+11BE F5                  PUSH	AF
+11BF 3A 18 FE            LD		A, (ERRFLAG)
+11C2 FE 00               CP		E_NONE
+11C4 20 03               JR		NZ, GHW_ERR
+11C6 F1                  POP     AF
+11C7 6F                  LD      L,A
+11C8 C9                  RET
+11C9 F1                  POP		AF
+11CA C9                  RET
+11CB E6 0F               AND     0Fh             	;Only low nibble in byte
+11CD C6 30               ADD     A,"0"             	;Adjust for char offset
+11CF FE 3A               CP      "9" + 1         	;Is the hex digit > 9?
+11D1 38 02               JR      C,N2C1				;Yes - Jump / No - Continue
+11D3 C6 07               ADD     A,"A" - "0" - 0Ah 	;Adjust for A-F
+11D5 C9                  RET
+11D6 E6 F0               AND     0F0h
+11D8 0F                  RRCA
+11D9 0F                  RRCA
+11DA 0F                  RRCA
+11DB 0F                  RRCA
+11DC C9                  RET
+11DD F5                  PUSH    AF
+11DE CD CB 11            CALL    NIB2CHAR
+11E1 CD 1E 11            CALL    PRINT_CHAR        	;Print the nibble
+11E4 F1                  POP     AF
+11E5 C9                  RET
+11E6 F5                  PUSH    AF      ;Save registers
+11E7 D5                  PUSH    DE
+11E8 57                  LD      D,A     ;Save for low nibble
+11E9 0F                  RRCA            ;Rotate high nibble into low nibble
+11EA 0F                  RRCA
+11EB 0F                  RRCA
+11EC 0F                  RRCA
+11ED CD DD 11            CALL    PRINTHNIB       ;Print high nibble
+11F0 7A                  LD      A,D             ;Restore for low nibble
+11F1 CD DD 11            CALL    PRINTHNIB       ;Print low nibble
+11F4 D1                  POP     DE
+11F5 F1                  POP     AF
+11F6 C9                  RET
+11F7 F5                  PUSH    AF
+11F8 7C                  LD      A,H
+11F9 CD E6 11            CALL    PRINTHBYTE      ;Print high byte
+11FC 7D                  LD      A,L
+11FD CD E6 11            CALL    PRINTHBYTE      ;Print low byte
+1200 F1                  POP     AF
+1201 C9                  RET
+1202 D6 30               SUB     "0"
+1204 FE 0A               CP      0ah
+1206 38 08               JR      C, C2N_DONE
+1208 D6 07               SUB     007h
+120A FE 10               CP      010h			; need to deduct 20h if it was lower case letter
+120C 38 02               JR      C, C2N_DONE
+120E D6 20               SUB     020h
+1210 E6 0F               AND     0Fh
+1212 C9                  RET
+1213 38 04               JR      C, PB0
+1215 3E 31               LD      A, "1"
+1217 18 04               JR      PBPRT
+1219 3E 30               LD      A, "0"
+121B 18 00               JR      PBPRT 
+121D CD 1E 11            CALL    PRINT_CHAR
+1220 C9                  RET
+1221 4F                  LD      C, A
+1222 06 08               LD      B, 8
+1224 CB 07               RLC     A
+1226 4F                  LD      C, A
+1227 CD 13 12            CALL    PRTBIT
+122A 05                  DEC     B
+122B 28 03               JR      Z, P8B_RET
+122D 79                  LD      A, C
+122E 18 F4               JR      P8B1
+1230 C9                  RET
+1231 C5                  PUSH    BC
+1232 7E                  LD      A, (HL)
+1233 23                  INC     HL
+1234 CD 02 12            CALL    CHAR2NIB        ; get upper nibble from char
+1237 CB 07               RLC     A
+1239 CB 07               RLC     A
+123B CB 07               RLC     A
+123D CB 07               RLC     A
+123F 47                  LD      B, A
+1240 7E                  LD      A, (HL)
+1241 23                  INC     HL
+1242 CD 02 12            CALL    CHAR2NIB        ; get lower nibble from char
+1245 B0                  OR      B
+1246 C1                  POP     BC
+1247 C9                  RET
+# End of file C:\zeus\mintz80_monitor\CONIO.asm
+# File C:\zeus\mintz80_monitor\CFDriver.asm
+1248 CD 8A 12    	CALL	CF_LP_BUSY
+124B 3E 01       	LD		A,01h						;LD features register to enable 8 bit
+124D D3 91       	OUT		(CFFEAT),A
+124F CD 8A 12    	CALL	CF_LP_BUSY
+1252 3E EF       	LD		A,0EFh						;Send set features command
+1254 D3 97       	OUT		(CFCMD),A
+1256 CD 8A 12    	CALL	CF_LP_BUSY
+1259 3E 00       	LD		A, 00h
+125B 32 28 FE    	LD		(CF_LBA0), A
+125E 32 29 FE    	LD		(CF_LBA1), A
+1261 32 2A FE    	LD		(CF_LBA2), A
+1264 32 2B FE    	LD		(CF_LBA3), A
+1267 3C          	INC		A
+1268 32 27 FE    	LD		(CF_SECCNT), A
+126B 21 72 12    	LD 		HL,CF_MSG_i					;Print some messages 
+126E CD 13 11    	CALL    PRINT_STRING
+1271 C9          	RET
+1272 0D 0A 43 46 20 43 61 72 64 20 49 6E 69 74 69 61 6C 69 7A 65 64 0D 0A 00 CF_MSG_i: DEFB 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
+128A DB 97       	IN		A, (CFSTAT)					;Read status
+128C E6 80       	AND		010000000b					;Mask busy bit
+128E C2 8A 12    	JP		NZ,CF_LP_BUSY				;Loop until busy(7) is 0
+1291 C9          	RET
+1292 DB 97       	IN		A,(CFSTAT)					;Read status
+1294 E6 C0       	AND		011000000b					;mask off busy and rdy bits
+1296 EE 40       	XOR		001000000b					;we want busy(7) to be 0 and drvrdy(6) to be 1
+1298 C2 92 12    	JP		NZ,CF_LP_CMD_RDY
+129B C9          	RET
+129C DB 97       	IN		A,(CFSTAT)					;Read status
+129E E6 88       	AND		010001000b					;mask off busy and drq bits
+12A0 EE 08       	XOR		000001000b					;we want busy(7) to be 0 and drq(3) to be 1
+12A2 C2 9C 12    	JP		NZ,CF_LP_DAT_RDY
+12A5 C9          	RET
+12A6 CD 92 12    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
+12A9 3E 20       	LD		A,020h						;Prepare read command
+12AB D3 97       	OUT		(CFCMD),A					;Send read command
+12AD CD 9C 12    	CALL	CF_LP_DAT_RDY				;Wait until data is ready to be read
+12B0 DB 97       	IN		A,(CFSTAT)					;Read status
+12B2 E6 01       	AND		000000001b					;mask off error bit
+12B4 C2 A6 12    	JP		NZ,CF_RD_CMD				;Try again if error
+12B7 21 00 F0    	LD 		HL,CFSECT_BUFF
+12BA 06 00       	LD 		B,0							;read 256 words (512 bytes per sector)
+12BC CD 9C 12    	CALL	CF_LP_DAT_RDY	
+12BF DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
+12C1 77          	LD 		(HL),A
+12C2 23          	INC 	HL
+12C3 CD 9C 12    	CALL	CF_LP_DAT_RDY
+12C6 DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
+12C8 77          	LD 		(HL),A
+12C9 23          	INC 	HL
+12CA 10 F0       	DJNZ 	CF_RD_SECT
+12CC C9          	RET
+12CD 0D 0A 43 46 20 43 61 72 64 20 52 65 61 64 0D 0A 00 CF_MSG1:  DEFB 0Dh, 0Ah, "CF Card Read", 0Dh, 0Ah, EOS
+12DE 52 65 61 64 69 6E 67 20 73 65 63 74 6F 72 20 CF_MSG21: DEFB "Reading sector "
+12ED 30 30 30 30 30 30 30 30 CF_MSG2h: DEFB "00000000"
+12F5 68 20 69 6E 74 6F 20 52 41 4D 20 62 75 66 66 65 72 2E 2E 2E 0D 0A 00 CF_MSG22: DEFB "h into RAM buffer...", 0Dh, 0Ah, EOS
+130C 53 65 63 74 6F 72 20 CF_MSG31: DEFB "Sector "
+1313 30 30 30 30 30 30 30 30 CF_MSG3h: DEFB "00000000"
+131B 68 20 72 65 61 64 2E 2E 2E 0D 0A 00 CF_MSG32: DEFB  "h read...", 0Dh, 0Ah, EOS
+1327 21 CD 12    	LD 		HL, CF_MSG1					;Print some messages 
+132A CD 13 11    	CALL    PRINT_STRING
+132D CD 9B 13    	CALL	CF_MKMS2
+1330 21 2C FE    	LD		HL, MSGBUF
+1333 CD 13 11    	CALL    PRINT_STRING
+1336 CD 8A 12    	CALL 	CF_LP_BUSY
+1339 3A 27 FE    	LD 		A,(CF_SECCNT)
+133C D3 92       	OUT 	(CFSECCO),A					;Number of sectors at a time (512 bytes)
+133E CD 8A 12    	CALL 	CF_LP_BUSY
+1341 3A 28 FE    	LD      A,(CF_LBA0)
+1344 D3 93       	OUT		(CFLBA0),A					;LBA 0:7
+1346 CD 8A 12    	CALL 	CF_LP_BUSY
+1349 3A 29 FE    	LD      A,(CF_LBA1)
+134C D3 94       	OUT		(CFLBA1),A					;LBA 8:15
+134E CD 8A 12    	CALL 	CF_LP_BUSY
+1351 3A 2A FE    	LD      A,(CF_LBA2)
+1354 D3 95       	OUT 	(CFLBA2),A					;LBA 16:23
+1356 CD 8A 12    	CALL 	CF_LP_BUSY
+1359 3A 2B FE    	LD      A,(CF_LBA3)
+135C E6 0F       	AND		00Fh						; Only LBA 24:27
+135E F6 E0       	OR		0E0h						;Selects CF as master
+1360 D3 96       	OUT 	(CFLBA3),A					;LBA 24:27 + DRV 0 selected + bits 5:7=111
+1362 CD A6 12    	CALL	CF_RD_CMD
+1365 CD 86 13    	CALL	CF_MKMS3
+1368 21 2C FE    	LD		HL, MSGBUF
+136B CD 13 11    	CALL    PRINT_STRING
+136E C9          	RET
+136F 43 46 3E 20 00 CF_PROMPT: DEFB	"CF> ", EOS
+1374 3E 20       	LD		A, " "
+1376 21 2C FE    	LD		HL, MSGBUF
+1379 77          	LD		(HL), A
+137A 11 2C FE    	LD		DE, MSGBUF
+137D 13          	INC		DE
+137E 06 00       	LD		B, 0
+1380 0E 50       	LD		C, ULBUFSIZE
+1382 0D          	DEC		C
+1383 ED B0       	LDIR
+1385 C9          	RET
+1386 CD 74 13    	CALL	CF_CLMSB
+1389 21 0C 13    	LD		HL, CF_MSG31
+138C 11 2C FE    	LD		DE, MSGBUF
+138F 01 1B 00    	LD		BC, CF_MSG3E - CF_MSG31
+1392 ED B0       	LDIR
+1394 21 33 FE    	LD		HL, MSGBUF + (CF_MSG3h - CF_MSG31)	; first digit position for CF_MSG31 in MSGBUF
+1397 CD B0 13    	CALL	CFSECDG
+139A C9          	RET
+139B CD 74 13    	CALL	CF_CLMSB
+139E 21 DE 12    	LD		HL, CF_MSG21
+13A1 11 2C FE    	LD		DE, MSGBUF
+13A4 01 2E 00    	LD		BC, CF_MSG2E - CF_MSG21
+13A7 ED B0       	LDIR
+13A9 21 3B FE    	LD		HL, MSGBUF + (CF_MSG2h - CF_MSG21)	; first digit position for CF_MSG21 in MSGBUF
+13AC CD B0 13    	CALL    CFSECDG
+13AF C9          	RET
+13B0 3A 2B FE    	LD		A,(CF_LBA3)
+13B3 F5          	PUSH	AF
+13B4 CD D6 11    	CALL	SHFTNIB
+13B7 CD CB 11    	CALL	NIB2CHAR
+13BA 77          	LD		(HL), A
+13BB 23          	INC		HL
+13BC F1          	POP		AF
+13BD CD CB 11    	CALL	NIB2CHAR
+13C0 77          	LD		(HL), A
+13C1 23          	INC		HL
+13C2 3A 2A FE    	LD		A,(CF_LBA2)
+13C5 F5          	PUSH	AF
+13C6 CD D6 11    	CALL	SHFTNIB
+13C9 CD CB 11    	CALL	NIB2CHAR
+13CC 77          	LD		(HL), A
+13CD 23          	INC		HL
+13CE F1          	POP		AF
+13CF CD CB 11    	CALL	NIB2CHAR
+13D2 77          	LD		(HL), A
+13D3 23          	INC		HL
+13D4 3A 29 FE    	LD		A,(CF_LBA1)
+13D7 F5          	PUSH	AF
+13D8 CD D6 11    	CALL	SHFTNIB
+13DB CD CB 11    	CALL	NIB2CHAR
+13DE 77          	LD		(HL), A
+13DF 23          	INC		HL
+13E0 F1          	POP		AF
+13E1 CD CB 11    	CALL	NIB2CHAR
+13E4 77          	LD		(HL), A
+13E5 23          	INC		HL
+13E6 3A 28 FE    	LD		A,(CF_LBA0)
+13E9 F5          	PUSH	AF
+13EA CD D6 11    	CALL	SHFTNIB
+13ED CD CB 11    	CALL	NIB2CHAR
+13F0 77          	LD		(HL), A
+13F1 23          	INC		HL
+13F2 F1          	POP		AF
+13F3 CD CB 11    	CALL	NIB2CHAR
+13F6 77          	LD		(HL), A
+13F7 C9          	RET
+13F8 0D 0A 43 46 20 43 61 72 64 20 49 64 65 6E 74 69 66 79 20 44 72 69 76 65 0D 0A 00 CF_MSGID:	DEFB 0Dh, 0Ah, "CF Card Identify Drive", 0Dh, 0Ah, EOS
+1413 21 F8 13    	LD		HL, CF_MSGID
+1416 CD 13 11    	CALL    PRINT_STRING
+1419 CD 8A 12    	CALL 	CF_LP_BUSY
+141C CD 92 12    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
+141F 3E EC       	LD		A,0ECh						;Prepare ID drive command
+1421 D3 97       	OUT		(CFCMD),A					;Send ID drive command
+1423 CD 9C 12    	CALL	CF_LP_DAT_RDY				;Wait until data is ready to be read
+1426 DB 97       	IN		A,(CFSTAT)					;Read status
+1428 E6 01       	AND		000000001b					;mask off error bit
+142A C2 13 14    	JP		NZ,CF_ID_CMD				;Try again if error
+142D 21 00 F0    	LD 		HL,CFSECT_BUFF
+1430 06 00       	LD 		B,0							;read 256 words (512 bytes per sector)
+1432 CD 9C 12    	CALL	CF_LP_DAT_RDY	
+1435 DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
+1437 77          	LD 		(HL),A
+1438 23          	INC 	HL
+1439 CD 9C 12    	CALL	CF_LP_DAT_RDY
+143C DB 90       	IN 		A,(CFDATA)					;get byte of ide data	
+143E 77          	LD 		(HL),A
+143F 23          	INC 	HL
+1440 10 F0       	DJNZ 	CF_ID1
+1442 C9          	RET
+1443 CD 92 12    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
+1446 3E E8       	LD		A,0E8h						;Prepare fill buffer command
+1448 D3 97       	OUT		(CFCMD),A					;Send write buffer command
+144A CD 92 12    	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
+144D 3E 30       	LD		A,030h						;Prepare write command
+144F D3 97       	OUT		(CFCMD),A					;Send write buffer command
+1451 CD 9C 12    	CALL	CF_LP_DAT_RDY				;Wait until drive is ready to be written
+1454 DB 97       	IN		A,(CFSTAT)					;Read status
+1456 E6 01       	AND		000000001b					;mask off error bit
+1458 C2 43 14    	JP		NZ,CF_WR_CMD				;Try again if error
+145B C9          	ret
+# End of file C:\zeus\mintz80_monitor\CFDriver.asm
+# File C:\zeus\mintz80_monitor\Z80Monitor.asm
+145C 0C 00       MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed) 
+145E 0E D0       dmpio:	ld c,$d0
+1460 06 00       		ld b,$0
+1462 CD 45 11    		CALL	PRINT_NEW_LINE
+1465 ED 78       dmpio1:	IN      A, (C)
+1467 CD E6 11    		CALL	PRINTHBYTE
+146A 0C          		inc c
+146B 79          		ld a,c
+146C FE E0       		cp $e0
+146E 20 F5       		jr nz,dmpio1
+1470 CD 45 11    		CALL	PRINT_NEW_LINE
+1473 C9          		ret
+# End of file C:\zeus\mintz80_monitor\Z80Monitor.asm
