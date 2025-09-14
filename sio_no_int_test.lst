@@ -7,7 +7,7 @@
 200D 7E          prt_hlo:	ld a,(hl)
 200E FE 00       		cp 0
 2010 28 06       		jr z, main_loop
-2012 CD 93 FD    		call jSIOA_TX
+2012 CD 96 FD    		call jSIOA_TX
 2015 23          		inc hl
 2016 18 F5       		jr prt_hlo
 2018 3A 80 30    main_loop:	ld a,(RAMCELL)      ; load the byte from RAM
@@ -37,10 +37,10 @@
 2052 C5          delay:	push bc
 2053 06 FF       loop1:	ld b,0xff
 2055 10 FE       loop2:	djnz loop2
-2057 CD 99 FD    		call jSIOA_RX_CHK
+2057 CD 9C FD    		call jSIOA_RX_CHK
 205A 28 06       		jr z,loop3
 205C 32 81 30    		ld (RAMCELL+1),a
-205F CD 93 FD    		call jSIOA_TX
+205F CD 96 FD    		call jSIOA_TX
 2062 0D          loop3:  dec c
 2063 20 EE               jr nz, loop1
 2065 C1                  pop bc
