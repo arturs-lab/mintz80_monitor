@@ -62,6 +62,7 @@ epp_upd2:	ld hl,epp_page
 		jr NZ,epp_upd3		; skip if invalid entry
 		ld a,l			; restore
 		ld (epp_tmp+epp_banka-epp_prog+1),a
+		ld (epp_tmp+epp_jmp_bnk-epp_prog+1),a
 
 epp_upd3:	pop af
 		pop hl
@@ -83,8 +84,8 @@ epp_p1:	ld a,b		; check if remaining bytes = 0
 		jr z,epp_exit	; yes, end the procedure
 		ld a,(de)		; no, fetch next byte
 		ld (hl),a		; store it in target address
+		jr epp_p3
 epp_p2:	push af		; save programmed byte
-		out (beepr),a
 		ld a,epp_del	; delay before reading back byte
 epp_delay:	push af			; count delay
 epp_del1:	dec a
@@ -93,6 +94,7 @@ epp_del1:	dec a
 		dec a
 		jr nz,epp_delay
 		pop af		; restore programmed byte
+epp_p3:	out (beepr),a
 		cp (hl)		; compare with EEPROM content
 		jr nz,epp_p2	; repeat till readback = programmed data
 		inc hl
@@ -110,12 +112,22 @@ epp_exit:	ld ($ff60),hl
 		pop hl
 		jp $0000		; since we've potentially changed the location of code that got us here, just start over
 
-deltest:	ld b,0
-dt1:		out (beepr),a
-		ld a,epp_del	; delay before reading back byte
-		call epp_delay	; about 100ms
-		dec b
-		jr nz,dt1
-		ret
+epp_switch:	in a,(memmap)	; call this at $ffnn after executing epp_prep
+		xor a,$02
+		out (memmap),a
+		jp $0
+
+; call this at $ffnn after executing epp_prep
+epp_jmp_bnk:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
+		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
+		jp $0000		; since we've potentially changed the location of code that got us here, just start over
+
+;deltest:	ld b,0
+;dt1:		out (beepr),a
+;		ld a,epp_del	; delay before reading back byte
+;		call epp_delay	; about 100ms
+;		dec b
+;		jr nz,dt1
+;		ret
 
 epp_end:	equ $
