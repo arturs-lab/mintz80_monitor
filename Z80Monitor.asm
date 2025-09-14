@@ -38,6 +38,84 @@ R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
             
             ORG ROM_BOTTOM + 24     ; room for eight routine entries
 
+		include "PIODriver.asm"
+		include "CTCDriver.asm"
+		include "SIODriver.asm"
+		include "ymzdrvr.asm";
+
+		include "eeprom_prog.asm";
+;		include "eeprom_write.asm";
+
+; triangular progression delay
+; at CPU CLK = 1.333MHz:
+; $1a - 9.76ms
+; $1b - 10.48ms
+; $59 - 100ms
+; at CPU CLK = 4MHz:
+; $01 - 52us -> 19.23kHz
+; $04 - 172us -> 5.814kHz
+; $2f - 9.84ms -> 102Hz
+; $30 - 10.24ms -> 97.656Hz
+; $6d - 49.8ms -> 20Hz
+; $78 - 60ms -> 16.666Hz
+; $9b - 99.6ms -> 10.04Hz
+; $9c - 100.8ms
+; at CPU CLK = 10MHz:
+; $01 - 52us -> 19.23kHz
+
+del00:	ld a,$00		; delay loop
+delay:	push af			; count delay
+del1:	dec a
+	jr nz,del1		; repeat till 0
+	pop af
+	dec a
+	jr nz,delay
+	ret
+
+; bc = duration, a = pitch
+beep:	push af
+bep1:	out (beepr),a
+	pop af
+	push af
+	call delay
+	dec bc
+	ld a,b
+	or c
+	jr nz,bep1
+	pop af
+	ret
+
+memmap_init:	in a,(beepr)	; unlock memmap
+	ld a,0		; init mem map
+	out ($d8),a
+	ld a,1
+	out ($d9),a
+	out ($da),a
+	out ($db),a
+	out ($dc),a
+	out ($dd),a
+	out ($de),a
+	out ($df),a
+	out (beepr),a	; lock memmap
+	ret
+
+; Coopy jump table from EEPROM to RAM so that routines can be swapped out
+JUMPTAB_INIT:	push AF
+			push HL
+			push DE
+			push BC
+
+			ld hl,JUMPTABR
+			ld de,JUMPTAB
+			ld bc,JUMPTAB_END-JUMPTABR
+			ldir
+
+			pop BC
+			pop DE
+			pop HL
+			pop AF
+			ret
+
 		include "jumptab.asm"		;
 
 ;***************************************************************************
@@ -264,45 +342,6 @@ MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed)
 
 ;        END
 
-; triangular progression delay
-; at CPU CLK = 1.333MHz:
-; $1a - 9.76ms
-; $1b - 10.48ms
-; $59 - 100ms
-; at CPU CLK = 4MHz:
-; $01 - 52us -> 19.23kHz
-; $04 - 172us -> 5.814kHz
-; $2f - 9.84ms -> 102Hz
-; $30 - 10.24ms -> 97.656Hz
-; $6d - 49.8ms -> 20Hz
-; $78 - 60ms -> 16.666Hz
-; $9b - 99.6ms -> 10.04Hz
-; $9c - 100.8ms
-; at CPU CLK = 10MHz:
-; $01 - 52us -> 19.23kHz
-
-del00:	ld a,$00		; delay loop
-delay:	push af			; count delay
-del1:	dec a
-	jr nz,del1		; repeat till 0
-	pop af
-	dec a
-	jr nz,delay
-	ret
-
-; bc = duration, a = pitch
-beep:	push af
-bep1:	out (beepr),a
-	pop af
-	push af
-	call delay
-	dec bc
-	ld a,b
-	or c
-	jr nz,bep1
-	pop af
-	ret
-
 dmpio:	ld c,$d0
 		ld b,$0
 		CALL	PRINT_NEW_LINE
@@ -315,44 +354,6 @@ dmpio1:	IN      A, (C)
 		CALL	PRINT_NEW_LINE
 		ret
 
-memmap_init:	in a,(beepr)	; unlock memmap
-	ld a,0		; init mem map
-	out ($d8),a
-	ld a,1
-	out ($d9),a
-	out ($da),a
-	out ($db),a
-	out ($dc),a
-	out ($dd),a
-	out ($de),a
-	out ($df),a
-	out (beepr),a	; lock memmap
-	ret
-
-; Coopy jump table from EEPROM to RAM so that routines can be swapped out
-JUMPTAB_INIT:	push AF
-			push HL
-			push DE
-			push BC
-
-			ld hl,JUMPTABR
-			ld de,JUMPTAB
-			ld bc,JUMPTAB_END-JUMPTABR
-			ldir
-
-			pop BC
-			pop DE
-			pop HL
-			pop AF
-			ret
-
-		include "PIODriver.asm"
-		include "CTCDriver.asm"
-		include "SIODriver.asm"
-		include "ymzdrvr.asm";
-
-		include "eeprom_prog.asm";
-;		include "eeprom_write.asm";
 
 endprog	equ $
 
