@@ -7,35 +7,36 @@
 ;  CREATE DATE :	19 June 15
 ;***************************************************************************
 
+;	org $2000
 
-CFBASE:		EQU		0F8h
-CFSECT_BUFF:EQU     RAM_BOTTOM + 0100h
-CFSECT_END:	EQU		CFSECT_BUFF + 0200h
+;CFBASE:		EQU		090h
+;CFSECT_BUFF:EQU     RAM_TOP - $0fff ; $3FF
+;CFSECT_END:	EQU		CFSECT_BUFF + 0200h
 ;EOS:		EQU		00h
 ;CF_PROMPT:	
 
+;RAM_TOP:	EQU $FFFF
+;MONVARS	EQU	RAM_TOP - $1FF	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
+;CF_SECCNT:  EQU    MONVARS + 27h 
+;CF_LBA0:    EQU    MONVARS + 28h
+;CF_LBA1:    EQU    MONVARS + 29h
+;CF_LBA2:    EQU    MONVARS + 2Ah
+;CF_LBA3:    EQU    MONVARS + 2Bh
 
-;PRINT_STRING:EQU	0F000h
+;UPLOADBUF:  EQU    MONVARS + 2Ch     ; Buffer for hex-intel upload. Allows up to 32 bytes (20h) per line.
+;ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 bytes...
+;ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
+;MSGBUF:     EQU    UPLOADBUF
 
-;The addresses that the CF Card resides in I/O space.
-;Change to suit hardware.
-CFDATA:		EQU	CFBASE + 00h		; Data (R/W)
-CFERR:		EQU	CFBASE + 01h		; Error register (R)
-CFFEAT:		EQU	CFBASE + 01h		; Features (W)
-CFSECCO:	EQU	CFBASE + 02h		; Sector count (R/W)
-CFLBA0:		EQU	CFBASE + 03h		; LBA bits 0-7 (R/W, LBA mode)
-CFLBA1:		EQU	CFBASE + 04h		; LBA bits 8-15 (R/W, LBA mode)
-CFLBA2:		EQU	CFBASE + 05h		; LBA bits 16-23 (R/W, LBA mode)
-CFLBA3:		EQU	CFBASE + 06h		; LBA bits 24-27 (R/W, LBA mode)
-CFSTAT:		EQU	CFBASE + 07h		; Status (R)
-CFCMD:		EQU	CFBASE + 07h		; Command (W)
+;PRINT_STRING:	EQU	$0d82
+;NIB2CHAR:	EQU $0E3A
+;SHFTNIB:	EQU $0E45
 
 
 ;***************************************************************************
 ;CF_INIT
 ;Function: Initialize CF to 8 bit data transfer mode
 ;***************************************************************************	
-CF_MSG_i: DEFB 0Dh, 0Ah, 'CF Card Initialized', 0Dh, 0Ah, EOS
 CF_INIT:
 	CALL	CF_LP_BUSY
 	LD		A,01h						;LD features register to enable 8 bit
@@ -54,6 +55,7 @@ CF_INIT:
 	LD 		HL,CF_MSG_i					;Print some messages 
 	CALL    PRINT_STRING
 	RET
+CF_MSG_i: DEFB 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
 
 ;***************************************************************************
 ;LOOP_BUSY
@@ -117,16 +119,16 @@ CF_RD_SECT:
 ;CF_READ
 ;Function: Read sector 0 into RAM buffer.
 ;***************************************************************************	
-CF_MSG1:  DEFB 0Dh, 0Ah, 'CF Card Read', 0Dh, 0Ah, EOS
+CF_MSG1:  DEFB 0Dh, 0Ah, "CF Card Read", 0Dh, 0Ah, EOS
 
-CF_MSG21: DEFB 'Reading sector '
-CF_MSG2h: DEFB '00000000'
-CF_MSG22: DEFB 'h into RAM buffer...', 0Dh, 0Ah, EOS
+CF_MSG21: DEFB "Reading sector "
+CF_MSG2h: DEFB "00000000"
+CF_MSG22: DEFB "h into RAM buffer...", 0Dh, 0Ah, EOS
 CF_MSG2E: 
 
-CF_MSG31: DEFB 'Sector '
-CF_MSG3h: DEFB '00000000'
-CF_MSG32: DEFB  'h read...', 0Dh, 0Ah, EOS
+CF_MSG31: DEFB "Sector "
+CF_MSG3h: DEFB "00000000"
+CF_MSG32: DEFB  "h read...", 0Dh, 0Ah, EOS
 CF_MSG3E:
 
 CF_READ:
@@ -158,11 +160,11 @@ CF_READ:
 	CALL    PRINT_STRING
 	RET
 	
-CF_PROMPT: DEFB	'CF> ', EOS
+CF_PROMPT: DEFB	"CF> ", EOS
 
 CF_CLMSB:
 ; clear message buffer
-	LD		A, ' '
+	LD		A, " "
 	LD		HL, MSGBUF
 	LD		(HL), A
 	LD		DE, MSGBUF
@@ -250,7 +252,7 @@ CFSECDG:
 ;CF_ID_CMD
 ;Function: Issue the Identify Drive command and read the response into the data buffer
 ;***************************************************************************
-CF_MSGID:	DEFB 0Dh, 0Ah, 'CF Card Identify Drive', 0Dh, 0Ah, EOS
+CF_MSGID:	DEFB 0Dh, 0Ah, "CF Card Identify Drive", 0Dh, 0Ah, EOS
 
 CF_ID_CMD:
 	LD		HL, CF_MSGID
@@ -296,4 +298,13 @@ CF_WR_CMD:
 	AND		000000001b					;mask off error bit
 	JP		NZ,CF_WR_CMD				;Try again if error
 	
+; add code here to write data
+
+	ret
+
+;endprog	equ $
+
+;	output_bin "CFDriver.bin",CF_INIT,endprog    ; 
+;	output_intel "CFDriver.hex",CF_INIT,endprog    ;
+;	output_list "CFDriver.lst"
 	
