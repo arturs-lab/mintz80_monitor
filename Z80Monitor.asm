@@ -8,7 +8,7 @@
 ;***************************************************************************
 
 VERSMYR:    EQU     "1"
-VERSMIN:    EQU     "1"
+VERSMIN:    EQU     "2"
 
             INCLUDE "CONSTANTS.asm" ; copy or edit one of the 
                                   ; CONSTANTS-aaaa-pp.asm files to
@@ -28,7 +28,7 @@ SCAN:        EQU     005FEh
 
 ROUTINES:
 R_MAIN:     JP      MAIN            ; init DART and starts command loop
-R_U_INIT:   JP      UART_INIT       ; configures DARTchannel B 
+R_U_INIT:   JP      SIO_INIT       ; configures DARTchannel B 
 R_PRT_NL:   JP      PRINT_NEW_LINE  ; sends a CR LF
 R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
             DEFS    3   ; spare  entries
@@ -38,6 +38,22 @@ R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
             
             ORG ROM_BOTTOM + 24     ; room for eight routine entries
 
+            ORG ROM_BOTTOM + $38     ; IRQ routine
+
+IRQ:		ex af,af'
+		exx
+		jp IRQTAB+(IRQV-IRQTABR)
+
+irq_end:	ex af,af'
+		exx
+irq_exit:	reti
+
+            ORG ROM_BOTTOM + $66     ; nmi routine
+
+NMI:		jp IRQTAB+(NMIV-IRQTABR)
+
+
+; we want all drivers at the beginning so they stay the same even if we remove monitor code
 		include "PIODriver.asm"
 		include "CTCDriver.asm"
 		include "SIODriver.asm"
@@ -45,6 +61,11 @@ R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
 
 		include "eeprom_prog.asm";
 ;		include "eeprom_write.asm";
+		INCLUDE "CFDriver.asm"
+		INCLUDE	"UARTDriver.asm"
+;		INCLUDE	"DARTDriver.asm"
+;		INCLUDE	"CONIO.asm"		; use UART for console
+		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
 
 ; triangular progression delay
 ; at CPU CLK = 1.333MHz:
@@ -71,6 +92,10 @@ del1:	dec a
 	dec a
 	jr nz,delay
 	ret
+
+chime:	ld bc,$0200	; bc = duration
+	ld a,$06		; a = pitch
+	; fall through to beep
 
 ; bc = duration, a = pitch
 beep:	push af
@@ -99,24 +124,46 @@ memmap_init:	in a,(beepr)	; unlock memmap
 	out (beepr),a	; lock memmap
 	ret
 
+;		include "irqtab.asm"		; table for interrupts
+		include "irqtab.asm"
+
+; https://jgmalcolm.com/z80/advanced/im2i
+;
+IRQTAB_INIT:	push HL
+			push DE
+			push BC
+
+			ld hl,irq_exit
+			ld (IRQTAB),hl		; initialize vector to interrupt return
+
+			ld hl,IRQTAB
+			ld de,IRQTAB+2
+			ld bc,256/2
+			ldir				; fill vector table with vectors pointing to interrupt exit
+
+			ld hl,IRQTABR
+			ld de,IRQTAB
+			ld bc,IRQTABEND-IRQTABR
+
+			jr TAB_INIT
+
 ; Coopy jump table from EEPROM to RAM so that routines can be swapped out
-JUMPTAB_INIT:	push AF
-			push HL
+JUMPTAB_INIT:	push HL
 			push DE
 			push BC
 
 			ld hl,JUMPTABR
 			ld de,JUMPTAB
 			ld bc,JUMPTAB_END-JUMPTABR
-			ldir
+
+TAB_INIT:		ldir
 
 			pop BC
 			pop DE
 			pop HL
-			pop AF
 			ret
 
-		include "jumptab.asm"		;
+		include "jumptab.asm"		; bios and monitor routine jump table
 
 ;***************************************************************************
 ;MAIN
@@ -135,15 +182,12 @@ MAIN:
 	ld a,$01		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
 	call ymzinit
-	ld bc,$0200	; bc = duration
-	ld a,$06		; a = pitch
-	call beep
+	call chime
+	call IRQTAB_INIT	; copy interrupt jump table from (IRQTABR) in eeprom to (IRQTAB) in ram
 	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
 	call PIO_INIT		; init PIO
 	call CTC_INIT_ALL     ; init CTC
 	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
-	call SIO_A_INT_SET	; initialize SIOA interrupts
-	call SIO_A_EI		; more interrupt code
 dio:	ld hl,hellostr
 	call PRINT_STRING
 	call dmpio
@@ -330,11 +374,7 @@ CLEAR_ERROR:	PUSH    AF
         POP     AF
         RET
         
-        INCLUDE	"UARTDriver.asm"
-;        INCLUDE	"DARTDriver.asm"
         INCLUDE	"MONCommands.asm"
-        INCLUDE	"CONIO.asm"
-        INCLUDE "CFDriver.asm"
 
 ;		jmp 0
 MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed) 
