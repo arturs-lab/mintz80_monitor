@@ -43,7 +43,7 @@ SIOB_INIT:	ld a,00000001b      ; write into WR0: select WR1
         out (SIO_CB),a
         ld a,00000010b      ; write into WR0: select WR2
         out (SIO_CB),a
-        ld a,0h             ; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
+        ld a,SIO_INT_VECT   ; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
                             ; will be affected by the channel & condition that raised the interrupt
                             ; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
                             ; for special conditions
