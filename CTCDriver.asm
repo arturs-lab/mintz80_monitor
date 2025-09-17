@@ -43,13 +43,13 @@ CTC3_INIT:	ld a,01110111b      ; interrupt off, counter mode, prescaler=256 (doe
         ret
 
 
-CTC_TC_INIT: ld a,$9c
+CTC_TC_INIT: ld a,CTC_CH0_TV
 		ld (CTC_CH0_TC),a
-		ld a,$9c
+		ld a,CTC_CH1_TV
 		ld (CTC_CH1_TC),a
-		ld a,$d0
+		ld a,CTC_CH2_TV
 		ld (CTC_CH2_TC),a
-		ld a,$d0
+		ld a,CTC_CH3_TV
 		ld (CTC_CH3_TC),a
 
 		ret
