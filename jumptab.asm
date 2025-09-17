@@ -25,10 +25,12 @@ jUART_PRNT_SP	jp UART_PRNT_SP
 jUART_PRNT_STR	jp UART_PRNT_STR
 jTO_UPPER		jp TO_UPPER
 jCHAR_ISHEX	jp CHAR_ISHEX
+jSHFTNIB		jp SHFTNIB
 jNIB2CHAR		jp NIB2CHAR
 jCHAR2NIB		jp CHAR2NIB
 jdel00:		jp del00
 jdelay:		jp delay
+jchime		jp chime
 jbeep:		jp beep
 jymzinit		jp ymzinit
 jymzwr		jp ymzwr
