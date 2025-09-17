@@ -9,8 +9,21 @@ RAM_TOP:     EQU    $ffff
 
 JUMPTAB:	EQU	RAM_TOP - $2FF
 
-CFSECT_BUFF:EQU     RAM_TOP - $0fff ; $3FF
+IRQTAB:	EQU	RAM_TOP - $3FF
+
+; these interrupt bases are added to Z80 interrupt vector register I to form final vector in IM2
+SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to interrupt type
+CTCV:		equ $10		; CTC interrupt vector base
+PIOV:		equ $20		; PIO interrupt vector base
+
+CFSECT_BUFF:EQU     RAM_TOP - $0fff ; = $f000 - $f200
 CFSECT_END:	EQU		CFSECT_BUFF + 0200h
+
+; location of time constant values for CTC channels
+CTC_CH0_TC	equ	$fefc		; time constant for channel 0
+CTC_CH1_TC	equ	$fefd		; time constant for channel 1
+CTC_CH2_TC	equ	$fefe		; time constant for channel 2
+CTC_CH3_TC	equ	$feff		; time constant for channel 3
 
 MONVARS	EQU	RAM_TOP - $1FF	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 MPFMON:     EQU    0000h
@@ -60,12 +73,6 @@ PIO_CB      equ $1f
 
 ;SPEED:      EQU    06Ch         ; DIP-switches for BAUD rate.
 
-; location of time constant values for CTC channels
-CTC_CH0_TC	equ	$fefc		; time constant for channel 0
-CTC_CH1_TC	equ	$fefd		; time constant for channel 1
-CTC_CH2_TC	equ	$fefe		; time constant for channel 2
-CTC_CH3_TC	equ	$feff		; time constant for channel 3
-
 ymbase:	equ	$02
 
 ;aybase:	equ	$00	; myz80 IO board
@@ -88,6 +95,17 @@ CFCMD:		EQU	CFBASE + 07h		; Command (W)
 turbo:	equ 	$d0	; clock divider
 beepr:	equ	$d1	; speaker beeper
 memmap:	equ 	$d8	; memory map
+
+; ### other
+
+; CTC time constants
+CTC_CH0_TV:	EQU $9c
+CTC_CH1_TV:	EQU $9c
+CTC_CH2_TV:	EQU $68	; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
+CTC_CH3_TV:	EQU $d0
+
+; SIO interrupt vector
+SIO_INT_VECT	EQU $0
 
 ; Error codes intel Hex record
 E_NONE:     EQU    00h
