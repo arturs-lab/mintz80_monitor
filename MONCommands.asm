@@ -556,19 +556,23 @@ HEXI_COMMAND:	LD      A, 1
         LD      HL, UPLOADBUF
         LD      (RX_READ_P), HL
         LD      (RX_WRITE_P), HL
-HXI_LOOP:	CALL    UART_RX_RDY
-        CALL    UART_RX
-        LD      HL, (RX_WRITE_P)
+;HXI_LOOP:	CALL    UART_RX_RDY
+;        CALL    UART_RX
+;HXI_LOOP:	CALL    SIOA_RX_WAIT
+HXI_LOOP:	CALL    SIOA_RX
+;        LD      HL, (RX_WRITE_P)
         LD      (HL), A
         INC     HL
-        LD      (RX_WRITE_P), HL
-        AND     A
+;        LD      (RX_WRITE_P), HL
+;        AND     A
         CP      LF
-        JR      Z, HXI_RCVD
-        JR      HXI_LOOP
+        JR      NZ, HXI_LOOP
+;        JR      Z, HXI_RCVD
+;        JR      HXI_LOOP
         
 ; the record is received, echo the start address
-HXI_RCVD:	LD      A, 0
+HXI_RCVD:	LD      (RX_WRITE_P), HL
+		sub a
         LD      (MUTE), A
         
         LD      HL, UPLOADBUF + 2       ; Point to the first address char.
@@ -610,7 +614,7 @@ HXD_LOOP:	CALL    CHARS2BYTE              ; get data byte
         call PRINTHBYTE
         dec hl
         ld (hl),a			; in case anyone wants to use checksum, store it in last byte of data buffer
-        CALL    PRINT_NEW_LINE
+;        CALL    PRINT_NEW_LINE
 
 ; Done
         xor a	; checksum being returned in A was matching command checks, so zero A
