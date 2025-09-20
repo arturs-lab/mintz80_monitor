@@ -1,5 +1,5 @@
-# File X:\zeus\mintz80_monitor\ymztest.asm
-2000 21 1B 20    	ld hl,ENDCODE
+# File C:\zeus\mintz80_monitor\ymztest.asm
+2000 21 20 20    loader:	ld hl,ENDCODE
 2003 11 60 EA    	ld de,MUSIC1
 2006 01 9C 13    	ld bc,endprog-MUSIC1
 2009 ED B0       	ldir
@@ -13,6 +13,7 @@
 2017 B5          	or a,l
 2018 20 FB       	jr nz,del1		; repeat till 0
 201A C9          	ret
+201B 00 00 00 00 00 pad	db 0,0,0,0,0
 EA60 00 28 35 35 35 2B 35 35 28 35 28 2D 35 28 35 26 EA60	DB	$00,$28,$35,$35,$35,$2B,$35,$35,$28,$35,$28,$2D,$35,$28,$35,$26
 EA70 35 28 35 35 35 2F 35 35 28 35 28 30 35 2F 35 2B 	DB	$35,$28,$35,$35,$35,$2F,$35,$35,$28,$35,$28,$30,$35,$2F,$35,$2B
 EA80 35 28 35 2F 35 28 35 28 26 35 26 23 35 2A 35 28 	DB	$35,$28,$35,$2F,$35,$28,$35,$28,$26,$35,$26,$23,$35,$2A,$35,$28
@@ -110,30 +111,32 @@ FA21 00 00 00    FA21	DB	$00,$00,$00
 FA24 00 00 00    FA24	DB	$00,$00,$00 
 FA27 00          FA27	DB	$00
 FA28 00 00 00 00 00 00 FA28	DB	$00,$00,$00,$00,$00,$00
-FA2E 60 EA       CHAMUSICPTR	DB	$60,$EA	; channel A music data address, $EA60
-FA30 61 EA       	DB	$61,$EA
-FA32 48 EE       CHBMUSICPTR	DB	$48,$EE	; channel B music data address, $EE48
-FA34 49 EE       	DB	$49,$EE
-FA36 30 F2       CHCMUSICPTR	DB	$30,$F2	; channel C music data address, $F230
-FA38 31 F2       	DB	$31,$F2
+FA2E 60 EA       CHAMUSICPTR	DW	MUSIC1	; channel A music data address, $EA60
+FA30 61 EA       	DW	MUSIC1+1
+FA32 48 EE       CHBMUSICPTR	DW	MUSIC2	; channel B music data address, $EE48
+FA34 49 EE       	DW	MUSIC2+1
+FA36 30 F2       CHCMUSICPTR	DW	MUSIC3	; channel C music data address, $F230
+FA38 31 F2       	DW	MUSIC3+1
 FA3A 18 F6       FA3A	DB	XTRA,XTRA>>8	; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, should be $F618 per new locations
-FA3C 19 F6       	DB	$19,$F6 
-FA3E E6          PBSPEED	DB	$E6	; playback speed
-FA3F 08 07 06 05 06 07 08 09 0A 0B 0B 0B 0B 0B 0B 0B 0F FA3F	DB	$08,$07,$06,$05,$06,$07,$08,$09,$0A,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0F
-FA50 0E 0D 0C 0B 0A 09 08 07 06 05 04 03 02 01 00 0F 	DB	$0E,$0D,$0C,$0B,$0A,$09,$08,$07,$06,$05,$04,$03,$02,$01,$00,$0F
-FA60 0E 0D 0C 0B 0A 09 08 08 09 0A 0B 0C 0D 0E 0F 04 	DB	$0E,$0D,$0C,$0B,$0A,$09,$08,$08,$09,$0A,$0B,$0C,$0D,$0E,$0F,$04
-FA70 06 08 0A 0B 0C 0D 0E 0F 0E 0D 0C 0B 0A 07 03 08 	DB	$06,$08,$0A,$0B,$0C,$0D,$0E,$0F,$0E,$0D,$0C,$0B,$0A,$07,$03,$08
-FA80 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0B 09 08 0B 	DB	$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0B,$09,$08,$0B
-FA90 0B 0B 0B 0B 0B 0B 0B 08 05 02 02 03 03 03 03 08 	DB	$0B,$0B,$0B,$0B,$0B,$0B,$0B,$08,$05,$02,$02,$03,$03,$03,$03,$08
-FAA0 0B 0D 0E 0F 0F 0E 0D 0C 0B 0A 09 09 09 09 09 0F 	DB	$0B,$0D,$0E,$0F,$0F,$0E,$0D,$0C,$0B,$0A,$09,$09,$09,$09,$09,$0F
-FAB0 00 0F 00 0F 00 0F 00 0F 00 0F 00 0F 00 0F 08 9F 	DB	$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$08,$9F
+FA3C 19 F6       	DW	XTRA+1
+FA3E F3          PBSPEED	DB	$f3	;$E6	; playback speed
+FA3F 08 07 06 05 06 07 08 09 0A 0B 0B 0B 0B 0B 0B 0B FA3F	DB	$08,$07,$06,$05,$06,$07,$08,$09,$0A,$0B,$0B,$0B,$0B,$0B,$0B,$0B
+FA4F 0F 0E 0D 0C 0B 0A 09 08 07 06 05 04 03 02 01 00 	DB	$0F,$0E,$0D,$0C,$0B,$0A,$09,$08,$07,$06,$05,$04,$03,$02,$01,$00
+FA5F 0F 0E 0D 0C 0B 0A 09 08 08 09 0A 0B 0C 0D 0E 0F 	DB	$0F,$0E,$0D,$0C,$0B,$0A,$09,$08,$08,$09,$0A,$0B,$0C,$0D,$0E,$0F
+FA6F 04 06 08 0A 0B 0C 0D 0E 0F 0E 0D 0C 0B 0A 07 03 	DB	$04,$06,$08,$0A,$0B,$0C,$0D,$0E,$0F,$0E,$0D,$0C,$0B,$0A,$07,$03
+FA7F 08 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 0B 09 08 	DB	$08,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0B,$09,$08
+FA8F 0B 0B 0B 0B 0B 0B 0B 0B 08 05 02 02 03 03 03 03 	DB	$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$08,$05,$02,$02,$03,$03,$03,$03
+FA9F 08 0B 0D 0E 0F 0F 0E 0D 0C 0B 0A 09 09 09 09 09 	DB	$08,$0B,$0D,$0E,$0F,$0F,$0E,$0D,$0C,$0B,$0A,$09,$09,$09,$09,$09
+FAAF 0F 00 0F 00 0F 00 0F 00 0F 00 0F 00 0F 00 0F 08 	DB	$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$08
+FABF 9F          N_TO_REG	DB	$9F
 FAC0 06 40 06 E6 05 91 05 41 05 F6 04 AE 04 6B 04 2C FAC0	DB	$06,$40,$06,$E6,$05,$91,$05,$41,$05,$F6,$04,$AE,$04,$6B,$04,$2C
 FAD0 04 F0 03 B7 03 82 03 4F 03 20 03 F3 02 C8 02 A1 FAD0	DB	$04,$F0,$03,$B7,$03,$82,$03,$4F,$03,$20,$03,$F3,$02,$C8,$02,$A1
 FAE0 02 7B 02 57 02 36 02 16 02 F8 01 DC 01 C1 01 A8 FAE0	DB	$02,$7B,$02,$57,$02,$36,$02,$16,$02,$F8,$01,$DC,$01,$C1,$01,$A8
 FAF0 01 90 01 79 01 64 01 50 01 3D 01 2C 01 1B 01 0B FAF0	DB	$01,$90,$01,$79,$01,$64,$01,$50,$01,$3D,$01,$2C,$01,$1B,$01,$0B
 FB00 01 FC 00 EE 00 E0 00 D4 00 C8 00 BD 00 B2 00 A8 FB00	DB	$01,$FC,$00,$EE,$00,$E0,$00,$D4,$00,$C8,$00,$BD,$00,$B2,$00,$A8
 FB10 00 9F 00 96 00 8D 00 85 00 7E 00 77 00 70 00 6A FB10	DB	$00,$9F,$00,$96,$00,$8D,$00,$85,$00,$7E,$00,$77,$00,$70,$00,$6A
-FB20 00 64 00 5E 00 59 00 54 00 FF FF 08 09 18 09 00 FB20	DB	$00,$64,$00,$5E,$00,$59,$00,$54,$00,$FF,$FF,$08,$09,$18,$09,$00
+FB20 00 64 00 5E 00 59 00 54 00 FB20	DB	$00,$64,$00,$5E,$00,$59,$00,$54,$00
+FB29 FF FF 08 09 18 09 00 FB29	DB	$FF,$FF,$08,$09,$18,$09,$00
 FB30 80 1C 80 04 10 0C 10 14 10 1C 80 1E 80 00 00 FB30	DB	$80,$1C,$80,$04,$10,$0C,$10,$14,$10,$1C,$80,$1E,$80,$00,$00 
 FB3F 00 00 00 00 00 00 FB3F	DB	$00,$00,$00,$00,$00,$00 
 FB45 CD 51 FB    FB45	call	FB51	; play notes for all channels?
@@ -158,9 +161,9 @@ FB69 23          	inc	hl
 FB6A CD D9 FC    	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
 FB6D 23          	inc	hl
 FB6E CD D9 FC    	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
-FB71 21 3A FA    	ld	hl,FA3A
-FB74 CD D0 FB    	call	FBD0
-FB77 CD 9D FC    	call	FC9D
+FB71 21 3A FA    	ld	hl,NOISPTR	; get noise?
+FB74 CD D0 FB    	call	FBD0		; get reg value
+FB77 CD 9D FC    	call	FC9D		; process it
 FB7A 21 2E FA    	ld	hl,CHAMUSICPTR	; channel A music data address
 FB7D CD D0 FB    	call	FBD0		; get note and reg value
 FB80 3E 01       	ld	a,$01		; channel number
@@ -214,7 +217,7 @@ FBDD 73          	ld	(hl),e
 FBDE 87          	add	a,a	; note * 2
 FBDF 5F          	ld	e,a	; turn it into offset to 16 bit table
 FBE0 16 00       	ld	d,$00
-FBE2 21 C0 FA    	ld	hl,FABF	; get address of beginning of note to reg value map
+FBE2 21 BF FA    	ld	hl,N_TO_REG	; get address of beginning of note to reg value map
 FBE5 19          	add	hl,de		; add offset
 FBE6 56          	ld	d,(hl)		; get value from table
 FBE7 23          	inc	hl
@@ -445,7 +448,7 @@ FD65 D0          	ret	nc		; return if A <= $35 (53 dec)
 FD66 16 00       	ld	d,$00
 FD68 87          	add	a,a
 FD69 5F          	ld	e,a		; DE = 2 * A
-FD6A 21 C0 FA    	ld	hl,FABF	; point to $FABF table
+FD6A 21 BF FA    	ld	hl,N_TO_REG	; point to $FABF table
 FD6D 19          	add	hl,de
 FD6E 5E          	ld	e,(hl)
 FD6F 23          	inc	hl
@@ -543,4 +546,4 @@ FDF8 7E          	ld	a,(hl)		; get value
 FDF9 E1          	pop	hl		; get pointer to channel amplitude
 FDFA 77          	ld	(hl),a		; put value there
 FDFB C9          	ret
-# End of file X:\zeus\mintz80_monitor\ymztest.asm
+# End of file C:\zeus\mintz80_monitor\ymztest.asm
