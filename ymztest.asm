@@ -32,7 +32,7 @@ PLAYER	EQU	$FA00
 
 	ORG $2000
 ;	ld sp,$6000
-	ld hl,ENDCODE
+loader:	ld hl,ENDCODE
 	ld de,MUSIC1
 	ld bc,endprog-MUSIC1
 	ldir
@@ -50,6 +50,7 @@ del1	dec hl			; count delay
 	jr nz,del1		; repeat till 0
 	ret
 
+pad	db 0,0,0,0,0
 ENDCODE	EQU	$
 
 
@@ -232,43 +233,45 @@ FA28	DB	$00,$00,$00,$00,$00,$00
 ; updated by $FB51 $FBA5 $FD0F
 ; read by $FD43
 ; FA2E
-CHAMUSICPTR	DB	$60,$EA	; channel A music data address, $EA60
-	DB	$61,$EA
+CHAMUSICPTR	DW	MUSIC1	; channel A music data address, $EA60
+	DW	MUSIC1+1
 ; FA32
-CHBMUSICPTR	DB	$48,$EE	; channel B music data address, $EE48
-	DB	$49,$EE
+CHBMUSICPTR	DW	MUSIC2	; channel B music data address, $EE48
+	DW	MUSIC2+1
 ; FA36
-CHCMUSICPTR	DB	$30,$F2	; channel C music data address, $F230
-	DB	$31,$F2
+CHCMUSICPTR	DW	MUSIC3	; channel C music data address, $F230
+	DW	MUSIC3+1
 
 ; updated by $FB51 $FBA5
+NOISPTR	EQU $
 FA3A	DB	XTRA,XTRA>>8	; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, should be $F618 per new locations
-	DB	$19,$F6 
+	DW	XTRA+1
 
 ; read by $FC72
-PBSPEED	DB	$E6	; playback speed
+PBSPEED	DB	$f3	;$E6	; playback speed
 
 ; read by $FDD5
-FA3F	DB	$08,$07,$06,$05,$06,$07,$08,$09,$0A,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0F
-	DB	$0E,$0D,$0C,$0B,$0A,$09,$08,$07,$06,$05,$04,$03,$02,$01,$00,$0F
-	DB	$0E,$0D,$0C,$0B,$0A,$09,$08,$08,$09,$0A,$0B,$0C,$0D,$0E,$0F,$04
-	DB	$06,$08,$0A,$0B,$0C,$0D,$0E,$0F,$0E,$0D,$0C,$0B,$0A,$07,$03,$08
-	DB	$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0B,$09,$08,$0B
-	DB	$0B,$0B,$0B,$0B,$0B,$0B,$0B,$08,$05,$02,$02,$03,$03,$03,$03,$08
-	DB	$0B,$0D,$0E,$0F,$0F,$0E,$0D,$0C,$0B,$0A,$09,$09,$09,$09,$09,$0F
-	DB	$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$08,$9F
-
-FABF	EQU	$
+FA3F	DB	$08,$07,$06,$05,$06,$07,$08,$09,$0A,$0B,$0B,$0B,$0B,$0B,$0B,$0B
+	DB	$0F,$0E,$0D,$0C,$0B,$0A,$09,$08,$07,$06,$05,$04,$03,$02,$01,$00
+	DB	$0F,$0E,$0D,$0C,$0B,$0A,$09,$08,$08,$09,$0A,$0B,$0C,$0D,$0E,$0F
+	DB	$04,$06,$08,$0A,$0B,$0C,$0D,$0E,$0F,$0E,$0D,$0C,$0B,$0A,$07,$03
+	DB	$08,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0B,$09,$08
+	DB	$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$08,$05,$02,$02,$03,$03,$03,$03
+	DB	$08,$0B,$0D,$0E,$0F,$0F,$0E,$0D,$0C,$0B,$0A,$09,$09,$09,$09,$09
+	DB	$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$00,$0F,$08
 
 ; note to reg value mapping?
 ; read by $FBD0 $FD43
+FABF	EQU	$
+N_TO_REG	DB	$9F
 FAC0	DB	$06,$40,$06,$E6,$05,$91,$05,$41,$05,$F6,$04,$AE,$04,$6B,$04,$2C
 FAD0	DB	$04,$F0,$03,$B7,$03,$82,$03,$4F,$03,$20,$03,$F3,$02,$C8,$02,$A1
 FAE0	DB	$02,$7B,$02,$57,$02,$36,$02,$16,$02,$F8,$01,$DC,$01,$C1,$01,$A8
 FAF0	DB	$01,$90,$01,$79,$01,$64,$01,$50,$01,$3D,$01,$2C,$01,$1B,$01,$0B
 FB00	DB	$01,$FC,$00,$EE,$00,$E0,$00,$D4,$00,$C8,$00,$BD,$00,$B2,$00,$A8
 FB10	DB	$00,$9F,$00,$96,$00,$8D,$00,$85,$00,$7E,$00,$77,$00,$70,$00,$6A
-FB20	DB	$00,$64,$00,$5E,$00,$59,$00,$54,$00,$FF,$FF,$08,$09,$18,$09,$00
+FB20	DB	$00,$64,$00,$5E,$00,$59,$00,$54,$00
+FB29	DB	$FF,$FF,$08,$09,$18,$09,$00
 FB30	DB	$80,$1C,$80,$04,$10,$0C,$10,$14,$10,$1C,$80,$1E,$80,$00,$00 
 
 ; updated by $FCDF
@@ -299,9 +302,9 @@ FB51	di			; make sure interrupts turned off
 	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
 	inc	hl
 	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
-	ld	hl,FA3A
-	call	FBD0
-	call	FC9D
+	ld	hl,NOISPTR	; get noise?
+	call	FBD0		; get reg value
+	call	FC9D		; process it
 	ld	hl,CHAMUSICPTR	; channel A music data address
 	call	FBD0		; get note and reg value
 	ld	a,$01		; channel number
@@ -363,7 +366,7 @@ FBD4	ld	a,(de)	; get sample
 	add	a,a	; note * 2
 	ld	e,a	; turn it into offset to 16 bit table
 	ld	d,$00
-	ld	hl,FABF	; get address of beginning of note to reg value map
+	ld	hl,N_TO_REG	; get address of beginning of note to reg value map
 	add	hl,de		; add offset
 	ld	d,(hl)		; get value from table
 	inc	hl
@@ -371,6 +374,7 @@ FBD4	ld	a,(de)	; get sample
 	ex	de,hl		; put it in HL
 	ret
 
+; restart music
 FBEB	inc	hl	; after current sample register we have loop dest address register
 	ld	e,(hl)	; get that address
 	inc	hl
@@ -494,6 +498,7 @@ FC89	nop
 	ret	z		; yes, return
 	jp	FC72		; no, continue loop
 
+; noise handler?
 FC9D	ld	a,b
 	and	$03		; put 2 lowest bits of B in C
 	ld	c,a
@@ -613,7 +618,7 @@ FD5E	ld	e,(hl)		; get current note from music
 	ld	d,$00
 	add	a,a
 	ld	e,a		; DE = 2 * A
-	ld	hl,FABF	; point to $FABF table
+	ld	hl,N_TO_REG	; point to $FABF table
 	add	hl,de
 	ld	e,(hl)
 	inc	hl
@@ -728,8 +733,9 @@ FDD5	ld	hl,RAMPLIT	; point to amplitudes table
 
 endprog	equ $
 
-	output_bin "ymzloader.bin",0,ENDCODE    ; loader of ay code into RAM
+	output_bin "ymzloader.bin",loader,ENDCODE-loader    ; loader of ay code into RAM
 	output_bin "ymztest.bin",MUSIC1,endprog-MUSIC1    ; The binary file
-;	output_intel "ymztest.hex",0,endprog    ;
+	output_intel "ymzloader.hex",loader,ENDCODE-loader    ;
+	output_intel "ymztest.hex",MUSIC1,endprog-MUSIC1    ; The binary file
 	output_list "ymztest.lst"
 
