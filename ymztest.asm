@@ -14,10 +14,10 @@ AYSEL		EQU	$02
 AYDTA		EQU	$03
 
 PLAYER	EQU	$2000
-MUSIC1	EQU	$2400
-MUSIC2	EQU	$27E8
-MUSIC3	EQU	$2BD0
-XTRA		EQU	$2FB8
+MUSIC1	EQU	$2500
+MUSIC2	EQU	$28E8
+MUSIC3	EQU	$2cD0
+XTRA		EQU	$30B8
 XTRAEND	EQU	XTRA + 385
 
 ;MUSIC1	EQU	$EA60
@@ -29,16 +29,31 @@ XTRAEND	EQU	XTRA + 385
 
 	ORG	PLAYER
 
-FA00	jp	FBA5
+FA00	ld a,$10	; frequency source
+	out (04),a
+	ld a,$1	; freq divider
+	out (05),a
+	ld a,$0	; cpu frequency
+	out ($d0),a
+	ld a,$e2		; playback speed
+	ld (PBSPEED),a
+	jp	FBA5		; initialize note pointers and start playing
 
 ; seem unused
 FA03	DB	$21,$13,$C2,$11,$12,$FA,$01,$2C,$01,$ED,$B0,$C9
+;	ld hl $c213
+;	ld de $fa12
+;	ld bc $012c
+;	ldir
+;	ret
 
 ; updated by $FBF4, $FCAB
+; 
 FA0F	DB	$0F
 
 ; updated by $FBF4
-FA10	DB	$0F,$0F ; channel 1
+; 
+FA10	DB	$0F,$0F ; channel 1 frequency
 
 ; AY sound register values
 RTPERIOD EQU $
@@ -109,7 +124,7 @@ FA3A	DB	XTRA,XTRA>>8	; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, 
 	DW	XTRA+1
 
 ; read by $FC72
-PBSPEED	DB	$f3	;$E6	; playback speed
+PBSPEED	DB	$f3	;$E6	; playback speed @CPU CLK: 2MHz->$f3, 4MHz->$e2
 
 ; read by $FDD5
 FA3F	DB	$08,$07,$06,$05,$06,$07,$08,$09,$0A,$0B,$0B,$0B,$0B,$0B,$0B,$0B
@@ -147,10 +162,10 @@ FB45	call	FB51	; play notes for all channels?
 	jp	FBC7	; unless key pressed - then exit
 
 FB51	di			; make sure interrupts turned off
-	ld	hl,RENABLE	; set enable register to all channels enabled + noise on
+	ld	hl,RENABLE	; set enable register to all channels disabled + noise off
 	ld	b,$FF
 	ld	(hl),b
-	inc	hl
+	inc	hl		; point at RAMPLIT
 	inc	b		; then set amplitudes to 0
 	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
 	ld	hl,FA20	; zero 
@@ -183,14 +198,15 @@ FB51	di			; make sure interrupts turned off
 	call	FC72
 	ret
 
+; initialize note pointers 
 FBA5	ld	hl,MUSIC1	; EA60 location of music
 	ld	de,CHAMUSICPTR	; 
 	ld	bc,$03E8	; 1000 decimal - length of channel data
 	call	FBBD		; store location of data for channel A - EA60 -> FA2E
 	call	FBBD		; store location of data for channel B - EE48 -> FA32
 	call	FBBD		; store location of data for channel C - F230 -> FA36
-	call	FBBD		; store location of data for - F618 -> FA3A
-	jp	FB45
+	call	FBBD		; store location of data for noise? - F618 -> FA3A
+	jp	FB45		; start playing
 
 FBBD	ld	a,l
 	ld	(de),a
@@ -203,10 +219,11 @@ FBBD	ld	a,l
 	inc	de
 	ret
 
+; exit player
 FBC7	ld	d,$07	; Write FF to register 7 - disable all channels. Should be 3F to not turn on output on IO ports
 	ld	e,$FF
 	call	AYWRITE
-	ei
+;	ei
 	ret		; exit
 
 ; entry:
@@ -253,8 +270,8 @@ FBEB	inc	hl	; after current sample register we have loop dest address register
 ; updates table $FA21
 FBF4	ld	c,a		; save channel number in C for later
 	ld	a,b		; get note number
-	cp	$36
-	jr	nc,FC39
+	cp	$36		; is it valid range? $36 or less?
+	jr	nc,FC39	; no, it's percussion or noisse?
 	ld	a,$FF		; is H = $FF ?
 	cp	h
 	ret	z		; return if so
@@ -262,10 +279,10 @@ FBF4	ld	c,a		; save channel number in C for later
 	push	hl		; save HL for later - contains register value for note
 	add	a,a		; 16 bit offset to channel data
 	dec	a
-	ld	hl,FA10	; point to table (not FA12?)
+	ld	hl,FA12	; point to table, counting from A=1 to 3, so 1,3 or 5
 	ld	d,$00
 	ld	e,a
-	add	hl,de		; add 16 bit offset
+	add	hl,de		; add 16 bit offset, results in fa11, fa13 or fa15 - starting with MSB
 	pop	de		; get note register value
 	ld	(hl),e		; store DE in table
 	dec	hl
@@ -593,6 +610,9 @@ FDD5	ld	hl,RAMPLIT	; point to amplitudes table
 	ret
 
 rtrn	ld e,$ff
+	call JUMPTAB+$2a
+	add $ff
+	ld e,a
 	ret
 
 	ORG	MUSIC1
@@ -706,7 +726,7 @@ MUSICEND	EQU $
 ;F799	DB	$3f
 XTRAEND	DB	$3f
 
-
+		include "jump.inc"
 
 endprog	equ $
 
