@@ -31,7 +31,7 @@ XTRAEND	EQU	XTRA + 385
 
 FA00	ld a,$10	; frequency source
 	out (04),a
-	ld a,$1	; freq divider
+	ld a,$10	; freq divider
 	out (05),a
 	ld a,$0	; cpu frequency
 	out ($d0),a
@@ -39,52 +39,35 @@ FA00	ld a,$10	; frequency source
 	ld (PBSPEED),a
 	jp	FBA5		; initialize note pointers and start playing
 
-; seem unused
-FA03	DB	$21,$13,$C2,$11,$12,$FA,$01,$2C,$01,$ED,$B0,$C9
-;	ld hl $c213
-;	ld de $fa12
-;	ld bc $012c
-;	ldir
-;	ret
 
 ; updated by $FBF4, $FCAB
 ; 
-FA0F	DB	$0F
+FA0F	DB	$0F		; channel 1
 
 ; updated by $FBF4
 ; 
-FA10	DB	$0F,$0F ; channel 1 frequency
+FA10	DB	$0F,$0F	; channel 2 and 3
 
 ; AY sound register values
 RTPERIOD EQU $
-FA12	DB	$A8,$01	; channel 2
-FA14	DB	$9F,$06	; channel 3
-FA16	DB	$3D,$01 
+FA12	DB	$A8,$01	; channel 1 period
+FA14	DB	$9F,$06	; channel 2 period
+FA16	DB	$3D,$01	; channel 3 period
 
-; noise period
-; updated by FC39
 ; FA18
-RNOISEP	DB	$1E
+RNOISEP	DB	$1E	; noise period updated by FC39
 
-;enable bits
-; updated by $FB51 $FBF4 $FC48
 ; FA19
-RENABLE	DB	$FB
+RENABLE	DB	$FB	; enable bits updated by $FB51 $FBF4 $FC48
 
-; amplitudes
-; updated by $FC63 $FDD5 
 ; FA1A
-RAMPLIT	DB	$00,$00,$0F
+RAMPLIT	DB	$00,$00,$0F	; amplitudes updated by $FC63 $FDD5 
 
-; envelope period
-; updated by none
 ; FA1D
-RENVPER	DB	$00,$00
+RENVPER	DB	$00,$00	; envelope period updated by none
 
-; envelope shape
-; updated by none
 ; FA1F
-RENVSHAP	DB	$00
+RENVSHAP	DB	$00	; envelope shape updated by none
 
 ; updated by $FB51 $FC72
 ; read by $FDD5
@@ -119,7 +102,7 @@ CHCMUSICPTR	DW	MUSIC3	; channel C music data address, $F230
 	DW	MUSIC3+1
 
 ; updated by $FB51 $FBA5
-NOISPTR	EQU $
+EFFECTPTR	EQU $
 FA3A	DB	XTRA,XTRA>>8	; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, should be $F618 per new locations
 	DW	XTRA+1
 
@@ -178,21 +161,42 @@ FB51	di			; make sure interrupts turned off
 	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
 	inc	hl
 	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
-	ld	hl,NOISPTR	; get noise?
+	ld	hl,EFFECTPTR	; get effect
 	call	FBD0		; get reg value
+	ld a," "
+	add b
+	call jUART_TX
+	ld a," "
+	call jUART_TX
 	call	FC9D		; process it
 	ld	hl,CHAMUSICPTR	; channel A music data address
 	call	FBD0		; get note and reg value
+	ld a," "
+	add b
+	call jUART_TX
+	ld a," "
+	call jUART_TX
 	ld	a,$01		; channel number
 	call	FBF4
 	ld	hl,CHBMUSICPTR	; channel B music data address
 	call	FBD0		; get note and reg value
+	ld a," "
+	add b
+	call jUART_TX
+	ld a," "
+	call jUART_TX
 	ld	a,$02		; channel number
 	call	FBF4
 	ld	hl,CHCMUSICPTR	; channel C music data address
 	call	FBD0		; get note and reg value
+	ld a," "
+	add b
+	call jUART_TX
+	ld a," "
+	call jUART_TX
 	ld	a,$03		; channel number
 	call	FBF4
+	call jPRINT_NEW_LINE
 	call	FD15
 	call	AYSETREG
 	call	FC72
@@ -205,7 +209,7 @@ FBA5	ld	hl,MUSIC1	; EA60 location of music
 	call	FBBD		; store location of data for channel A - EA60 -> FA2E
 	call	FBBD		; store location of data for channel B - EE48 -> FA32
 	call	FBBD		; store location of data for channel C - F230 -> FA36
-	call	FBBD		; store location of data for noise? - F618 -> FA3A
+	call	FBBD		; store location of data for effect? - F618 -> FA3A
 	jp	FB45		; start playing
 
 FBBD	ld	a,l
@@ -282,7 +286,7 @@ FBF4	ld	c,a		; save channel number in C for later
 	ld	hl,FA12	; point to table, counting from A=1 to 3, so 1,3 or 5
 	ld	d,$00
 	ld	e,a
-	add	hl,de		; add 16 bit offset, results in fa11, fa13 or fa15 - starting with MSB
+	add	hl,de		; add 16 bit offset, results in fa13, fa15 or fa17 - starting with MSB
 	pop	de		; get note register value
 	ld	(hl),e		; store DE in table
 	dec	hl
@@ -335,13 +339,13 @@ FC48	ld	hl,FA21	; point to table
 	ld	hl,RENABLE
 	dec	c
 	jr	nz,FC5A
-	res	3,(hl)		; if 0 turn on noise A in channel enable shadow reg
+	res	3,(hl)		; if 0 turn on effect A in channel enable shadow reg
 	ret
 FC5A	dec	c
 	jr	nz,FC60
-	res	4,(hl)		; if 0 turn on noise B in channel enable shadow reg
+	res	4,(hl)		; if 0 turn on effect B in channel enable shadow reg
 	ret
-FC60	res	5,(hl)		; if 0 turn on noise C in channel enable shadow reg
+FC60	res	5,(hl)		; if 0 turn on effect C in channel enable shadow reg
 	ret
 
 FC63	ld	a,l		; get lower nibble of L
@@ -376,7 +380,7 @@ FC89	nop
 	ret	z		; yes, return
 	jp	FC72		; no, continue loop
 
-; noise handler?
+; effect handler?
 FC9D	ld	a,b
 	and	$03		; put 2 lowest bits of B in C
 	ld	c,a
@@ -610,7 +614,7 @@ FDD5	ld	hl,RAMPLIT	; point to amplitudes table
 	ret
 
 rtrn	ld e,$ff
-	call JUMPTAB+$2a
+	call jRX_CHK
 	add $ff
 	ld e,a
 	ret
