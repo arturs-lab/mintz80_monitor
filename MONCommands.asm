@@ -7,8 +7,6 @@
 ;  CREATE DATE :	06 May 15 / 2021-01-01
 ;***************************************************************************
 
-HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
-
 ;***************************************************************************
 ;HELP_COMMAND
 ;Function: Print help dialogue box
@@ -556,19 +554,12 @@ HEXI_COMMAND:	LD      A, 1
         LD      HL, UPLOADBUF
         LD      (RX_READ_P), HL
         LD      (RX_WRITE_P), HL
-;HXI_LOOP:	CALL    UART_RX_RDY
-;        CALL    UART_RX
-;HXI_LOOP:	CALL    SIOA_RX_WAIT
-HXI_LOOP:	CALL    SIOA_RX
-;        LD      HL, (RX_WRITE_P)
+HXI_LOOP:	CALL    CON_RX	;SIOA_RX
         LD      (HL), A
         INC     HL
-;        LD      (RX_WRITE_P), HL
 ;        AND     A
         CP      LF
         JR      NZ, HXI_LOOP
-;        JR      Z, HXI_RCVD
-;        JR      HXI_LOOP
         
 ; the record is received, echo the start address
 HXI_RCVD:	LD      (RX_WRITE_P), HL
@@ -582,7 +573,6 @@ HXIADRLP:	LD      A, (HL)
         INC     HL
         DJNZ    HXIADRLP
         
-;        CALL    PRINT_NEW_LINE
         
 ; processing the record
 HXI_PROC:	LD      HL, UPLOADBUF
