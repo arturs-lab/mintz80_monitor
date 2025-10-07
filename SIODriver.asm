@@ -97,10 +97,10 @@ SIO_A_EI:	ld a,00000011b      ; write into WR0: select WR3
 ; put string to print, terminated by EOS immediately after the CALL instruction
 ; calling this procedure
 ;***************************************************************************
-SIOA_PRNT_SP:	pop HL
+SIOA_PRNT_SP:	ex (sp),hl                 
 			call SIOA_PRNT_STR
 			inc hl
-			push hl
+			ex (sp),hl
 			ret
 
 ;***************************************************************************
