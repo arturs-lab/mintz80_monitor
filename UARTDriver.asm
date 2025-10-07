@@ -41,10 +41,10 @@ UART_INIT:		LD     A,80h				;Mask to Set DLAB Flag
 ; put string to print, terminated by EOS immediately after the CALL instruction
 ; calling this procedure
 ;***************************************************************************
-UART_PRNT_SP:	pop HL
+UART_PRNT_SP:	ex (sp),hl
 			call UART_PRNT_STR
 			inc hl
-			push hl
+			ex (sp),hl
 			ret
 
 ;***************************************************************************
