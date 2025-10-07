@@ -16,9 +16,6 @@ SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to 
 CTCV:		equ $10		; CTC interrupt vector base
 PIOV:		equ $20		; PIO interrupt vector base
 
-CFSECT_BUFF:EQU     RAM_TOP - $0fff ; = $f000 - $f200
-CFSECT_END:	EQU		CFSECT_BUFF + 0200h
-
 ; location of time constant values for CTC channels
 CTC_CH0_TC	equ	$fefc		; time constant for channel 0
 CTC_CH1_TC	equ	$fefd		; time constant for channel 1
@@ -47,7 +44,9 @@ CF_LBA0:    EQU    MONVARS + 28h
 CF_LBA1:    EQU    MONVARS + 29h
 CF_LBA2:    EQU    MONVARS + 2Ah
 CF_LBA3:    EQU    MONVARS + 2Bh
-UPLOADBUF:  EQU    MONVARS + 2Ch     ; Buffer for hex-intel upload. Allows up to 32 bytes (20h) per line.
+CF_PART_CUR:	EQU    MONVARS + 2Ch	; Current partition offset into MBR
+CFSECT_BUF: EQU    MONVARS + 2Eh	; pointer to location of CF data buffer. Need $200 byte buffer
+UPLOADBUF:  EQU    MONVARS + 30h     ; Buffer for hex-intel upload. Allows up to 32 bytes (20h) per line.
 ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 bytes...
 ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
 MSGBUF:     EQU    UPLOADBUF
@@ -73,12 +72,14 @@ PIO_CB      equ $1f
 
 ;SPEED:      EQU    06Ch         ; DIP-switches for BAUD rate.
 
-ymbase:	equ	$02
+ymbase:	equ	$b0	; 02 address reg 03 data reg, on mint board $70/$b0
 
 ;aybase:	equ	$00	; myz80 IO board
-;ymcs:		equ 	$02	; 02 address reg 03 data reg
+;ymcs:		equ 	$02	; 02 address reg 03 data reg, on mint board $70/$b0
+;sndclksrc	equ $04	; source of sound clock on z80 board 10=sysclk, 20=?, 40=uartclk 1.84MHz 
+;sndclkdiv	equ $05	; sound clock divider 00=/1, 10=/2, 20=/4, 30=/8
 
-CFBASE:		EQU		090h
+CFBASE:		EQU		080h
 ;The addresses that the CF Card resides in I/O space.
 ;Change to suit hardware.
 CFDATA:		EQU	CFBASE + 00h		; Data (R/W)
@@ -92,13 +93,13 @@ CFLBA3:		EQU	CFBASE + 06h		; LBA bits 24-27 (R/W, LBA mode)
 CFSTAT:		EQU	CFBASE + 07h		; Status (R)
 CFCMD:		EQU	CFBASE + 07h		; Command (W)
 
-turbo:	equ 	$d0	; clock divider
+turbo:	equ 	$d0	; clock divider 0=4MHz, 1=2MHz, 2=1.33MHz, 3=1MHz
 beepr:	equ	$d1	; speaker beeper
-memmap:	equ 	$d8	; memory map
+memmap:	equ 	$d8	; memory map $d8-$df
 
 ; ### other
 
-; CTC time constants
+; CTC time constants values
 CTC_CH0_TV:	EQU $9c
 CTC_CH1_TV:	EQU $9c
 CTC_CH2_TV:	EQU $68	; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
@@ -131,7 +132,11 @@ epp_tgt:	equ $0000	; target starting address
 epp_len:	equ $2000	; byte count of data to be programmed
 epp_del:	equ $1b	; delay between EEPROM readbacks, about 10ms max per datasheet 
 epp_tmp:	equ $ff00	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
-epp_bank:	equ $02	; eeprom bank to select. by default program shadow bank to allow testing and reset if programming fails
+epp_bank:	equ $01	; eeprom bank to select. by default program RAM bank to allow testing and reset if programming fails
+
+; for hex dump routine: number of lines to print
+HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
+
 
 ;$0000-$1fff ROM
 ;$2000-$3fff RAM
