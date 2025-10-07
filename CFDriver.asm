@@ -7,86 +7,85 @@
 ;  CREATE DATE :	19 June 15
 ;***************************************************************************
 
-;	org $2000
-
-;CFBASE:		EQU		090h
-;CFSECT_BUFF:EQU     RAM_TOP - $0fff ; $3FF
-;CFSECT_END:	EQU		CFSECT_BUFF + 0200h
-;EOS:		EQU		00h
-;CF_PROMPT:	
-
-;RAM_TOP:	EQU $FFFF
-;MONVARS	EQU	RAM_TOP - $1FF	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
-;CF_SECCNT:  EQU    MONVARS + 27h 
-;CF_LBA0:    EQU    MONVARS + 28h
-;CF_LBA1:    EQU    MONVARS + 29h
-;CF_LBA2:    EQU    MONVARS + 2Ah
-;CF_LBA3:    EQU    MONVARS + 2Bh
-
-;UPLOADBUF:  EQU    MONVARS + 2Ch     ; Buffer for hex-intel upload. Allows up to 32 bytes (20h) per line.
-;ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 bytes...
-;ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
-;MSGBUF:     EQU    UPLOADBUF
-
-;PRINT_STRING:	EQU	$0d82
-;NIB2CHAR:	EQU $0E3A
-;SHFTNIB:	EQU $0E45
-
 
 ;***************************************************************************
 ;CF_INIT
 ;Function: Initialize CF to 8 bit data transfer mode
 ;***************************************************************************	
-CF_INIT:
-	CALL	CF_LP_BUSY
+CF_INIT:	CALL	CF_LP_BUSY
+	jr nz,CF_INIT_TOUT				; timeout
 	LD		A,01h						;LD features register to enable 8 bit
 	OUT		(CFFEAT),A
 	CALL	CF_LP_BUSY
+	jr nz,CF_INIT_TOUT				; timeout
 	LD		A,0EFh						;Send set features command
 	OUT		(CFCMD),A
 	CALL	CF_LP_BUSY
-	LD		A, 00h
+	jr nz,CF_INIT_TOUT				; timeout
+	xor a
 	LD		(CF_LBA0), A
 	LD		(CF_LBA1), A
 	LD		(CF_LBA2), A
 	LD		(CF_LBA3), A
 	INC		A
 	LD		(CF_SECCNT), A
+	ld hl,RAM_TOP - $0fff 		; = $f000 - $f200
+	ld (CFSECT_BUF),hl			; by default point to this location for CF data buffer
 	LD 		HL,CF_MSG_i					;Print some messages 
 	CALL    PRINT_STRING
 	RET
+
+CF_INIT_TOUT:	call jUART_PRNT_SP
+zoWarnFlow = false
+	db $0d,$0a,"CF card init timeout",$0d,$0a,0
+zoWarnFlow = true
+	ret
+
 CF_MSG_i: DEFB 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
 
 ;***************************************************************************
 ;LOOP_BUSY
 ;Function: Loops until status register bit 7 (busy) is 0
 ;***************************************************************************	
-CF_LP_BUSY:
+CF_LP_BUSY:	push bc
+	ld c,0
+CF_LP_BUSY_1:	dec c
+	jr z,CF_LP_BUSY_X
 	IN		A, (CFSTAT)					;Read status
 	AND		010000000b					;Mask busy bit
-	JP		NZ,CF_LP_BUSY				;Loop until busy(7) is 0
+	JR		NZ,CF_LP_BUSY_1				;Loop until busy(7) is 0
+CF_LP_BUSY_X:	pop bc		; we get here either because not busy, A=0 or because timeout, A=$80
 	RET
 
 ;***************************************************************************
 ;LOOP_CMD_RDY
 ;Function: Loops until status register bit 7 (busy) is 0 and drvrdy(6) is 1
 ;***************************************************************************	
-CF_LP_CMD_RDY:
+CF_LP_CMD_RDY:	push bc
+	ld c,0
+CF_LP_CMD_RDY_1:	dec c
+	jr z,CF_LP_CMD_RDY_X
 	IN		A,(CFSTAT)					;Read status
 	AND		011000000b					;mask off busy and rdy bits
 	XOR		001000000b					;we want busy(7) to be 0 and drvrdy(6) to be 1
-	JP		NZ,CF_LP_CMD_RDY
+	JR		NZ,CF_LP_CMD_RDY_1
+CF_LP_CMD_RDY_X:	pop bc	; we get here either because not busy & ready, A=0 or because timeout, A=$c0
 	RET
 
 ;***************************************************************************
 ;LOOP_DAT_RDY
 ;Function: Loops until status register bit 7 (busy) is 0 and drq(3) is 1
 ;***************************************************************************		
-CF_LP_DAT_RDY:
+CF_LP_DAT_RDY:	push bc
+	ld c,0
+CF_LP_DAT_RDY_1:	dec c
+	jr z,CF_LP_DAT_RDY_X
+
 	IN		A,(CFSTAT)					;Read status
 	AND		010001000b					;mask off busy and drq bits
 	XOR		000001000b					;we want busy(7) to be 0 and drq(3) to be 1
-	JP		NZ,CF_LP_DAT_RDY
+	JR		NZ,CF_LP_DAT_RDY_1
+CF_LP_DAT_RDY_X:	pop bc		; we get here either because not busy & drq, A=0 or because timeout, A=$88
 	RET
 	
 ;***************************************************************************
@@ -95,216 +94,150 @@ CF_LP_DAT_RDY:
 ;***************************************************************************			
 CF_RD_CMD:
 	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
+	jr nz,CF_RD_CMD_TOUT				; time out
 	LD		A,020h						;Prepare read command
 	OUT		(CFCMD),A					;Send read command
 	CALL	CF_LP_DAT_RDY				;Wait until data is ready to be read
+	jr nz,CF_RD_CMD_TOUT				; time out
 	IN		A,(CFSTAT)					;Read status
 	AND		000000001b					;mask off error bit
-	JP		NZ,CF_RD_CMD				;Try again if error
-	LD 		HL,CFSECT_BUFF
+	JR		NZ,CF_RD_CMD				;Try again if error
+	LD 		HL,(CFSECT_BUF)
 	LD 		B,0							;read 256 words (512 bytes per sector)
 CF_RD_SECT:
 	CALL	CF_LP_DAT_RDY	
+	jr nz,CF_RD_CMD_TOUT				; time out
 	IN 		A,(CFDATA)					;get byte of ide data	
 	LD 		(HL),A
 	INC 	HL
 	CALL	CF_LP_DAT_RDY
+	jr nz,CF_RD_CMD_TOUT				; time out
 	IN 		A,(CFDATA)					;get byte of ide data	
 	LD 		(HL),A
 	INC 	HL
 	DJNZ 	CF_RD_SECT
+	xor a						; zero A to indicate success
 	RET
 	
-;***************************************************************************
-;CF_READ
-;Function: Read sector 0 into RAM buffer.
-;***************************************************************************	
-CF_MSG1:  DEFB 0Dh, 0Ah, "CF Card Read", 0Dh, 0Ah, EOS
-
-CF_MSG21: DEFB "Reading sector "
-CF_MSG2h: DEFB "00000000"
-CF_MSG22: DEFB "h into RAM buffer...", 0Dh, 0Ah, EOS
-CF_MSG2E: 
-
-CF_MSG31: DEFB "Sector "
-CF_MSG3h: DEFB "00000000"
-CF_MSG32: DEFB  "h read...", 0Dh, 0Ah, EOS
-CF_MSG3E:
-
-CF_READ:
-	LD 		HL, CF_MSG1					;Print some messages 
-	CALL    PRINT_STRING
-	CALL	CF_MKMS2
-	LD		HL, MSGBUF
-	CALL    PRINT_STRING
-	CALL 	CF_LP_BUSY
-	LD 		A,(CF_SECCNT)
-	OUT 	(CFSECCO),A					;Number of sectors at a time (512 bytes)
-	CALL 	CF_LP_BUSY
-	LD      A,(CF_LBA0)
-	OUT		(CFLBA0),A					;LBA 0:7
-	CALL 	CF_LP_BUSY
-	LD      A,(CF_LBA1)
-	OUT		(CFLBA1),A					;LBA 8:15
-	CALL 	CF_LP_BUSY
-	LD      A,(CF_LBA2)
-	OUT 	(CFLBA2),A					;LBA 16:23
-	CALL 	CF_LP_BUSY
-	LD      A,(CF_LBA3)
-	AND		00Fh						; Only LBA 24:27
-	OR		0E0h						;Selects CF as master
-	OUT 	(CFLBA3),A					;LBA 24:27 + DRV 0 selected + bits 5:7=111
-	CALL	CF_RD_CMD
-	CALL	CF_MKMS3
-	LD		HL, MSGBUF
-	CALL    PRINT_STRING
-	RET
-	
-CF_PROMPT: DEFB	"CF> ", EOS
-
-CF_CLMSB:
-; clear message buffer
-	LD		A, " "
-	LD		HL, MSGBUF
-	LD		(HL), A
-	LD		DE, MSGBUF
-	INC		DE
-	LD		B, 0
-	LD		C, ULBUFSIZE
-	DEC		C
-	LDIR
-	RET
-	
-;CF_MKMSG2
-; Function: Construct CF message before reading in MSGBUF
-CF_MKMS3:
-	CALL	CF_CLMSB
-	LD		HL, CF_MSG31
-	LD		DE, MSGBUF
-	LD		BC, CF_MSG3E - CF_MSG31
-	LDIR
-	LD		HL, MSGBUF + (CF_MSG3h - CF_MSG31)	; first digit position for CF_MSG31 in MSGBUF
-	CALL	CFSECDG
-	RET
-	
-;CF_MKMSG3
-; Function: Construct CF message after reading in MSGBUF
-CF_MKMS2:
-	CALL	CF_CLMSB
-	LD		HL, CF_MSG21
-	LD		DE, MSGBUF
-	LD		BC, CF_MSG2E - CF_MSG21
-	LDIR
-	LD		HL, MSGBUF + (CF_MSG2h - CF_MSG21)	; first digit position for CF_MSG21 in MSGBUF
-	CALL    CFSECDG
-	
-	RET
-
-	
-CFSECDG:
-	LD		A,(CF_LBA3)
-	PUSH	AF
-	CALL	SHFTNIB
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	POP		AF
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	
-	LD		A,(CF_LBA2)
-	PUSH	AF
-	CALL	SHFTNIB
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	POP		AF
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	
-	LD		A,(CF_LBA1)
-	PUSH	AF
-	CALL	SHFTNIB
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	POP		AF
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	
-	LD		A,(CF_LBA0)
-	PUSH	AF
-	CALL	SHFTNIB
-	CALL	NIB2CHAR
-	LD		(HL), A
-	INC		HL
-	POP		AF
-	CALL	NIB2CHAR
-	LD		(HL), A
-	
-	RET
-	
-
-;***************************************************************************
-;CF_ID_CMD
-;Function: Issue the Identify Drive command and read the response into the data buffer
-;***************************************************************************
-CF_MSGID:	DEFB 0Dh, 0Ah, "CF Card Identify Drive", 0Dh, 0Ah, EOS
-
-CF_ID_CMD:
-	LD		HL, CF_MSGID
-	CALL    PRINT_STRING
-	CALL 	CF_LP_BUSY
-	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
-	LD		A,0ECh						;Prepare ID drive command
-	OUT		(CFCMD),A					;Send ID drive command
-	CALL	CF_LP_DAT_RDY				;Wait until data is ready to be read
-	IN		A,(CFSTAT)					;Read status
-	AND		000000001b					;mask off error bit
-	JP		NZ,CF_ID_CMD				;Try again if error
-	LD 		HL,CFSECT_BUFF
-	LD 		B,0							;read 256 words (512 bytes per sector)
-CF_ID1:
-	CALL	CF_LP_DAT_RDY	
-	IN 		A,(CFDATA)					;get byte of ide data	
-	LD 		(HL),A
-	INC 	HL
-	CALL	CF_LP_DAT_RDY
-	IN 		A,(CFDATA)					;get byte of ide data	
-	LD 		(HL),A
-	INC 	HL
-	DJNZ 	CF_ID1
-	RET
-
+CF_RD_CMD_TOUT:	call jUART_PRNT_SP
+zoWarnFlow = false
+	db $0d,$0a,"CF card read timeout",$0d,$0a,0
+zoWarnFlow = true
+	xor a
+	dec a		; return $ff
+	ret
 
 ;***************************************************************************
 ;CF_WR_CMD
 ;Function: Puts a sector (512 bytes) from RAM buffer disk buffer and to the disk.
 ;***************************************************************************			
-CF_WR_CMD:
+CF_WR_CMD:	push bc
+	ld c,0
+CF_WR_CMD_1:	dec c
+	jr z,CF_WR_CMD_TOUT
+
 	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
-	LD		A,0E8h						;Prepare fill buffer command
-	OUT		(CFCMD),A					;Send write buffer command
-;...	
-	
-	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
+	jr nz,CF_WR_CMD_TOUT				; time out
+
 	LD		A,030h						;Prepare write command
 	OUT		(CFCMD),A					;Send write buffer command
 	CALL	CF_LP_DAT_RDY				;Wait until drive is ready to be written
+	jr nz,CF_WR_CMD_TOUT				; time out
 	IN		A,(CFSTAT)					;Read status
 	AND		000000001b					;mask off error bit
-	JP		NZ,CF_WR_CMD				;Try again if error
+	JR		NZ,CF_WR_CMD_1				;Try again if error
 	
 ; add code here to write data
+	LD 		HL,(CFSECT_BUF)
+	LD 		B,0					;write 256 words (512 bytes per sector)
+CF_WR_SECT_L:
+	LD 		A,(HL)
+	OUT 		(CFDATA),A				;write byte of ide data	
+	INC 	HL
+;	CALL	CF_LP_DAT_RDY
+;	jr nz,CF_WR_CMD_TOUT				; time out
+	LD 		A,(HL)
+	OUT 		(CFDATA),A				;write byte of ide data	
+	INC 	HL
+;	CALL	CF_LP_DAT_RDY	
+;	jr nz,CF_WR_CMD_TOUT				; time out
+	DJNZ 	CF_WR_SECT_L
+
+	pop bc
+	xor a						; zero A to indicate success
+	ret
+
+CF_WR_CMD_TOUT:	call jUART_PRNT_SP
+zoWarnFlow = false
+	db $0d,$0a,"CF card write timeout",$0d,$0a,0
+zoWarnFlow = true
+	pop bc
+	xor a
+	dec a	; return $ff
 
 	ret
 
-;endprog	equ $
+CF_WR_SECT:	push bc
+	LD 		B,0					;write 256 words (512 bytes per sector)
+	JR CF_WR_SECT_L
 
-;	output_bin "CFDriver.bin",CF_INIT,endprog    ; 
-;	output_intel "CFDriver.hex",CF_INIT,endprog    ;
-;	output_list "CFDriver.lst"
-	
+;set LBA on SD card to values from monitor vars
+CF_SETUP_LBA:	ld a,(CF_LBA0)
+	OUT (CFLBA0), A
+;	CALL 	jCF_LP_BUSY
+	ld a,(CF_LBA1)
+	OUT (CFLBA1), A
+;	CALL 	jCF_LP_BUSY
+	ld a,(CF_LBA2)
+	OUT (CFLBA2), A
+;	CALL 	jCF_LP_BUSY
+	ld a,(CF_LBA3)
+	and a,$0f
+	or a,$e0
+	OUT (CFLBA3), A
+;	CALL 	jCF_LP_BUSY
+	ret
+
+; find active partition and put its LBA address in monitor vars
+CF_SETUP_PART:	push hl
+	push bc
+	ld hl,(CFSECT_BUF)
+	ld bc,$01be				; point to first entry of partition table
+CF_SETUP_PART1:	add hl,bc
+	ld a,l
+	cp a,$fe					; did we go past 4th partition?
+	jr z,CF_SETUP_PART_LAST
+
+	ld a,(HL)
+	cp a,$80					; is it an active partition?
+	jr z,CF_SETUP_PART2
+CF_NEXT_PART:	ld bc,$0010
+	jr CF_SETUP_PART1
+
+CF_SETUP_PART2:	ld (CF_PART_CUR),hl	; save pointer to currently used partition in MBR
+	ld bc,$0008				; point to current partition's address
+	add hl,bc
+	push de
+	ld de,CF_LBA0
+	ld bc,$0004
+	ldir						; copy it to monvars
+	pop de
+
+	xor a
+CF_SETUP_X:	pop bc
+	pop hl
+	ret
+
+CF_SETUP_PART_LAST: call jUART_PRNT_SP
+zoWarnFlow = false
+	db $0d,$0a,"No valid partition found",$0d,$0a,0
+zoWarnFlow = true
+	xor a
+	dec a
+	jr CF_SETUP_X
+
+; point to next partition
+CF_PART_NEXT:	push hl
+	push bc
+	ld hl,(CF_PART_CUR)
+	jr CF_NEXT_PART
