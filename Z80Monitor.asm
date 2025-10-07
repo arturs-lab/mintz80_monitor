@@ -8,7 +8,7 @@
 ;***************************************************************************
 
 VERSMYR:    EQU     "1"
-VERSMIN:    EQU     "2"
+VERSMIN:    EQU     "1"
 
             INCLUDE "CONSTANTS.asm" ; copy or edit one of the 
                                   ; CONSTANTS-aaaa-pp.asm files to
@@ -60,12 +60,11 @@ NMI:		jp IRQTAB+(NMIV-IRQTABR)
 		include "ymzdrvr.asm";
 
 		include "eeprom_prog.asm";
-;		include "eeprom_write.asm";
 		INCLUDE "CFDriver.asm"
 		INCLUDE	"UARTDriver.asm"
 ;		INCLUDE	"DARTDriver.asm"
-;		INCLUDE	"CONIO.asm"		; use UART for console
-		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
+		INCLUDE	"CONIO.asm"		; use UART for console
+;		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
 
 ; triangular progression delay
 ; at CPU CLK = 1.333MHz:
@@ -175,7 +174,7 @@ MAIN:
 	out ($f0),a
 	ld a,$b1
 	out ($f1),a
-	ld sp,RAM_TOP
+	ld sp,0
 ;	call memmap_init
 	ld a,$20
 	call delay		; looks like Z80 needs this delay to successfully write to IO ports
@@ -195,8 +194,7 @@ dio:	ld hl,hellostr
 
 hellostr:	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
 
-gomain:	LD SP,RAM_TOP		;Load the stack pointer for stack operations.
-	CALL UART_INIT		;Initialize UART
+gomain:	CALL UART_INIT		;Initialize UART
 	CALL PRINT_MON_HDR	;Print the monitor header info
 	LD A, 00h
 	LD (DMPADDR), A
