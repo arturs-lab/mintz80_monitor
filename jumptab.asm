@@ -71,6 +71,10 @@ jCF_WR_SECT:	jp CF_WR_SECT
 jCF_SETUP_LBA:	jp CF_SETUP_LBA
 jCF_SETUP_PART:	jp CF_SETUP_PART
 jCF_PART_NEXT:	jp CF_PART_NEXT
+jCON_RX		jp CON_RX
+jCON_TX		jp CON_TX
+jPRINT_STRING_SP	jp PRINT_STRING_SP
+
 
 jj:	jp 0
 epp_toggle:	in a,(memmap)	; call this at $ffnn after executing epp_prep
