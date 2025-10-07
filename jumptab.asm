@@ -67,6 +67,11 @@ jCF_LP_DAT_RDY:	jp CF_LP_DAT_RDY
 jCF_RD_CMD:	jp CF_RD_CMD
 jCF_RD_SECT:	jp CF_RD_SECT
 jCF_WR_CMD:	jp CF_WR_CMD
+jCF_WR_SECT:	jp CF_WR_SECT
+jCF_SETUP_LBA:	jp CF_SETUP_LBA
+jCF_SETUP_PART:	jp CF_SETUP_PART
+jCF_PART_NEXT:	jp CF_PART_NEXT
+
 jj:	jp 0
 epp_toggle:	in a,(memmap)	; call this at $ffnn after executing epp_prep
 		xor a,$02
