@@ -1,7 +1,7 @@
 ymzinit:	push hl
 	push bc
 	push af
-	ld hl,ymztab+13
+	ld hl,ymztab+$0d
 	ld b,$0d
 ymz1:	ld a,b
 	call ymzwr
@@ -25,4 +25,4 @@ ymzsetreg: out (ymbase),a
 	out (ymbase+1),a
 	ret
 
-ymztab:	defb $40,0,$20,0,$10,0,0,$f8,$f,$f,$f,0,0,0
+ymztab:	defb 0,0,0,0,0,0,0,$ff,0,0,0,0,0,0
