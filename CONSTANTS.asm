@@ -13,6 +13,8 @@ IRQTAB:	EQU	RAM_BOTTOM + $0100	; interrupt vector table
 
 SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
 
+CFSECT_BUF_V	EQU $C000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
+
 ; these interrupt bases are added to Z80 interrupt vector register I to form final vector in IM2
 SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to interrupt type
 CTCV:		equ $10		; CTC interrupt vector base

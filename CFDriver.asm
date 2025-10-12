@@ -43,7 +43,7 @@ CF_INIT_GO:	pop af
 	LD		(CF_LBA3), A
 	INC		A
 	LD		(CF_SECCNT), A
-	ld hl,RAM_TOP - $0fff 		; = $f000 - $f200
+	ld hl,CFSECT_BUF_V		; = $c000 in preparation for CPM loader which will load data from CF into $c000-$ffff
 	ld (CFSECT_BUF),hl			; by default point to this location for CF data buffer
 	call CON_PRT_STR_SP
 zoWarnFlow = false
