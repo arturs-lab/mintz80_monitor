@@ -360,6 +360,21 @@ dmpio1:	IN      A, (C)
 		CALL	CON_PRT_NL
 		ret
 
+zero_ram:	ld hl,zero_ram_r
+		ld de,RAM_BOTTOM
+		ld bc, zero_ram_end - zero_ram_r
+		ldir
+		jp RAM_BOTTOM
+zero_ram_r:	ld hl,RAM_BOTTOM + (zero_ram_end - zero_ram_r)
+		ld de,hl
+		inc de
+		ld bc,$ffff - RAM_BOTTOM + (zero_ram_end - zero_ram_r)
+		xor a
+		ld (hl),a
+		ldir
+		jp 0
+zero_ram_end:	equ $
+
 ;		INCLUDE	"DARTDriver.asm"
 		INCLUDE	"UARTDriver.asm"
 
