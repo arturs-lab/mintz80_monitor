@@ -8,7 +8,7 @@
 ;***************************************************************************
 
 VERSMYR:    EQU     "1"
-VERSMIN:    EQU     "1"
+VERSMIN:    EQU     "2"
 
             INCLUDE "CONSTANTS.asm" ; copy or edit one of the 
                                   ; CONSTANTS-aaaa-pp.asm files to
@@ -29,8 +29,8 @@ SCAN:        EQU     005FEh
 ROUTINES:
 R_MAIN:     JP      MAIN            ; init DART and starts command loop
 R_U_INIT:   JP      SIO_INIT       ; configures DARTchannel B 
-R_PRT_NL:   JP      PRINT_NEW_LINE  ; sends a CR LF
-R_PRT_STR:  JP      PRINT_STRING    ; sends a NULL terminated string
+R_PRT_NL:   JP      CON_PRT_NL  ; sends a CR LF
+R_PRT_STR:  JP      CON_PRT_STR    ; sends a NULL terminated string
             DEFS    3   ; spare  entries
             DEFS    3
             DEFS    3
@@ -61,8 +61,6 @@ NMI:		jp IRQTAB+(NMIV-IRQTABR)
 
 		include "eeprom_prog.asm";
 		INCLUDE "CFDriver.asm"
-		INCLUDE	"UARTDriver.asm"
-;		INCLUDE	"DARTDriver.asm"
 		INCLUDE	"CONIO.asm"		; use UART for console
 ;		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
 
@@ -188,7 +186,7 @@ MAIN:
 	call CTC_INIT_ALL     ; init CTC
 	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
 dio:	ld hl,hellostr
-	call PRINT_STRING
+	call CON_PRT_STR
 	call dmpio
 	jr gomain
 
@@ -210,7 +208,7 @@ gomain:	CALL UART_INIT		;Initialize UART
 ;***************************************************************************
 CLEAR_SCREEN:
 	LD HL,MON_CLS
-	CALL PRINT_STRING
+	CALL CON_PRT_STR
 	RET
 			
 ;***************************************************************************
@@ -239,27 +237,27 @@ MONERR:     DEFB    0Dh, 0AH, "Error in params: ", EOS
 PRINT_MON_HDR:
         CALL    CLEAR_SCREEN        ;Clear the terminal screen
         LD      HL, MNMSG1          ;Print some messages
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      HL, ROM_BOTTOM
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      HL, MNMSG3B         ; 2nd part, RAM
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      HL, RAM_BOTTOM
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      HL, MNMSG3C         ; 3rd part PIO
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, PIO_BASE
-        CALL    PRINTHBYTE
+        CALL    CON_PRINTHBYTE
         LD      HL, MNMSG3D         ; 4th part CTC
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, CTC_BASE
-        CALL    PRINTHBYTE
+        CALL    CON_PRINTHBYTE
         LD      HL, MNMSG3E         ; 5th part SIO
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, SIO_BASE
-        CALL    PRINTHBYTE
+        CALL    CON_PRINTHBYTE
         LD      HL, MNMSG3F         ; 6th part, line ending
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         RET
 
 ;***************************************************************************
@@ -272,15 +270,15 @@ MON_PRMPT_LOOP:
         LD      A, 00h
         LD      (MUTE), A       ; Enables echo of received chars
         LD      HL,MON_PROMPT   ; Print monitor prompt
-        CALL    PRINT_STRING
-        CALL    GET_CHAR        ; Get a character from user into Acc
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_STR
+        CALL    CON_GET_CHAR        ; Get a character from user into Acc
+        CALL    CON_PRT_CHAR
         CP      CR
         JR      Z, _MPL_CR
-        CALL    PRINT_NEW_LINE  ; Print a new line
+        CALL    CON_PRT_NL  ; Print a new line
 _MPL_CR:
         CALL    MON_COMMAND     ; Respond to user input
-        CALL    PRINT_NEW_LINE  ; Print a new line
+        CALL    CON_PRT_NL  ; Print a new line
         JR      MON_PRMPT_LOOP
 
 ;***************************************************************************
@@ -301,8 +299,6 @@ MON_COMMAND:    ; Inserted ERROR_CHK for all commands requiring input
         CALL    Z,PW_COMMAND
         CP      "P"
         CALL    Z,PSCOMMAND
-        CP      "Q"
-        CALL    Z,UTERMTST
         CP      "R"
         CALL    Z,RESET_COMMAND
         CP      "M"
@@ -330,42 +326,14 @@ MON_COMMAND:    ; Inserted ERROR_CHK for all commands requiring input
         CALL    ERROR_CHK
         RET
         
-                        ; micro terminal: scans MPF keyboard and sends ASCII 
-                        ; '0'-'F' for the hex keys and '10-1F' for other keys.
-UTERMTST:	CALL    RX_CHK
-        RET     NZ      ; Return on serial received char
-        LD      IX, SCTXT
-        CALL    SCAN
-        CP      010h    ; A - 010h
-        JR      C, _UTHEX
-        CALL    PRINTHBYTE
-        LD      A, " "
-        CALL    PRINT_CHAR
-        JR      UTERMTST
-        
-_UTHEX:
-        CALL    NIB2CHAR
-        CALL    PRINT_CHAR
-        LD      A, " "
-        CALL    PRINT_CHAR
-        JR      UTERMTST
-        
-;               dpcbafge     ; 7-segment pattern to bit  map
-SCTXT   DB      10000111b    ; t
-        DB      10101110b    ; S
-        DB      10000111b    ; t
-        DB      01000011b    ; r.
-        DB      10001111b    ; E
-        DB      10101110b    ; S
-
 ERROR_CHK:	LD      A, (ERRFLAG)
         CP      E_NONE
         RET     Z
         LD      HL, MONERR
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, (ERRFLAG)
-        CALL    PRINTHBYTE
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRINTHBYTE
+        CALL    CON_PRT_NL
 CLEAR_ERROR:	PUSH    AF
         LD      A, E_NONE
         LD      (ERRFLAG), A
@@ -382,16 +350,18 @@ MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed)
 
 dmpio:	ld c,$d0
 		ld b,$0
-		CALL	PRINT_NEW_LINE
+		CALL	CON_PRT_NL
 dmpio1:	IN      A, (C)
-		CALL	PRINTHBYTE
+		CALL	CON_PRINTHBYTE
 		inc c
 		ld a,c
 		cp $e0
 		jr nz,dmpio1
-		CALL	PRINT_NEW_LINE
+		CALL	CON_PRT_NL
 		ret
 
+;		INCLUDE	"DARTDriver.asm"
+		INCLUDE	"UARTDriver.asm"
 
 endprog	equ $
 

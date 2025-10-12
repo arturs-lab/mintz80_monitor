@@ -23,7 +23,6 @@ HLPMSGm: DEFB "M - copy bytes in memory", 0Dh, 0Ah
          DEFB "N - read IO port", 0Dh, 0Ah
 HLPMSGo: DEFB "O - write byte to output port", 0Dh, 0Ah
 HLPMSGp: DEFB "P - print port scan (00-FF)", 0Dh, 0Ah
-HLPMSGq: DEFB "Q - test MPF keyboard", 0Dh, 0Ah
 HLPMSGr: DEFB "R - monitor reset", 0Dh, 0Ah
 HLPMSGs: DEFB "S - calculate checksum for memory range", 0Dh, 0Ah
 HLPMSGt: DEFB "T - test memory range", 0Dh, 0Ah
@@ -34,7 +33,7 @@ HLPMSGA: DEFB ": - Load hex-intel record", 0DH, 0AH, EOS
 
 HELP_COMMAND:
         LD      HL, HLPMSG1     ;Print some messages
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, EOS          ;Load $FF into Acc so MON_COMMAND finishes
         RET
 
@@ -48,49 +47,49 @@ MDC_3: DEFB "      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EO
 
 MDCMD:
 			LD 		HL,MDC_1			;Print some messages 
-			CALL    PRINT_STRING
+			CALL    CON_PRT_STR
 			
-			CALL    GETHEXWORD			;HL now points to databyte location	
+			CALL    CON_GETHEXWORD			;HL now points to databyte location	
 			LD		A, (ERRFLAG)
 			CP		E_NONE
 			RET		NZ
 			LD		(DMPADDR), HL		;Keep address for next/prev.
 			PUSH	HL					;Save HL that holds databyte location on stack
-			CALL    PRINT_NEW_LINE		;Print some messages
-			CALL    PRINT_NEW_LINE
+			CALL    CON_PRT_NL		;Print some messages
+			CALL    CON_PRT_NL
 			LD 		HL, MDC_3	
-			CALL    PRINT_STRING
+			CALL    CON_PRT_STR
 
 			POP		HL					;Restore HL that holds databyte location on stack
 MDNXTPR:	LD		C,HEXLINES			;Register C holds counter of dump lines to print
 MDLINE:	
 			LD		DE,	ASCDMPBUF
 			LD		B,16				;Register B holds counter of dump bytes to print
-			CALL	PRINTHWORD			;Print dump line address in hex form
+			CALL	CON_PRINTHWORD			;Print dump line address in hex form
 			LD		A," "				;Print spacer
-			CALL	PRINT_CHAR
+			CALL	CON_PRT_CHAR
 			DEC		C					;Decrement C to keep track of number of lines printed
 MDBYTES:
 			LD		A,(HL)				;Load Acc with databyte HL points to
-			CALL	PRINTHBYTE  		;Print databyte in HEX form 
+			CALL	CON_PRINTHBYTE  		;Print databyte in HEX form 
 			CALL	CHAR2BUF			;Store ASCII char
 			LD		A," "				;Print spacer
-			CALL	PRINT_CHAR	
+			CALL	CON_PRT_CHAR	
 			INC 	HL					;Increase HL to next address pointer
 			DJNZ	MDBYTES				;Print 16 bytes out since B holds 16
 			
 			LD		A," "				;Print spacer
-			CALL	PRINT_CHAR			;
+			CALL	CON_PRT_CHAR			;
 			LD		A, EOS
 			LD		(ASCDMPEND), A		;Make sure there is a EOS
 
 			PUSH	HL
 			LD		HL, ASCDMPBUF		;Point HL to ASCII buffer
-			CALL    PRINT_STRING		;Print buffer
+			CALL    CON_PRT_STR		;Print buffer
 			POP		HL
 			
 			LD		B,C					;Load B with C to keep track of number of lines printed
-			CALL    PRINT_NEW_LINE		;Get ready for next dump line
+			CALL    CON_PRT_NL		;Get ready for next dump line
 			DJNZ	MDLINE				;Print 16 line out since C holds 16 and we load B with C
 			LD		A,EOS				;Load $FF into Acc so MON_COMMAND finishes
 
@@ -112,34 +111,34 @@ MVC_E:	DEFB	"End Location: ", EOS
 MVC_D:	DEFB	"Destination Location: ", EOS
 
 MOVE_COMMAND:	LD		HL, MVC_1	; Print some messages
-        CALL	PRINT_STRING
+        CALL	CON_PRT_STR
         
         LD		HL, MVC_S
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         LD		(MVADDR), HL
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
         LD		HL, MVC_E
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         LD		(MVADDR+2), HL
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
         LD		HL, MVC_D
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         LD		(MVADDR+4), HL
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
 ;***************************************************************************
 ; Adapted copy from MPF-1(B) Monitor
@@ -194,20 +193,20 @@ MFC_1:	DEFB	"Fill Memory", 0Dh, 0Ah, EOS
 MFC_D:	DEFB	"Data value (one byte): ", EOS
 
 FILL_COMMAND:	LD		HL, MFC_1	; Print some messages
-        CALL	PRINT_STRING
+        CALL	CON_PRT_STR
         
         LD		HL, MVC_S	; Start msg.
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         LD		(MVADDR), HL	; Start val.
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
         LD		HL, MVC_E	; End msg.
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		(MVADDR+2), HL	; End val.
         LD		A, (ERRFLAG)
         CP		E_NONE
@@ -217,16 +216,16 @@ FILL_COMMAND:	LD		HL, MFC_1	; Print some messages
         SBC		HL, DE		; Make sure end is past start...
         JR		C, F_ORDERR
         LD		HL, (MVADDR+2)
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
         LD		HL, MFC_D
-        CALL	PRINT_STRING
-        CALL	GETHEXBYTE
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXBYTE
         LD		(MVADDR+4), A
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
 
         LD		DE, (MVADDR)	; Start
         LD		HL, (MVADDR+2)	; End
@@ -252,7 +251,7 @@ F_ORDERR:
 ;***************************************************************************
 
 NEXTP_COMMAND:	LD 		HL,MDC_3	
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD		HL, (DMPADDR)
         INC		H
         LD		(DMPADDR), HL
@@ -264,7 +263,7 @@ NEXTP_COMMAND:	LD 		HL,MDC_3
 ;***************************************************************************
 
 PREVP_COMMAND:	LD 		HL,MDC_3	
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD		HL, (DMPADDR)
         DEC		H
         LD		(DMPADDR), HL
@@ -276,27 +275,27 @@ PREVP_COMMAND:	LD 		HL,MDC_3
 ;***************************************************************************
 
 EDIT_COMMAND:	LD 		HL, MVC_S	; Start msg.
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
-        CALL	GETHEXWORD	; Get first address
+        CALL	CON_GETHEXWORD	; Get first address
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         
 EDIT_LP:	LD		A, ":"
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR
         LD		A, " "
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR
         
         LD		A, (HL)		; Print original value
-        CALL	PRINTHBYTE
+        CALL	CON_PRINTHBYTE
         
         LD		A, ">"
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR
         LD		A, " "
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR
         
-        CALL	GETHEXBYTE
+        CALL	CON_GETHEXBYTE
         LD		(MVADDR+4), A
         LD		A, (ERRFLAG)
         CP		E_NONE
@@ -305,9 +304,9 @@ EDIT_LP:	LD		A, ":"
         LD		A, (MVADDR+4)
         LD		(HL), A		; Write new value
         
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         INC		HL
-        CALL	PRINTHWORD
+        CALL	CON_PRINTHWORD
         JR		EDIT_LP		; Only way out is type a non-hex char...
 
 ;***************************************************************************
@@ -318,27 +317,27 @@ PSC_1: DEFB "Port Scan", 0Dh, 0Ah, EOS
 ;PSC_3: DEFB "     0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F", 0Dh, 0Ah, EOS
 
 PSCOMMAND:	LD 		HL,PSC_1			;Print some messages 
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
         LD 		HL,MDC_3			;Print some messages 
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
 
         LD		BC, 0h
         XOR     A
 PS_NEWPL:                   ; Start new line, start with port address
         LD		A, " "
-        CALL	PRINT_CHAR  ; address - contents separator
+        CALL	CON_PRT_CHAR  ; address - contents separator
         LD      A,C
-        CALL	PRINTHBYTE
+        CALL	CON_PRINTHBYTE
         LD		A, " "
-        CALL	PRINT_CHAR  ; address - contents separator
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR  ; address - contents separator
+        CALL	CON_PRT_CHAR
         
 PS_LOOP:                    ; Print port contents
         IN		A, (C)
-        CALL	PRINTHBYTE
+        CALL	CON_PRINTHBYTE
         LD		A, " "
-        CALL	PRINT_CHAR ; inter-port-contents separator
+        CALL	CON_PRT_CHAR ; inter-port-contents separator
         
         INC		BC
         XOR		A
@@ -349,12 +348,12 @@ PS_LOOP:                    ; Print port contents
         AND		00Fh	; multiples of 16
         JR      NZ, PS_LOOP	; line not yet full
         
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         JR		PS_NEWPL
         
 PS_CONT:                    ; continue on same line
         LD		A, " "
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR
         JR		PS_LOOP
 
 PS_END:                     ; done all ports
@@ -368,24 +367,24 @@ RIC_1: DEFB "IO Read", 0Dh, 0Ah
 RIC_2: DEFB "Enter IO address. Only $00nn supported. 'ENTER' ends", 0Dh, 0Ah, EOS
 
 RICOMMAND:        LD 		HL,RIC_1			;Print some messages 
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
-RILOOP:        CALL    GETHEXBYTE
+RILOOP:        CALL    CON_GETHEXBYTE
         LD      (MVADDR), A             ; Misuse Move address buffer to store port
         LD      A, (ERRFLAG)
         CP      E_NONE
         JR      NZ,RICOUT
         
         LD		A, " "
-        CALL	PRINT_CHAR
+        CALL	CON_PRT_CHAR
         LD      A, (MVADDR)
         LD      C, A
         LD      B, 0
         IN      A, (C)
-        CALL	PRINTHBYTE
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRINTHBYTE
+        CALL	CON_PRT_NL
         JR      RILOOP
-RICOUT:        CALL	PRINT_NEW_LINE
+RICOUT:        CALL	CON_PRT_NL
         RET
 
 ; untested code, 2023-04-24
@@ -398,16 +397,16 @@ MPW_1:  DEFB    "Write data to port", 0Dh, 0Ah
 MPW_P:  DEFB    "Port & data: ", EOS
 
 PW_COMMAND:	LD      HL, MPW_1
-        CALL    PRINT_STRING
-        CALL    GETHEXBYTE
+        CALL    CON_PRT_STR
+        CALL    CON_GETHEXBYTE
         LD      (MVADDR), A             ; Misuse Move address buffer to store port
         LD      A, (ERRFLAG)
         CP      E_NONE
         RET     NZ
         
         LD      A, " "
-        CALL    PRINT_CHAR
-        CALL    GETHEXBYTE
+        CALL    CON_PRT_CHAR
+        CALL    CON_GETHEXBYTE
         LD      (MVADDR+1), A
         LD      A, (ERRFLAG)
         CP      E_NONE
@@ -430,10 +429,10 @@ MGo_1:	DEFB	"Execute program in memory", 0Dh, 0Ah, EOS
 MGo_2:	DEFB	"Memory location: ", EOS
 
 GO_COMMAND:	LD		HL, MGo_1	; Print some messages
-        CALL	PRINT_STRING
+        CALL	CON_PRT_STR
         LD		HL, MGo_2	; Print some messages
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
@@ -448,10 +447,10 @@ GO_COMMAND:	LD		HL, MGo_1	; Print some messages
 MCl_1:	DEFB	"Call program in memory", 0Dh, 0Ah, EOS
 
 CL_COMMAND:	LD		HL, MCl_1	; Print some messages
-        CALL	PRINT_STRING
+        CALL	CON_PRT_STR
         LD		HL, MGo_2	; Print some messages
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
@@ -477,25 +476,25 @@ CCKSM_3:	DEFB	"End location: ", EOS
 CCKSM_4:    DEFB    "Checksum: ", EOS
 
 CCKSM_COMMAND:	LD		HL, CCKSM_1
-        CALL	PRINT_STRING
+        CALL	CON_PRT_STR
         
         LD		HL, CCKSM_2	    ; start
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         LD      (MVADDR+0), HL
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
         LD		HL, CCKSM_3     ; end
-        CALL	PRINT_STRING
-        CALL	GETHEXWORD
+        CALL	CON_PRT_STR
+        CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
         RET		NZ
         LD      (MVADDR+2), HL
-        CALL	PRINT_NEW_LINE
+        CALL	CON_PRT_NL
         
         LD      BC, (MVADDR+0)  ; starting point
         LD      DE, (MVADDR+2)  ; end point
@@ -528,12 +527,12 @@ CCSM_2:                     ; done this value
 CCSM_4:                     ; running address matches end, done
         PUSH    HL
         LD		HL, CCKSM_4     ; end
-        CALL	PRINT_STRING
+        CALL	CON_PRT_STR
         LD      A, (CHKSUM_C)
-        CALL    PRINTHBYTE      ; checksum overflow first
+        CALL    CON_PRINTHBYTE      ; checksum overflow first
         POP     HL
-        CALL    PRINTHWORD
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRINTHWORD
+        CALL    CON_PRT_NL
 
         RET
 
@@ -569,27 +568,27 @@ HXI_RCVD:	LD      (RX_WRITE_P), HL
         LD      HL, UPLOADBUF + 2       ; Point to the first address char.
         LD      B, 4
 HXIADRLP:	LD      A, (HL)
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         INC     HL
         DJNZ    HXIADRLP
         
         
 ; processing the record
 HXI_PROC:	LD      HL, UPLOADBUF
-        CALL    CHARS2BYTE              ; get record size
+        CALL    CON_CHARS2BYTE              ; get record size
         LD      (ULSIZE), A             ; store it
-        CALL    CHARS2BYTE              ; get record address, MSB
+        CALL    CON_CHARS2BYTE              ; get record address, MSB
         LD      (IECADDR+1), A          ; 
-        CALL    CHARS2BYTE              ; get record address, LSB
+        CALL    CON_CHARS2BYTE              ; get record address, LSB
         LD      (IECADDR), A 
-        CALL    CHARS2BYTE              ; get record type
+        CALL    CON_CHARS2BYTE              ; get record type
         LD      (IERECTYPE), A
         CP      01h                     ; compare to end record
         JR      Z, HXI_ENDR
         LD      A, (ULSIZE)
         LD      B, A                    ; set up DJNZ loop
         LD      DE, (IECADDR)
-HXD_LOOP:	CALL    CHARS2BYTE              ; get data byte
+HXD_LOOP:	CALL    CON_CHARS2BYTE              ; get data byte
         LD      (DE), A                 ; store it at target location
         INC     DE
         DJNZ    HXD_LOOP                ; repeat for all data bytes
@@ -599,12 +598,12 @@ HXD_LOOP:	CALL    CHARS2BYTE              ; get data byte
 ;        LD      (MUTE), A
 
         ld a," "
-        CALL    PRINT_CHAR
-        CALL    CHARS2BYTE              ; Get checksum. Not that anyone checks it...
-        call PRINTHBYTE
+        CALL    CON_PRT_CHAR
+        CALL    CON_CHARS2BYTE              ; Get checksum. Not that anyone checks it...
+        call CON_PRINTHBYTE
         dec hl
         ld (hl),a			; in case anyone wants to use checksum, store it in last byte of data buffer
-;        CALL    PRINT_NEW_LINE
+;        CALL    CON_PRT_NL
 
 ; Done
         xor a	; checksum being returned in A was matching command checks, so zero A
@@ -633,90 +632,90 @@ RDLN_1: DEFB    " AF   BC   DE   HL   IX   IY   AF", 027h, "  BC", 027h, "  DE",
 RDLN_3: DEFB    " SP   PC   IF   SZ-H-PNC  SZ-H-PNC", 027h  , EOS
 
 REGDUMP_COMMAND:	LD      HL, RDLN_1
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRT_NL
         
         LD      HL, (USERAF)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERBC)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERDE)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERHL)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERIX)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERIY)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
 
         LD      HL, (UAFP)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (UBCP)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (UDEP)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (UHLP)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRT_NL
         
         LD      HL, RDLN_3
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRT_NL
         
         LD      HL, (USERSP)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERPC)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      HL, (USERIF)
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      A, " "
-        CALL    PRINT_CHAR
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
+        CALL    CON_PRT_CHAR
         
         LD      A, (USERAF+1)
         CALL    PRT8BIT
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         LD      A, " "
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         LD      A, (UAFP+1)
         CALL    PRT8BIT
         
@@ -735,17 +734,17 @@ TRC_3: DEFB 0Dh, 0Ah, "Location to end in 4 digit HEX: ", EOS
 TRC_4: DEFB 0Dh, 0Ah, "Start address should be before End address", EOS
 
 TRAM_COMMAND:	LD      HL,TRC_1        ;Print some messages 
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      HL,TRC_2
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
-        CALL    GETHEXWORD              ;HL now points to databyte location	
+        CALL    CON_GETHEXWORD              ;HL now points to databyte location	
         LD      (MVADDR), HL
         
         LD      HL,TRC_3
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
-        CALL    GETHEXWORD              ;HL now points to databyte location	
+        CALL    CON_GETHEXWORD              ;HL now points to databyte location	
         LD      (MVADDR+2), HL
         
         LD      A, (MVADDR+3)   ; End MSB
@@ -768,7 +767,7 @@ _TC_ZERO:
 _TC_NEGM:
 _TC_NEGL:
         LD      HL, TRC_4
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         JR      _TC_DONE
                 
 _TC_DONE:        
@@ -808,7 +807,7 @@ MTCER3: DEFB ", found: ", EOS
 MTEST:	LD      IX, MVADDR
 ; Pass 1   ; check only new value (write phase)
         LD      HL, MTC_1
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         
         LD      HL, (MVADDR+0)
         LD      BC, (MVADDR+2)
@@ -822,7 +821,7 @@ MTEST:	LD      IX, MVADDR
         
 ; Pass 2   ; check old value and new value (read & write phase)
         LD      HL, MTC_2
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
 
         LD      HL, (MVADDR+0)  ; reset start address
         LD      E, 000h         ; old value
@@ -835,7 +834,7 @@ MTEST:	LD      IX, MVADDR
         
 ; Pass 3
         LD      HL, MTC_3
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
 
         LD      HL, (MVADDR+0)  ; reset start address
         LD      E, 055h         ; old value
@@ -848,7 +847,7 @@ MTEST:	LD      IX, MVADDR
         
 ; Pass 4
         LD      HL, MTC_4
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
 
         LD      HL, (MVADDR+0)  ; reset start address
         LD      E, 0AAh         ; old value
@@ -860,7 +859,7 @@ MTEST:	LD      IX, MVADDR
         JR      C, _MTDONE      ; skip other tests on error
         
         LD      HL, MTC_5       ; Ok text
-        CALL    PRINT_STRING        
+        CALL    CON_PRT_STR        
 _MTDONE:
         RET
 
@@ -896,37 +895,37 @@ _MCSKIPOLD:
 ; Error handling
 _MTLPER1:
         PUSH    AF
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRT_NL
         LD      A, "1"
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         LD      A, "."
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         POP     AF
         JR      _MTLPER
 _MTLPER2:
         PUSH    AF
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRT_NL
         LD      A, "2"
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         LD      A, "."
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         POP     AF
 
 _MTLPER:
         PUSH    HL              ; keep actual location
         LD      HL, MTCER1      ; at text
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         POP     HL
-        CALL    PRINTHWORD
+        CALL    CON_PRINTHWORD
         LD      HL, MTCER2      ; expected text
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, (MVADDR+5)   ; expected value
-        CALL    PRINTHBYTE
+        CALL    CON_PRINTHBYTE
         LD      HL, MTCER3      ; actual found text
-        CALL    PRINT_STRING
+        CALL    CON_PRT_STR
         LD      A, (MVADDR+4)   ; actual value
-        CALL    PRINTHBYTE
-        CALL    PRINT_NEW_LINE
+        CALL    CON_PRINTHBYTE
+        CALL    CON_PRT_NL
         SCF                     ; Flag the error for calling routine
 _MCDONE:        
         RET

@@ -27,8 +27,8 @@ epp_upda:	push hl
 		push af
 
 		ld hl,epp_srcaddr
-		call PRINT_STRING
-		call GETHEXWORD
+		call CON_PRT_STR
+		call CON_GETHEXWORD
 		LD A, (ERRFLAG)
 		CP E_NONE
 		RET NZ
@@ -36,8 +36,8 @@ epp_upda:	push hl
 
 		; update target addr
 		ld hl,epp_tgtaddr
-		call PRINT_STRING
-		call GETHEXWORD
+		call CON_PRT_STR
+		call CON_GETHEXWORD
 		LD A, (ERRFLAG)
 		CP E_NONE
 		jr NZ,epp_upd1		; skip if invalid entry
@@ -45,8 +45,8 @@ epp_upda:	push hl
 
 		; update byte count
 epp_upd1:	ld hl,epp_numbyte
-		call PRINT_STRING
-		call GETHEXWORD
+		call CON_PRT_STR
+		call CON_GETHEXWORD
 		LD A, (ERRFLAG)
 		CP E_NONE
 		jr NZ,epp_upd2		; skip if invalid entry
@@ -54,8 +54,8 @@ epp_upd1:	ld hl,epp_numbyte
 
 		; update target page
 epp_upd2:	ld hl,epp_page
-		call PRINT_STRING
-		call GETHEXBYTE
+		call CON_PRT_STR
+		call CON_GETHEXBYTE
 		ld l,a			; save temporarily
 		LD A, (ERRFLAG)
 		CP E_NONE

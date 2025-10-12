@@ -11,3 +11,8 @@ PIO_INIT:	ld a,11001111b      ; mode 3 (bit control)
 
         ret
 
+PIOA_OUT:	out (PIO_DA),A
+	ret
+
+PIOB_OUT:	out (PIO_DB),A
+	ret

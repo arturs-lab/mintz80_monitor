@@ -22,34 +22,22 @@ CON_TX:	JP UART_TX
         
 
 ;***************************************************************************
-;PRINT_STRING_SP
+;CON_PRT_STR_SP
 ;Function: Prints string to terminal program. Start in HL
 ;***************************************************************************
-PRINT_STRING_SP:	CALL    UART_PRNT_SP
-        RET
+CON_PRT_STR_SP:	JP    UART_PRNT_SP
         
 ;***************************************************************************
-;PRINT_STRING
+;CON_PRT_STR
 ;Function: Prints string to terminal program. Start in HL
 ;***************************************************************************
-PRINT_STRING:	CALL    UART_PRNT_STR
-        RET
+CON_PRT_STR:	JP    UART_PRNT_STR
         
 ;***************************************************************************
-;GET_CHAR
-;Function: Get upper case ASCII character from user into Accumulator
-;***************************************************************************
-GET_CHAR:	CALL    UART_RX         ;Get char into Acc
-        CALL    TO_UPPER        ;Character has to be upper case
-        RET
-        
-;***************************************************************************
-;PRINT_CHAR
+;CON_PRT_CHAR
 ;Function: Get upper case ASCII character from Accumulator to UART
 ;***************************************************************************
-PRINT_CHAR:	CALL UART_TX    ;Echo character to terminal
-
-        RET
+CON_PRT_CHAR:	JP UART_TX    ;Echo character to terminal
         
 ; Optional print char
 OPRINTCHAR:
@@ -58,17 +46,36 @@ OPRINTCHAR:
         CP      MUTEON  ; compare with 1=true
         JR      Z, PRTSKIP
         LD      A, C
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
 
 PRTSKIP:
         LD      A, C
         RET
 
 ;***************************************************************************
-;TO_UPPER
+;CON_PRT_NL
+;Function: Prints carriage return and line feed
+;***************************************************************************			
+CON_PRT_NL:	PUSH    af
+        LD      A, $0d
+        CALL    CON_PRT_CHAR
+        LD      A, $0a
+        CALL    CON_PRT_CHAR
+        POP     af
+        RET
+        
+;***************************************************************************
+;CON_GET_CHAR
+;Function: Get upper case ASCII character from user into Accumulator
+;***************************************************************************
+CON_GET_CHAR:	CALL    UART_RX         ;Get char into Acc
+;        JP    CON_TO_UPPER        ;Character has to be upper case
+        
+;***************************************************************************
+;CON_TO_UPPER
 ;Function: Convert character in Accumulator to upper case 
 ;***************************************************************************
-TO_UPPER:       
+CON_TO_UPPER:       
         CP      "a"     ; Nothing to do if not lower case
         RET     C
         CP      "z" + 1 ; > "z"?
@@ -93,23 +100,10 @@ ADDOT:
         RET
         
 ;***************************************************************************
-;PRINT_NEW_LINE
-;Function: Prints carriage return and line feed
-;***************************************************************************			
-PRINT_NEW_LINE:
-        PUSH    af
-        LD      A, $0d
-        CALL    PRINT_CHAR
-        LD      A, $0a
-        CALL    PRINT_CHAR
-        POP     af
-        RET
-        
-;***************************************************************************
-;CHAR_ISHEX
+;CON_CHAR_ISHEX
 ;Function: Checks if value in A is a hexadecimal digit, C flag set if true
 ;***************************************************************************		
-CHAR_ISHEX:         
+CON_CHAR_ISHEX:         
                                     ;Checks if Acc between "0" and "F"
         CP      "F" + 1         ;(Acc) > "F"? 
         RET     NC              ;Yes - Return / No - Continue
@@ -131,12 +125,12 @@ CIH2:
         RET
         
 ;***************************************************************************
-;GET_HEX_NIBBLE
+;CON_GETHEXNIB
 ;Function: Translates char to HEX nibble in bottom 4 bits of A
 ;***************************************************************************
-GETHEXNIB:      
-        CALL    GET_CHAR
-        CALL    CHAR_ISHEX      ; Is it a hex digit?
+CON_GETHEXNIB:      
+        CALL    CON_GET_CHAR
+        CALL    CON_CHAR_ISHEX      ; Is it a hex digit?
         JP      NC,NONHEXNIB    ; Yes - Continue / No - Exit
         CALL    OPRINTCHAR
 
@@ -153,12 +147,12 @@ NONHEXNIB:                      ; Allow exit on wrong char
         RET
 
 ;***************************************************************************
-;GET_HEX_BTYE
+;CON_GETHEXBYTE
 ;Function: Gets HEX byte into A
 ;Uses: AF, D
 ;***************************************************************************
-GETHEXBYTE:
-        CALL    GETHEXNIB       ; Get high nibble
+CON_GETHEXBYTE:
+        CALL    CON_GETHEXNIB       ; Get high nibble
         PUSH	DE
         PUSH	AF
         LD	A, (ERRFLAG)
@@ -170,7 +164,7 @@ GETHEXBYTE:
         RLC     A
         RLC     A
         LD      D,A             ; Save upper four bits
-        CALL    GETHEXNIB       ; Get lower nibble
+        CALL    CON_GETHEXNIB       ; Get lower nibble
         PUSH	AF
         LD	A, (ERRFLAG)
         CP	E_NONE
@@ -185,19 +179,19 @@ GHB_ERR:
         RET
 
 ;***************************************************************************
-;GET_HEX_WORD
+;CON_GETHEXWORD
 ;Function: Gets two HEX bytes into HL
 ;Uses: AF
 ;***************************************************************************
-GETHEXWORD:
-        CALL    GETHEXBYTE	;Get high byte
+CON_GETHEXWORD:
+        CALL    CON_GETHEXBYTE	;Get high byte
         PUSH	AF
         LD		A, (ERRFLAG)
         CP		E_NONE
         JR		NZ, GHW_ERR
         POP		AF
         LD		H,A
-        CALL    GETHEXBYTE    	;Get low byte
+        CALL    CON_GETHEXBYTE    	;Get low byte
         PUSH	AF
         LD		A, (ERRFLAG)
         CP		E_NONE
@@ -210,10 +204,10 @@ GHW_ERR:
         RET
         
 ;***************************************************************************
-;NIB2CHAR
+;CON_NIB2CHAR
 ;Function: Converts the lower nibble in A into a HEX character
 ;***************************************************************************
-NIB2CHAR:
+CON_NIB2CHAR:
         AND     0Fh             	;Only low nibble in byte
         ADD     A,"0"             	;Adjust for char offset
         CP      "9" + 1         	;Is the hex digit > 9?
@@ -223,10 +217,10 @@ N2C1:
         RET
 
 ;***************************************************************************
-;SHFTNIB
+;CON_SHFTNIB
 ;Function: Shift the upper nibble to the lower position
 ;***************************************************************************
-SHFTNIB:
+CON_SHFTNIB:
         AND     0F0h
         RRCA
         RRCA
@@ -238,10 +232,10 @@ SHFTNIB:
 ;PRINT_HEX_NIB
 ;Function: Prints a low nibble in hex notation from Acc to the serial line.
 ;***************************************************************************
-PRINTHNIB:
+CON_PRINTHNIB:
         PUSH    AF
-        CALL    NIB2CHAR
-        CALL    PRINT_CHAR        	;Print the nibble
+        CALL    CON_NIB2CHAR
+        CALL    CON_PRT_CHAR        	;Print the nibble
         POP     AF
         RET
         
@@ -249,7 +243,7 @@ PRINTHNIB:
 ;PRINT_HEX_BYTE
 ;Function: Prints a byte in hex notation from Acc to the serial line.
 ;***************************************************************************		
-PRINTHBYTE:
+CON_PRINTHBYTE:
         PUSH    AF      ;Save registers
         PUSH    DE
         LD      D,A     ;Save for low nibble
@@ -257,9 +251,9 @@ PRINTHBYTE:
         RRCA
         RRCA
         RRCA
-        CALL    PRINTHNIB       ;Print high nibble
+        CALL    CON_PRINTHNIB       ;Print high nibble
         LD      A,D             ;Restore for low nibble
-        CALL    PRINTHNIB       ;Print low nibble
+        CALL    CON_PRINTHNIB       ;Print low nibble
         POP     DE
         POP     AF
         RET
@@ -268,13 +262,13 @@ PRINTHBYTE:
 ;PRINT_HEX_WORD
 ;Function: Prints the four hex digits of a word to the serial line from HL
 ;***************************************************************************
-PRINTHWORD:     
+CON_PRINTHWORD:     
 ;       PUSH    HL
         PUSH    AF
         LD      A,H
-        CALL    PRINTHBYTE      ;Print high byte
+        CALL    CON_PRINTHBYTE      ;Print high byte
         LD      A,L
-        CALL    PRINTHBYTE      ;Print low byte
+        CALL    CON_PRINTHBYTE      ;Print low byte
         POP     AF
 ;       POP     HL
         RET
@@ -283,7 +277,7 @@ PRINTHWORD:
 ;CHAR TO NIBBLE
 ;Transforms the HEX-character in A to a value fitting in the lower nibble
 ;***************************************************************************
-CHAR2NIB:
+CON_CHAR2NIB:
         SUB     "0"
         CP      0ah
         JR      C, C2N_DONE
@@ -306,7 +300,7 @@ PB0:
         JR      PBPRT 
         
 PBPRT:
-        CALL    PRINT_CHAR
+        CALL    CON_PRT_CHAR
         RET
 
 ;***************************************************************************
@@ -332,11 +326,11 @@ P8B_RET:
 ;TWO CHARS TO BYTE
 ; convert the (hex) char at (HL) and the next to a byte in A. On exit
 ; HL points to the next, ininterpreted character.
-CHARS2BYTE:
+CON_CHARS2BYTE:
         PUSH    BC
         LD      A, (HL)
         INC     HL
-        CALL    CHAR2NIB        ; get upper nibble from char
+        CALL    CON_CHAR2NIB        ; get upper nibble from char
         RLC     A
         RLC     A
         RLC     A
@@ -344,7 +338,7 @@ CHARS2BYTE:
         LD      B, A
         LD      A, (HL)
         INC     HL
-        CALL    CHAR2NIB        ; get lower nibble from char
+        CALL    CON_CHAR2NIB        ; get lower nibble from char
         OR      B
         POP     BC
         RET

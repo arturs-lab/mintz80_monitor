@@ -176,3 +176,90 @@ SIOA_RX:	CALL  SIOA_RX_WAIT			;wait to receive char
 SIOA_RX1:	in a,(SIO_DA)       ;read that char
 		RET			
 
+;#######
+;***************************************************************************
+;SIOB_PRNT_SP:
+;Function: Print out string starting at MEM location (SP) to SIOB
+; put string to print, terminated by EOS immediately after the CALL instruction
+; calling this procedure
+;***************************************************************************
+SIOB_PRNT_SP:	ex (sp),hl                 
+			call SIOB_PRNT_STR
+			inc hl
+			ex (sp),hl
+			ret
+
+;***************************************************************************
+;SIOB_PRNT_STR:
+;Function: Print out string starting at MEM location (HL) to 16550 UART
+;***************************************************************************
+SIOB_PRNT_STR:	PUSH	AF
+SIOBPRNTSTRLP:	LD		A,(HL)
+		CP		EOS					;Test for end byte
+		JR		Z,SIOB_END_PRNT_STR	;Jump if end byte is found
+		CALL	SIOB_TX
+		INC		HL					;Increment pointer to next char
+		JR		SIOBPRNTSTRLP	;Transmit loop
+SIOB_END_PRNT_STR:	POP		AF
+		RET	 
+			 	
+;***************************************************************************
+;SIOB_TX_READY blocking
+;Function: wait for SIOB to be ready to transmit
+;***************************************************************************
+SIOB_TX_RDY:	PUSH 	AF
+SIOB_TX_RD1:	ld a,1
+		out (SIO_CB),a
+		in a,(SIO_CB)
+		bit 0,a
+		jr z,SIOB_TX_RD1
+		POP     AF
+		RET
+	
+;***************************************************************************
+;SIOB_TX
+;Function: Transmit character in A to SIOB
+;***************************************************************************
+SIOB_TX:		CALL  SIOB_TX_RDY			;Make sure UART is ready to receive
+			out (SIO_DB),a      			;Transmit character in A to UART
+			RET
+				
+;***************************************************************************
+;SIOB_RX_WAIT blocking
+;Function: wait for SIOB to receive char
+;***************************************************************************
+SIOB_RX_WAIT:	PUSH 	AF					
+SIOB_RX_WAIT_LP:	sub a               ;clear a, write into WR0: select RR0
+		out (SIO_CB),a
+		in a,(SIO_CB)       ;read RRx
+		bit 0,a
+		jr z,SIOB_RX_WAIT_LP	;if any rx char left in rx buffer
+			POP     AF
+			RET
+	
+;***************************************************************************
+;SIOB_RX_CHK
+;Function: Non-blocking receive char
+; returns 0 if no data or char if data present
+;***************************************************************************
+SIOB_RX_CHK:	sub a               ;clear a, write into WR0: select RR0
+		out (SIO_CB),a
+		in a,(SIO_CB)       ;read RRx
+		bit 0,a
+		ret z			;if any rx char left in rx buffer
+		in a,(SIO_DB)       ;read that char
+		ret			; return status
+
+
+;***************************************************************************
+;UART_RX
+;Function: Receive character in UART to A
+; either wait for it if called at SIOB_RX
+; or just fetch it without waiting if called at SIOB_RX1
+; the latter is in case we already tested for and know char is available
+;***************************************************************************
+SIOB_RX:	CALL  SIOB_RX_WAIT			;wait to receive char
+SIOB_RX1:	in a,(SIO_DB)       ;read that char
+		RET			
+
+

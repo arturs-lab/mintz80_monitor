@@ -11,9 +11,23 @@
 ;***************************************************************************
 ;CF_INIT
 ;Function: Initialize CF to 8 bit data transfer mode
+; Clobbers: A
 ;***************************************************************************	
-CF_INIT:	CALL	CF_LP_BUSY
-	jr nz,CF_INIT_TOUT				; timeout
+CF_INIT:	ld a,$0E			; issue software reset
+	out (CFCTL),a
+	ld a,$0A				; exit reset
+	out (CFCTL),a
+	xor a
+CF_INIT_LP:	push af
+	CALL	CF_LP_BUSY
+	jr z,CF_INIT_GO
+	pop af
+	dec a
+	jr nz,CF_INIT_LP
+	jr CF_INIT_TOUT
+
+CF_INIT_GO:	pop af
+	ld (ULBEND+1),a
 	LD		A,01h						;LD features register to enable 8 bit
 	OUT		(CFFEAT),A
 	CALL	CF_LP_BUSY
@@ -31,17 +45,24 @@ CF_INIT:	CALL	CF_LP_BUSY
 	LD		(CF_SECCNT), A
 	ld hl,RAM_TOP - $0fff 		; = $f000 - $f200
 	ld (CFSECT_BUF),hl			; by default point to this location for CF data buffer
-	LD 		HL,CF_MSG_i					;Print some messages 
-	CALL    PRINT_STRING
+	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
+zoWarnFlow = true
+	xor a
 	RET
 
-CF_INIT_TOUT:	call jUART_PRNT_SP
+CF_INIT_TOUT:	push af
+	call CON_PRT_STR_SP
 zoWarnFlow = false
-	db $0d,$0a,"CF card init timeout",$0d,$0a,0
+	db $0d,$0a,"CF card init timeout ",0
 zoWarnFlow = true
+	pop af
+	call CON_PRINTHBYTE
+	call CON_PRT_NL
+	xor a
+	dec a
 	ret
-
-CF_MSG_i: DEFB 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
 
 ;***************************************************************************
 ;LOOP_BUSY
@@ -55,6 +76,7 @@ CF_LP_BUSY_1:	dec c
 	AND		010000000b					;Mask busy bit
 	JR		NZ,CF_LP_BUSY_1				;Loop until busy(7) is 0
 CF_LP_BUSY_X:	pop bc		; we get here either because not busy, A=0 or because timeout, A=$80
+	or a
 	RET
 
 ;***************************************************************************
@@ -70,6 +92,7 @@ CF_LP_CMD_RDY_1:	dec c
 	XOR		001000000b					;we want busy(7) to be 0 and drvrdy(6) to be 1
 	JR		NZ,CF_LP_CMD_RDY_1
 CF_LP_CMD_RDY_X:	pop bc	; we get here either because not busy & ready, A=0 or because timeout, A=$c0
+	or a
 	RET
 
 ;***************************************************************************
@@ -86,13 +109,20 @@ CF_LP_DAT_RDY_1:	dec c
 	XOR		000001000b					;we want busy(7) to be 0 and drq(3) to be 1
 	JR		NZ,CF_LP_DAT_RDY_1
 CF_LP_DAT_RDY_X:	pop bc		; we get here either because not busy & drq, A=0 or because timeout, A=$88
+	or a
 	RET
 	
 ;***************************************************************************
 ;CF_RD_CMD
 ;Function: Gets a sector (512 bytes) into RAM buffer.
 ;***************************************************************************			
-CF_RD_CMD:
+CF_RD_CMD:	CALL 	CF_LP_BUSY
+	jr nz,CF_RD_CMD_TOUT				; time out
+	LD 		A,(CF_SECCNT)
+	OUT 	(CFSECCO),A					;Number of sectors at a time (512 bytes)
+	CALL 	CF_LP_BUSY
+	jr nz,CF_RD_CMD_TOUT				; time out
+	CALL	CF_SETUP_LBA
 	CALL	CF_LP_CMD_RDY				;Make sure drive is ready for command
 	jr nz,CF_RD_CMD_TOUT				; time out
 	LD		A,020h						;Prepare read command
@@ -101,11 +131,18 @@ CF_RD_CMD:
 	jr nz,CF_RD_CMD_TOUT				; time out
 	IN		A,(CFSTAT)					;Read status
 	AND		000000001b					;mask off error bit
-	JR		NZ,CF_RD_CMD				;Try again if error
-	LD 		HL,(CFSECT_BUF)
+	JR		Z,CF_RD_NOERR			; no error, read data
+	call UART_PRNT_SP
+zoWarnFlow = false
+	db $0d,$0a,"CF card read error: ",0
+zoWarnFlow = true
+	in A,(CFERR)						; read error code
+	call CON_PRINTHBYTE
+	call CON_PRT_NL
+	jr CF_RD_CMD				;Try again if error
+CF_RD_NOERR:	LD 		HL,(CFSECT_BUF)
 	LD 		B,0							;read 256 words (512 bytes per sector)
-CF_RD_SECT:
-	CALL	CF_LP_DAT_RDY	
+CF_RD_SECT:	CALL	CF_LP_DAT_RDY	
 	jr nz,CF_RD_CMD_TOUT				; time out
 	IN 		A,(CFDATA)					;get byte of ide data	
 	LD 		(HL),A
@@ -119,10 +156,11 @@ CF_RD_SECT:
 	xor a						; zero A to indicate success
 	RET
 	
-CF_RD_CMD_TOUT:	call jUART_PRNT_SP
+CF_RD_CMD_TOUT:	call UART_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"CF card read timeout",$0d,$0a,0
 zoWarnFlow = true
+	ld (ULBEND+1),a
 	xor a
 	dec a		; return $ff
 	ret
@@ -131,7 +169,8 @@ zoWarnFlow = true
 ;CF_WR_CMD
 ;Function: Puts a sector (512 bytes) from RAM buffer disk buffer and to the disk.
 ;***************************************************************************			
-CF_WR_CMD:	push bc
+CF_WR_CMD:	CALL	CF_SETUP_LBA
+	push bc
 	ld c,0
 CF_WR_CMD_1:	dec c
 	jr z,CF_WR_CMD_TOUT
@@ -150,8 +189,7 @@ CF_WR_CMD_1:	dec c
 ; add code here to write data
 	LD 		HL,(CFSECT_BUF)
 	LD 		B,0					;write 256 words (512 bytes per sector)
-CF_WR_SECT_L:
-	LD 		A,(HL)
+CF_WR_SECT_L:	LD 		A,(HL)
 	OUT 		(CFDATA),A				;write byte of ide data	
 	INC 	HL
 ;	CALL	CF_LP_DAT_RDY
@@ -167,10 +205,12 @@ CF_WR_SECT_L:
 	xor a						; zero A to indicate success
 	ret
 
-CF_WR_CMD_TOUT:	call jUART_PRNT_SP
+CF_WR_CMD_TOUT:	call UART_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"CF card write timeout",$0d,$0a,0
 zoWarnFlow = true
+	ld a,c
+	ld (ULBEND+1),a
 	pop bc
 	xor a
 	dec a	; return $ff
@@ -184,18 +224,18 @@ CF_WR_SECT:	push bc
 ;set LBA on SD card to values from monitor vars
 CF_SETUP_LBA:	ld a,(CF_LBA0)
 	OUT (CFLBA0), A
-;	CALL 	jCF_LP_BUSY
+;	CALL 	CF_LP_BUSY
 	ld a,(CF_LBA1)
 	OUT (CFLBA1), A
-;	CALL 	jCF_LP_BUSY
+;	CALL 	CF_LP_BUSY
 	ld a,(CF_LBA2)
 	OUT (CFLBA2), A
-;	CALL 	jCF_LP_BUSY
+;	CALL 	CF_LP_BUSY
 	ld a,(CF_LBA3)
 	and a,$0f
 	or a,$e0
 	OUT (CFLBA3), A
-;	CALL 	jCF_LP_BUSY
+;	CALL 	CF_LP_BUSY
 	ret
 
 ; find active partition and put its LBA address in monitor vars
@@ -228,7 +268,7 @@ CF_SETUP_X:	pop bc
 	pop hl
 	ret
 
-CF_SETUP_PART_LAST: call jUART_PRNT_SP
+CF_SETUP_PART_LAST: call UART_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"No valid partition found",$0d,$0a,0
 zoWarnFlow = true
