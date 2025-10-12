@@ -172,7 +172,7 @@ MAIN:
 	out ($f0),a
 	ld a,$b1
 	out ($f1),a
-	ld sp,0
+	ld sp,SP_INIT
 ;	call memmap_init
 	ld a,$20
 	call delay		; looks like Z80 needs this delay to successfully write to IO ports

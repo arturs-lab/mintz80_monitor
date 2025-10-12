@@ -32,7 +32,7 @@ RAMCELL     equ 0x3080
 ; MAIN
 ;-------------------------------------------------------------------------------
 
-        org $2000
+        org $4000
 main:		call setPIO         ; set PIO
 ;        call jCTC_INIT_ALL     ; set CTC
 ;        call jSIO_INIT         ; set SIO

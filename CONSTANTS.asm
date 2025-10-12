@@ -7,22 +7,18 @@ ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 RAM_BOTTOM: EQU    02000H       ; Bottom address of RAM
 RAM_TOP:     EQU    $ffff
 
-JUMPTAB:	EQU	RAM_TOP - $2FF
+JUMPTAB:	EQU	RAM_BOTTOM + $0000	; jump table for monitor routines
 
-IRQTAB:	EQU	RAM_TOP - $3FF
+IRQTAB:	EQU	RAM_BOTTOM + $0100	; interrupt vector table
+
+SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
 
 ; these interrupt bases are added to Z80 interrupt vector register I to form final vector in IM2
 SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to interrupt type
 CTCV:		equ $10		; CTC interrupt vector base
 PIOV:		equ $20		; PIO interrupt vector base
 
-; location of time constant values for CTC channels
-CTC_CH0_TC	equ	$fefc		; time constant for channel 0
-CTC_CH1_TC	equ	$fefd		; time constant for channel 1
-CTC_CH2_TC	equ	$fefe		; time constant for channel 2
-CTC_CH3_TC	equ	$feff		; time constant for channel 3
-
-MONVARS	EQU	RAM_TOP - $1FF	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
+MONVARS	EQU	RAM_BOTTOM + $0200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 MPFMON:     EQU    0000h
 ASCDMPBUF:  EQU    MONVARS + 0h      ;Buffer to construct ASCII part of memory dump
 ASCDMPEND:  EQU    MONVARS + 10h     ;End of buffer, fill with EOS
@@ -50,6 +46,13 @@ UPLOADBUF:  EQU    MONVARS + 30h     ; Buffer for hex-intel upload. Allows up to
 ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 bytes...
 ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
 MSGBUF:     EQU    UPLOADBUF
+
+; location of time constant values for CTC channels
+CTC_CH0_TC	equ	MONVARS + $fc		; time constant for channel 0
+CTC_CH1_TC	equ	MONVARS + $fd		; time constant for channel 1
+CTC_CH2_TC	equ	MONVARS + $fe		; time constant for channel 2
+CTC_CH3_TC	equ	MONVARS + $ff		; time constant for channel 3
+
 
 ; ### IO map
 ;IOM-MPF-IP ports:
@@ -130,11 +133,11 @@ LF:         EQU    00Ah
 CR:         EQU    00Dh
 
 
-epp_src:	equ $2000	; source of code to be programmed into EEPROM
+epp_src:	equ $4000	; source of code to be programmed into EEPROM
 epp_tgt:	equ $0000	; target starting address
 epp_len:	equ $2000	; byte count of data to be programmed
 epp_del:	equ $1b	; delay between EEPROM readbacks, about 10ms max per datasheet 
-epp_tmp:	equ $ff00	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
 epp_bank:	equ $01	; eeprom bank to select. by default program RAM bank to allow testing and reset if programming fails
 
 ; for hex dump routine: number of lines to print
