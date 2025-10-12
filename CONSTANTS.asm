@@ -92,6 +92,9 @@ CFLBA2:		EQU	CFBASE + 05h		; LBA bits 16-23 (R/W, LBA mode)
 CFLBA3:		EQU	CFBASE + 06h		; LBA bits 24-27 (R/W, LBA mode)
 CFSTAT:		EQU	CFBASE + 07h		; Status (R)
 CFCMD:		EQU	CFBASE + 07h		; Command (W)
+CFCTL:		EQU	CFBASE + 08h + 06h	; write: Device control
+CFALTSTAT:		EQU	CFBASE + 08h + 06h	; read: Alternate status
+CFADDR:		EQU	CFBASE + 08h + 07h	; read: Drive address
 
 turbo:	equ 	$d0	; clock divider 0=4MHz, 1=2MHz, 2=1.33MHz, 3=1MHz
 beepr:	equ	$d1	; speaker beeper
