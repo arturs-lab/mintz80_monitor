@@ -10,8 +10,8 @@
 ;
 ; SAVE "name" CODE 60000 5024
 
-AYSEL		EQU	$02
-AYDTA		EQU	$03
+AYSEL		EQU	$00
+AYDTA		EQU	$01
 
 PLAYER	EQU	$2000
 MUSIC1	EQU	$2500
@@ -37,6 +37,7 @@ FA00	ld a,$10	; frequency source
 	out ($d0),a
 	ld a,$e2		; playback speed
 	ld (PBSPEED),a
+	call jCON_PRT_NL
 	jp	FBA5		; initialize note pointers and start playing
 
 
@@ -163,15 +164,19 @@ FB51	di			; make sure interrupts turned off
 	call	FCD9		; store B -> (HL) 3 times incrementing HL each time
 	ld	hl,EFFECTPTR	; get effect
 	call	FBD0		; get reg value
-	ld a," "
-	add b
-	call jUART_TX
+	ld a,b
+	jr z,prsp
+	add a,$f8
+	and a,$7f
+	jr prs
+prsp:	add a," "
+prs:	call jUART_TX
 	ld a," "
 	call jUART_TX
 	call	FC9D		; process it
 	ld	hl,CHAMUSICPTR	; channel A music data address
 	call	FBD0		; get note and reg value
-	ld a," "
+	ld a,"#"
 	add b
 	call jUART_TX
 	ld a," "
@@ -180,7 +185,7 @@ FB51	di			; make sure interrupts turned off
 	call	FBF4
 	ld	hl,CHBMUSICPTR	; channel B music data address
 	call	FBD0		; get note and reg value
-	ld a," "
+	ld a,"#"
 	add b
 	call jUART_TX
 	ld a," "
@@ -189,14 +194,14 @@ FB51	di			; make sure interrupts turned off
 	call	FBF4
 	ld	hl,CHCMUSICPTR	; channel C music data address
 	call	FBD0		; get note and reg value
-	ld a," "
+	ld a,"#"
 	add b
 	call jUART_TX
 	ld a," "
 	call jUART_TX
 	ld	a,$03		; channel number
 	call	FBF4
-	call jPRINT_NEW_LINE
+	call jCON_PRT_NL
 	call	FD15
 	call	AYSETREG
 	call	FC72
@@ -614,7 +619,7 @@ FDD5	ld	hl,RAMPLIT	; point to amplitudes table
 	ret
 
 rtrn	ld e,$ff
-	call jRX_CHK
+	call jUART_RX_CHK
 	add $ff
 	ld e,a
 	ret
@@ -734,7 +739,7 @@ XTRAEND	DB	$3f
 
 endprog	equ $
 
-	output_bin "ymztest_2000.bin",PLAYER,endprog-PLAYER		; The binary file
-	output_intel "ymztest_2000.hex",PLAYER,endprog-PLAYER		; The binary file
-	output_list "ymztest_2000.lst"
+	output_bin "ymztest.bin",PLAYER,endprog-PLAYER		; The binary file
+	output_intel "ymztest.hex",PLAYER,endprog-PLAYER		; The binary file
+	output_list "ymztest.lst"
 
