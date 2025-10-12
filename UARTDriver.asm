@@ -103,7 +103,7 @@ UART_RXRDY_LP:
 ;RX_CHK
 ;Function: Non-blocking receive check
 ;***************************************************************************
-RX_CHK:		IN		A,(UART5)			;Fetch the control register
+UART_RX_CHK:	IN		A,(UART5)			;Fetch the control register
 			AND	1					;Mask other bits, has some char arrived?
 			RET
 
