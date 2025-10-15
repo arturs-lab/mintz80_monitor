@@ -54,12 +54,12 @@ NMI:		jp IRQTAB+(NMIV-IRQTABR)
 
 
 ; we want all drivers at the beginning so they stay the same even if we remove monitor code
-		include "PIODriver.asm"
+		include "eeprom_prog.asm";
 		include "CTCDriver.asm"
 		include "SIODriver.asm"
+		include "PIODriver.asm"
 		include "ymzdrvr.asm";
 
-		include "eeprom_prog.asm";
 		INCLUDE "CFDriver.asm"
 		INCLUDE	"CONIO.asm"		; use UART for console
 ;		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
@@ -196,7 +196,9 @@ zoWarnFlow = true
 
 	call dmpio
 
-	call CF_INIT		; initialize CF
+	call CF_BOOT
+
+CF_BOOT:	call CF_INIT		; initialize CF
 	jp nz,gomain		; if error, just go to main loop
 	call 	CF_RD_CMD
 	jp nz,CF_READ_ERR
@@ -351,9 +353,9 @@ MNMSG2:     DEFB    0DH, 0Ah, " adaptation to MPF-1 / Z80 DART", 09h, "2022 F.J.
             DEFB    "Adaptation to MintZ80 2025 Artur's Lab", 0Dh, 0Ah
 MNMSG3A:    DEFB    "Monitor v", VERSMYR, ".", VERSMIN, ", ROM: ", EOS
 MNMSG3B:    DEFB    "h, RAM: ", EOS
-MNMSG3C:    DEFB    "h, PIO: ", EOS
-MNMSG3D:    DEFB    "h, CTC: ", EOS
-MNMSG3E:    DEFB    "h, SIO: ", EOS
+MNMSG3C:    DEFB    "h, CTC: ", EOS
+MNMSG3D:    DEFB    "h, SIO: ", EOS
+MNMSG3E:    DEFB    "h, PIO: ", EOS
 MNMSG3F:    DEFB    "h", 0Dh, 0AH, 0Dh, 0AH
 MONHLP:     DEFB    09h," Input ? for command list", 0Dh, 0AH, EOS
 MONERR:     DEFB    0Dh, 0AH, "Error in params: ", EOS
@@ -368,17 +370,17 @@ PRINT_MON_HDR:
         CALL    CON_PRT_STR
         LD      HL, RAM_BOTTOM
         CALL    CON_PRINTHWORD
-        LD      HL, MNMSG3C         ; 3rd part PIO
-        CALL    CON_PRT_STR
-        LD      A, PIO_BASE
-        CALL    CON_PRINTHBYTE
-        LD      HL, MNMSG3D         ; 4th part CTC
+        LD      HL, MNMSG3C         ; 3rd part CTC
         CALL    CON_PRT_STR
         LD      A, CTC_BASE
         CALL    CON_PRINTHBYTE
-        LD      HL, MNMSG3E         ; 5th part SIO
+        LD      HL, MNMSG3D         ; 4th part SIO
         CALL    CON_PRT_STR
         LD      A, SIO_BASE
+        CALL    CON_PRINTHBYTE
+        LD      HL, MNMSG3E         ; 5th part PIO
+        CALL    CON_PRT_STR
+        LD      A, PIO_BASE
         CALL    CON_PRINTHBYTE
         LD      HL, MNMSG3F         ; 6th part, line ending
         CALL    CON_PRT_STR
