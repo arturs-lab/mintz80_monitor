@@ -76,8 +76,8 @@ epp_prog:	push hl
 		call CON_PRT_NL
 epp_banka:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
 		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
-epp_tgta:	ld hl,epp_tgt	; source of data to be programmed
-epp_srca:	ld de,epp_src	; target address
+epp_tgta:	ld hl,epp_tgt	; target of data to be programmed
+epp_srca:	ld de,epp_src	; source address
 epp_lena:	ld bc,epp_len	; number of bytes
 
 epp_p1:	ld a,b		; check if remaining bytes = 0
@@ -101,17 +101,26 @@ epp_p3:	out (beepr),a
 		inc hl
 		inc de
 		dec bc
+	if def ROM_BOTTOM_a000
 		ld a,c
 		or a
 		jr nz,epp_p1
 		call CON_PRINTHWORD
 		call CON_PRT_NL
+	endif
+	if def ROM_BOTTOM_c000
+		ld a,c
+		or a
+		jr nz,epp_p1
+		call CON_PRINTHWORD
+		call CON_PRT_NL
+	endif
 		jr epp_p1
 
-epp_exit:	ld ($ff60),hl
-		ld ($ff62),de
-		ld ($ff64),bc
-		ld ($ff66),a
+epp_exit:	ld (MONVARS+$f0),hl
+		ld (MONVARS+$f2),de
+		ld (MONVARS+$f4),bc
+		ld (MONVARS+$f6),a
 		pop af
 		pop bc
 		pop de

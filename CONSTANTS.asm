@@ -7,20 +7,38 @@ ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 RAM_BOTTOM: EQU    02000H       ; Bottom address of RAM
 RAM_TOP:     EQU    $ffff
 
-JUMPTAB:	EQU	RAM_BOTTOM + $0000	; jump table for monitor routines
 
-IRQTAB:	EQU	RAM_BOTTOM + $0100	; interrupt vector table
-
-SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
-
+	if def ROM_BOTTOM_c000
+JUMPTAB:	EQU	RAM_TOP - $2FF	; jump table for monitor routines
+IRQTAB:	EQU	RAM_TOP - $3FF	; interrupt vector table
+SP_INIT	EQU 0				; initial value of SP
+CFSECT_BUF_V	EQU $A000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
+MONVARS	EQU	RAM_TOP - $1ff	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
+epp_tmp:	equ RAM_TOP - $ff	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+	else
+		if def ROM_BOTTOM_a000
+JUMPTAB:	EQU $c000 - $300	; jump table for monitor routines
+IRQTAB:	EQU $c000 - $400	; interrupt vector table
+SP_INIT	EQU $c000			; initial value of SP
 CFSECT_BUF_V	EQU $C000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
+MONVARS	EQU $c000 - $200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
+epp_tmp:	equ $c000 - $100	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+		else
+JUMPTAB:	EQU	RAM_BOTTOM + $0000	; jump table for monitor routines
+IRQTAB:	EQU	RAM_BOTTOM + $0100	; interrupt vector table
+SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
+CFSECT_BUF_V	EQU $C000			; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
+MONVARS	EQU	RAM_BOTTOM + $0200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
+epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+		endif
+	endif
+
 
 ; these interrupt bases are added to Z80 interrupt vector register I to form final vector in IM2
 SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to interrupt type
 CTCV:		equ $10		; CTC interrupt vector base
 PIOV:		equ $20		; PIO interrupt vector base
 
-MONVARS	EQU	RAM_BOTTOM + $0200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 MPFMON:     EQU    0000h
 ASCDMPBUF:  EQU    MONVARS + 0h      ;Buffer to construct ASCII part of memory dump
 ASCDMPEND:  EQU    MONVARS + 10h     ;End of buffer, fill with EOS
@@ -139,18 +157,17 @@ epp_src:	equ $4000	; source of code to be programmed into EEPROM
 epp_tgt:	equ $0000	; target starting address
 epp_len:	equ $2000	; byte count of data to be programmed
 epp_del:	equ $1b	; delay between EEPROM readbacks, about 10ms max per datasheet 
-epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
 epp_bank:	equ $01	; eeprom bank to select. by default program RAM bank to allow testing and reset if programming fails
 
 ; for hex dump routine: number of lines to print
 HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 
 
-;$0000-$1fff ROM
-;$2000-$3fff RAM
-;$4000-$5fff RAM
-;$6000-$7fff RAM
-;$8000-$9fff RAM
-;$a000-$bfff RAM
-;$c000-$dfff RAM
-;$e000-$ffff RAM
+;$0000-$1fff ROM	d8
+;$2000-$3fff RAM	d9
+;$4000-$5fff RAM	da
+;$6000-$7fff RAM	db
+;$8000-$9fff RAM	dc
+;$a000-$bfff RAM	dd
+;$c000-$dfff RAM	de
+;$e000-$ffff RAM	df

@@ -196,7 +196,7 @@ zoWarnFlow = true
 
 	call dmpio
 
-	call CF_BOOT
+;	call CF_BOOT
 
 CF_BOOT:	call CF_INIT		; initialize CF
 	jp nz,gomain		; if error, just go to main loop
@@ -234,7 +234,11 @@ zoWarnFlow = true
 	call jphl
 	jp gomain		; after executing code from CF go to main loop. Unless code from CF does something else
 
-CF_LD_SYS:	ld hl,(CFSECT_BUF)	; save this in HL now because call that follows will destroy it
+CF_LD_SYS:		call CON_PRT_STR_SP	; see if user wants to jump to it
+zoWarnFlow = false
+	db "CF Loading SYS sectors",0
+zoWarnFlow = true
+	ld hl,(CFSECT_BUF)	; save this in HL now because call that follows will destroy it
 	call CF_SYSLD		; load rest of CF sectors into $c200-$ffff, this call destroys value of CFSECT_BUF
 	jp nz,gomain		; if failed loading system, jump to main monitor loop
 	ld bc,$0200
@@ -246,7 +250,7 @@ CF_LD_SYS:	ld hl,(CFSECT_BUF)	; save this in HL now because call that follows wi
 	jp z,gomain		; otherwise presume this may be a valid code that can be jumped to
 	call jCON_PRT_STR_SP
 zoWarnFlow = false
-	db "CF card executable found at ",0
+	db "CF SYS executable found at ",0
 zoWarnFlow = true
 	call CON_PRINTHWORD
 	call CON_PRT_STR_SP

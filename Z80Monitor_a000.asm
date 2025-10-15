@@ -14,7 +14,7 @@ VERSMIN:    EQU     "2"
                                   ; CONSTANTS-aaaa-pp.asm files to
                                   ; CONSTANTS.asm
 
-ROM_BOTTOM_c000	equ $c000
+ROM_BOTTOM_a000	equ $a000
 
 SCAN:        EQU     005FEh
 
@@ -27,7 +27,7 @@ SCAN:        EQU     005FEh
 ;UART_BASE:  EQU     0E0h        ; Base port address, DART uses 4 ports
 
 
-            ORG ROM_BOTTOM_c000
+            ORG ROM_BOTTOM_a000
 
 ROUTINES:
 R_MAIN:     JP      MAIN            ; init DART and starts command loop
@@ -39,9 +39,9 @@ R_PRT_STR:  JP      CON_PRT_STR    ; sends a NULL terminated string
             DEFS    3
             DEFS    3
             
-            ORG ROM_BOTTOM_c000 + 24     ; room for eight routine entries
+            ORG ROM_BOTTOM_a000 + 24     ; room for eight routine entries
 
-            ORG ROM_BOTTOM_c000 + $38     ; IRQ routine
+            ORG ROM_BOTTOM_a000 + $38     ; IRQ routine
 
 IRQ:		ex af,af'
 		exx
@@ -51,7 +51,7 @@ irq_end:	ex af,af'
 		exx
 irq_exit:	reti
 
-            ORG ROM_BOTTOM_c000 + $66     ; nmi routine
+            ORG ROM_BOTTOM_a000 + $66     ; nmi routine
 
 NMI:		jp IRQTAB+(NMIV-IRQTABR)
 
@@ -244,7 +244,7 @@ PRINT_MON_HDR:
         CALL    CLEAR_SCREEN        ;Clear the terminal screen
         LD      HL, MNMSG1          ;Print some messages
         CALL    CON_PRT_STR
-        LD      HL, ROM_BOTTOM_c000
+        LD      HL, ROM_BOTTOM_a000
         CALL    CON_PRINTHWORD
         LD      HL, MNMSG3B         ; 2nd part, RAM
         CALL    CON_PRT_STR
@@ -386,6 +386,6 @@ zero_ram_end:	equ $
 
 endprog	equ $
 
-	output_bin "z80monitor_c000.bin",ROM_BOTTOM_c000,endprog-ROM_BOTTOM_c000    ; 
-	output_intel "z80monitor_c000.hex",ROM_BOTTOM_c000,endprog-ROM_BOTTOM_c000    ;
-	output_list "z80monitor_c000.lst"
+	output_bin "z80monitor_a000.bin",ROM_BOTTOM_a000,endprog-ROM_BOTTOM_a000    ; 
+	output_intel "z80monitor_a000.hex",ROM_BOTTOM_a000,endprog-ROM_BOTTOM_a000    ;
+	output_list "z80monitor_a000.lst"
