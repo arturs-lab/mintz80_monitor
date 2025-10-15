@@ -467,34 +467,33 @@ CL_COMMAND:	LD		HL, MCl_1	; Print some messages
 ; Function: Calculate checksum for address range in three bytes
 ;***************************************************************************
 
-CCKSM_1:	DEFB	"Calculate checksum for memory range", 0Dh, 0Ah, EOS
+CCKSM_1:	DEFB	"Calculate checksum for memory range", 0Dh, 0Ah
 
 CCKSM_2:	DEFB	"Start location: ", EOS
 
-CCKSM_3:	DEFB	"End location: ", EOS
+CCKSM_3:	DEFB	$0d,$0a,"End location: ", EOS
 
-CCKSM_4:    DEFB    "Checksum: ", EOS
+CCKSM_4:    DEFB    $0d,$0a,"Checksum: ", EOS
 
 CCKSM_COMMAND:	LD		HL, CCKSM_1
         CALL	CON_PRT_STR
         
-        LD		HL, CCKSM_2	    ; start
-        CALL	CON_PRT_STR
+;        LD		HL, CCKSM_2	    ; start
+;        CALL	CON_PRT_STR
         CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
-        RET		NZ
+        RET	NZ
         LD      (MVADDR+0), HL
-        CALL	CON_PRT_NL
         
         LD		HL, CCKSM_3     ; end
         CALL	CON_PRT_STR
         CALL	CON_GETHEXWORD
         LD		A, (ERRFLAG)
         CP		E_NONE
-        RET		NZ
+        RET	NZ
+        INC	HL
         LD      (MVADDR+2), HL
-        CALL	CON_PRT_NL
         
         LD      BC, (MVADDR+0)  ; starting point
         LD      DE, (MVADDR+2)  ; end point

@@ -1,18 +1,18 @@
 		include "CONSTANTS.asm"
 
-jJUMPTAB_INIT:	equ JUMPTAB+$00
-jCON_RX		equ JUMPTAB+$03
-jCON_TX		equ JUMPTAB+$06
-jCON_PRT_STR_SP	equ JUMPTAB+$09
-jCON_PRT_STR:	equ JUMPTAB+$0c
-jCON_PRT_CHAR:	equ JUMPTAB+$0f
-jCON_PRT_NL:	equ JUMPTAB+$12
-jCON_GET_CHAR	equ JUMPTAB+$15
-jCON_CHAR_ISHEX	equ JUMPTAB+$18
-jCON_GETHEXNIB	equ JUMPTAB+$1b
-jCON_GETHEXBYTE	equ JUMPTAB+$1e
-jCON_GETHEXWORD	equ JUMPTAB+$21
-jCON_NIB2CHAR	equ JUMPTAB+$24
+jJUMPTAB_INIT:	equ JUMPTAB+$00	; initialize jump table
+jCON_RX		equ JUMPTAB+$03	; receive char on console
+jCON_TX		equ JUMPTAB+$06	; send char on console
+jCON_PRT_STR_SP	equ JUMPTAB+$09	; print string pointed to by stack
+jCON_PRT_STR:	equ JUMPTAB+$0c	; print string pointed to by HL
+jCON_PRT_CHAR:	equ JUMPTAB+$0f	; print character
+jCON_PRT_NL:	equ JUMPTAB+$12	; print CR LF
+jCON_GET_CHAR	equ JUMPTAB+$15	; get character
+jCON_CHAR_ISHEX	equ JUMPTAB+$18	; is character valid hex
+jCON_GETHEXNIB	equ JUMPTAB+$1b	; get hex nibble
+jCON_GETHEXBYTE	equ JUMPTAB+$1e	; get hex byte
+jCON_GETHEXWORD	equ JUMPTAB+$21	; get hex word
+jCON_NIB2CHAR	equ JUMPTAB+$24	; nibble to character
 jCON_SHFTNIB	equ JUMPTAB+$27
 jCON_PRINTHNIB:	equ JUMPTAB+$2a
 jCON_PRINTHBYTE:	equ JUMPTAB+$2d
@@ -70,10 +70,11 @@ jCF_WR_SECT	equ JUMPTAB+$c6
 jCF_SETUP_LBA	equ JUMPTAB+$c9
 jCF_SETUP_PART	equ JUMPTAB+$cc
 jCF_PART_NEXT	equ JUMPTAB+$cf
-jUART_RX_RDY	equ JUMPTAB+$d2
-jUART_RX	equ JUMPTAB+$d5
-jUART_RX_CHK	equ JUMPTAB+$d8
-jUART_TX_RDY	equ JUMPTAB+$db
-jUART_TX	equ JUMPTAB+$de
-jUART_PRNT_SP	equ JUMPTAB+$e1
-jUART_PRNT_STR	equ JUMPTAB+$e4
+jCF_SYSLD	equ JUMPTAB+$d2
+jUART_RX_RDY	equ JUMPTAB+$d5
+jUART_RX	equ JUMPTAB+$d8
+jUART_RX_CHK	equ JUMPTAB+$db
+jUART_TX_RDY	equ JUMPTAB+$de
+jUART_TX	equ JUMPTAB+$e1
+jUART_PRNT_SP	equ JUMPTAB+$e4
+jUART_PRNT_STR	equ JUMPTAB+$e7

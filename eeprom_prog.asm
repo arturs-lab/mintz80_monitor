@@ -73,6 +73,7 @@ epp_prog:	push hl
 		push de
 		push bc
 		push af
+		call CON_PRT_NL
 epp_banka:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
 		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
 epp_tgta:	ld hl,epp_tgt	; source of data to be programmed
@@ -100,6 +101,11 @@ epp_p3:	out (beepr),a
 		inc hl
 		inc de
 		dec bc
+		ld a,c
+		or a
+		jr nz,epp_p1
+		call CON_PRINTHWORD
+		call CON_PRT_NL
 		jr epp_p1
 
 epp_exit:	ld ($ff60),hl

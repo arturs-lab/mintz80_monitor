@@ -17,6 +17,17 @@ CF_INIT:	ld a,$0E			; issue software reset
 	out (CFCTL),a
 	ld a,$0A				; exit reset
 	out (CFCTL),a
+
+	xor a
+	LD		(CF_LBA0), A
+	LD		(CF_LBA1), A
+	LD		(CF_LBA2), A
+	LD		(CF_LBA3), A
+	INC		A
+	LD		(CF_SECCNT), A
+	ld hl,CFSECT_BUF_V	; = $c000 in preparation for CPM loader which will load data from CF into $c000-$ffff
+	ld (CFSECT_BUF),hl	; by default point to this location for CF data buffer
+
 	xor a
 CF_INIT_LP:	push af
 	CALL	CF_LP_BUSY
@@ -36,15 +47,6 @@ CF_INIT_GO:	pop af
 	OUT		(CFCMD),A
 	CALL	CF_LP_BUSY
 	jr nz,CF_INIT_TOUT				; timeout
-	xor a
-	LD		(CF_LBA0), A
-	LD		(CF_LBA1), A
-	LD		(CF_LBA2), A
-	LD		(CF_LBA3), A
-	INC		A
-	LD		(CF_SECCNT), A
-	ld hl,CFSECT_BUF_V		; = $c000 in preparation for CPM loader which will load data from CF into $c000-$ffff
-	ld (CFSECT_BUF),hl			; by default point to this location for CF data buffer
 	call CON_PRT_STR_SP
 zoWarnFlow = false
 	db 0Dh, 0Ah, "CF Card Initialized", 0Dh, 0Ah, EOS
@@ -76,7 +78,7 @@ CF_LP_BUSY_1:	dec c
 	AND		010000000b					;Mask busy bit
 	JR		NZ,CF_LP_BUSY_1				;Loop until busy(7) is 0
 CF_LP_BUSY_X:	pop bc		; we get here either because not busy, A=0 or because timeout, A=$80
-	or a
+	or a					; update flags
 	RET
 
 ;***************************************************************************
@@ -92,7 +94,7 @@ CF_LP_CMD_RDY_1:	dec c
 	XOR		001000000b					;we want busy(7) to be 0 and drvrdy(6) to be 1
 	JR		NZ,CF_LP_CMD_RDY_1
 CF_LP_CMD_RDY_X:	pop bc	; we get here either because not busy & ready, A=0 or because timeout, A=$c0
-	or a
+	or a					; update flags
 	RET
 
 ;***************************************************************************
@@ -109,7 +111,7 @@ CF_LP_DAT_RDY_1:	dec c
 	XOR		000001000b					;we want busy(7) to be 0 and drq(3) to be 1
 	JR		NZ,CF_LP_DAT_RDY_1
 CF_LP_DAT_RDY_X:	pop bc		; we get here either because not busy & drq, A=0 or because timeout, A=$88
-	or a
+	or a					; update flags
 	RET
 	
 ;***************************************************************************
@@ -169,7 +171,10 @@ zoWarnFlow = true
 ;CF_WR_CMD
 ;Function: Puts a sector (512 bytes) from RAM buffer disk buffer and to the disk.
 ;***************************************************************************			
-CF_WR_CMD:	CALL	CF_SETUP_LBA
+CF_WR_CMD:	LD A,(CF_SECCNT)
+	OUT 	(CFSECCO),A					;Number of sectors at a time (512 bytes)
+	CALL 	CF_LP_BUSY
+	CALL	CF_SETUP_LBA
 	push bc
 	ld c,0
 CF_WR_CMD_1:	dec c
@@ -281,3 +286,42 @@ CF_PART_NEXT:	push hl
 	push bc
 	ld hl,(CF_PART_CUR)
 	jr CF_NEXT_PART
+
+CF_SYSLD:	push hl
+	ld hl,1		; we presume 0th sector was already loaded to $c000 during boot
+	ld (CF_LBA0),hl		; so load starting from 1st CF sector
+	ld hl,$c200		; and into $c200
+	ld (CFSECT_BUF),hl
+	ld a,1
+	ld (CF_SECCNT),a
+CF_SYSLD_LOOP:	call	jCF_RD_CMD
+	or a
+	jr nz,CF_SYSLD_ERR
+	ld hl,(CFSECT_BUF)
+	ld bc,$0200
+	add hl,bc
+	ld (CFSECT_BUF),hl
+	ld a,h
+	cp a,$00			; keep going till loaded to $ffff
+	jr z,CF_SYSLD_END
+	ld hl,(CF_LBA0)
+	inc hl
+	ld (CF_LBA0),hl
+	jr CF_SYSLD_LOOP
+
+CF_SYSLD_END: call CON_PRT_STR_SP
+zoWarnFlow = false
+	db $0d,$0a,"CF SYSLD success ",$0d,$0a,0
+zoWarnFlow = true
+	pop hl
+	xor a
+	ret
+
+CF_SYSLD_ERR:	call jCON_PRT_STR_SP
+zoWarnFlow = false
+	db $0d,$0a,"CF SYSLD error ",$0d,$0a,0
+zoWarnFlow = true
+	pop hl
+	xor a
+	dec a
+	ret

@@ -162,10 +162,7 @@ CFSECDG:	LD		A,(CF_LBA3)
 ;Function: Write a sector from RAM buffer.
 ;***************************************************************************	
 
-CF_WRITE:	LD 		A,(CF_SECCNT)
-	OUT 	(CFSECCO),A					;Number of sectors at a time (512 bytes)
-	CALL 	jCF_LP_BUSY
-	CALL	jCF_WR_CMD
+CF_WRITE:	CALL	jCF_WR_CMD
 
 	RET
 	
@@ -337,38 +334,50 @@ zoWarnFlow = false
 zoWarnFlow = true
 	ret
 
-CF_RD_32k:	ld hl,0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Read multiple sectors with count given in DE
+; Once DE reaches 0 - reading ends
+; CLOBBERS HL, DE, BC, A
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CF_RD_MULT:	ld hl,0	; enter here to start reading from sector 0
 	ld (CF_LBA0),hl
-	ld hl,$5000
+	ld hl,CFSECT_BUF_V	; set sector in CF_LBA0 to desired value and enter here to start loading into CFSECT_BUF_V
 	ld (CFSECT_BUF),hl
-	ld a,1
+	ld a,1			; set desired start sector an buffer start and enter here
 	ld (CF_SECCNT),a
-CF_RD_32k_LOOP:	call	jCF_RD_CMD
+	ld a,e
+	add a,e
+	ld b,a
+	ld c,0
+	add hl,bc
+	jr c,CF_RD_MULT_ERR	; error if adding sector count * $200 to start address results in flipping past $ffff
+CF_RD_MULT_LOOP:	call	jCF_RD_CMD
 	or a
-	jr nz,CF_RD_32k_ERR
+	jr nz,CF_RD_MULT_ERR
 	ld hl,(CFSECT_BUF)
 	ld bc,$0200
 	add hl,bc
 	ld (CFSECT_BUF),hl
-	ld a,h
-	cp a,$d0
-	jr z,CF_RD_32k_END
 	ld hl,(CF_LBA0)
 	inc hl
 	ld (CF_LBA0),hl
-	jr CF_RD_32k_LOOP
+	dec de
+	ld a,d
+	or e
+	jr z,CF_RD_MULT_END	; return if done reading desired sector count
+	jr CF_RD_MULT_LOOP
 
-CF_RD_32k_END: call jCON_PRT_STR_SP
+CF_RD_MULT_END: call jCON_PRT_STR_SP
 zoWarnFlow = false
-	db "CF card read success ",$0d,$0a,0
+	db $0d,$0a,"CF card read success ",$0d,$0a,0
 zoWarnFlow = true
 	xor a
 	ret
 
 
-CF_RD_32k_ERR:	call jCON_PRT_STR_SP
+CF_RD_MULT_ERR:	call jCON_PRT_STR_SP
 zoWarnFlow = false
-	db "CF card read error ",$0d,$0a,0
+	db $0d,$0a,"CF card read error ",$0d,$0a,0
 zoWarnFlow = true
 	xor a
 	dec a
