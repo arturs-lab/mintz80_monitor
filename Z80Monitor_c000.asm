@@ -8,7 +8,7 @@
 ;***************************************************************************
 
 VERSMYR:    EQU     "1"
-VERSMIN:    EQU     "2"
+VERSMIN:    EQU     "3"
 
             INCLUDE "CONSTANTS.asm" ; copy or edit one of the 
                                   ; CONSTANTS-aaaa-pp.asm files to
