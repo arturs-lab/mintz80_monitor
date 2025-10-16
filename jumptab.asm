@@ -5,6 +5,7 @@
 ;***************************************************************************
 JUMPTABR:		; jump table in ROM to be copied to JUMPTAB in RAM
 jJUMPTAB_INIT:	jp JUMPTAB_INIT
+jCON_RX_CHK	jp CON_RX_CHK
 jCON_RX		jp CON_RX
 jCON_TX		jp CON_TX
 jCON_PRT_STR_SP	jp CON_PRT_STR_SP
@@ -33,7 +34,6 @@ jymzwr		jp ymzwr
 jymzsetreg		jp ymzsetreg
 jepp_prep		jp epp_prep
 jepp_upda		jp epp_upda
-jepp_prog		jp epp_prog
 jCTC_INIT_ALL	jp CTC_INIT_ALL
 jCTC0_INIT		jp CTC0_INIT
 jCTC1_INIT		jp CTC0_INIT

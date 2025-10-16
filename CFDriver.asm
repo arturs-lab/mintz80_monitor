@@ -325,3 +325,126 @@ zoWarnFlow = true
 	xor a
 	dec a
 	ret
+
+CF_BOOT:	call CF_INIT		; initialize CF
+	ret nz		; if error, just go to main loop
+	call 	CF_RD_CMD
+	jp nz,CF_READ_ERR
+	ld hl,(CFSECT_BUF)
+	ld a,(hl)
+	cp a,"Z"			; check if first byte = "Z"
+	jp nz,CF_SECT_ERR	; no, invalid CF
+	inc hl
+	ld a,(hl)
+	cp a,$80			; check if 2nd byte = $80
+	jp nz,CF_SECT_ERR	; no, invalid CF
+
+	inc hl
+	ld a,(hl)
+	cp a,0
+	jp z,CF_LD_SYS		; if (CFSECT_BUF + 2) = 0 then no code to run, but we have valid CF signature, so load system sectors
+	cp a,$ff
+	jp z,CF_LD_SYS		; if (CFSECT_BUF + 2) = $ff then no code to run, but we have valid CF signature, so load system sectors
+
+	; otherwise presume this may be a valid code that can be jumped to
+	call CON_PRT_STR_SP	; see if user wants to jump to it
+zoWarnFlow = false
+	db "CF MBR executable found at ",0
+zoWarnFlow = true
+	call CON_PRINTHWORD
+	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db $0d,$0a,"Run it? (y/n) ",$0d,$0a,0
+zoWarnFlow = true
+	call CON_GET_CHAR
+	cp a,"Y"
+	jr nz, CF_LD_SYS
+	call jphl
+	ret		; after executing code from CF go to main loop. Unless code from CF does something else
+
+CF_LD_SYS:		call CON_PRT_STR_SP	; see if user wants to jump to it
+zoWarnFlow = false
+	db "CF Loading SYS sectors",0
+zoWarnFlow = true
+	ld hl,(CFSECT_BUF)	; save this in HL now because call that follows will destroy it
+	call CF_SYSLD		; load rest of CF sectors into $c200-$ffff, this call destroys value of CFSECT_BUF
+	ret nz		; if failed loading system, jump to main monitor loop
+	ld bc,$0200
+	add hl,bc
+	ld a,(hl)
+	cp a,0			; if (CFSECT_BUF + $0200) = 0 then no code to run
+	ret z
+	cp a,$ff			; if (CFSECT_BUF + $0200) = $ff then no code to run
+	ret z		; otherwise presume this may be a valid code that can be jumped to
+	call jCON_PRT_STR_SP
+zoWarnFlow = false
+	db "CF SYS executable found at ",0
+zoWarnFlow = true
+	call CON_PRINTHWORD
+	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db $0d,$0a,"Run it? (y/n) ",$0d,$0a,0
+zoWarnFlow = true
+	call CON_GET_CHAR
+	cp a,"Y"
+	jp nz, CF_LD_PART
+	call jphl
+	ret		; after executing code from CF go to main loop. Unless code from CF does something else
+
+CF_LD_PART: ld hl,0	; lastly check if active partition has code to run and offer to run it
+	ld (CF_LBA0),hl
+	ld hl,CFSECT_BUF_V
+	ld (CFSECT_BUF),hl
+	ld a,1
+	ld (CF_SECCNT),a
+	call CF_RD_CMD		;get 0 sector
+	call CF_SETUP_PART
+	ret nz		; skip to monitor if failed to find partition
+	call CF_RD_CMD		;get first sector of active partition
+
+	ld hl,(CFSECT_BUF)
+	ld bc,$003e
+	add hl,bc
+	ld a,(hl)
+	cp a,"Z"			; check if first byte = "Z"
+	jp nz,CF_SECT_ERR	; no, invalid CF
+	inc hl
+	ld a,(hl)
+	cp a,$80			; check if 2nd byte = $80
+	jp nz,CF_SECT_ERR	; no, invalid CF
+
+	inc hl
+	ld a,(hl)
+	cp a,0
+	ret z		; if (CFSECT_BUF + 2) = 0 then no code to run, jump to monitor
+	cp a,$ff
+	ret z		; if (CFSECT_BUF + 2) = $ff then no code to run, jump to monitor
+
+	; otherwise presume this may be a valid code that can be jumped to
+	call CON_PRT_STR_SP	; see if user wants to jump to it
+zoWarnFlow = false
+	db "CF active partition with executable found at ",0
+zoWarnFlow = true
+	call CON_PRINTHWORD
+	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db $0d,$0a,"Run it? (y/n) ",$0d,$0a,0
+zoWarnFlow = true
+	call CON_GET_CHAR
+	cp a,"Y"
+	ret nz	; if not "Y", go to monitor
+	call jphl
+	ret		; after executing code from CF go to main loop. Unless code from CF does something else
+
+
+CF_READ_ERR:	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db "CF card read error ",$0d,$0a,0
+zoWarnFlow = true
+	ret
+
+CF_SECT_ERR:	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db "CF card no magic",$0d,$0a,0
+zoWarnFlow = true
+	ret

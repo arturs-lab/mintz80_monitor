@@ -87,7 +87,7 @@ UART_TX:		CALL  UART_TX_RDY			;Make sure UART is ready to receive
 				
 ;***************************************************************************
 ;UART_RX_READY
-;Function: Check if UART is ready to receive
+;Function: Wait for UART to receive a byte
 ;***************************************************************************
 UART_RX_RDY:	PUSH 	AF					
 UART_RXRDY_LP:			

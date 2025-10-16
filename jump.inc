@@ -1,35 +1,35 @@
 		include "CONSTANTS.asm"
 
 jJUMPTAB_INIT:	equ JUMPTAB+$00	; initialize jump table
-jCON_RX		equ JUMPTAB+$03	; receive char on console
-jCON_TX		equ JUMPTAB+$06	; send char on console
-jCON_PRT_STR_SP	equ JUMPTAB+$09	; print string pointed to by stack
-jCON_PRT_STR:	equ JUMPTAB+$0c	; print string pointed to by HL
-jCON_PRT_CHAR:	equ JUMPTAB+$0f	; print character
-jCON_PRT_NL:	equ JUMPTAB+$12	; print CR LF
-jCON_GET_CHAR	equ JUMPTAB+$15	; get character
-jCON_CHAR_ISHEX	equ JUMPTAB+$18	; is character valid hex
-jCON_GETHEXNIB	equ JUMPTAB+$1b	; get hex nibble
-jCON_GETHEXBYTE	equ JUMPTAB+$1e	; get hex byte
-jCON_GETHEXWORD	equ JUMPTAB+$21	; get hex word
-jCON_NIB2CHAR	equ JUMPTAB+$24	; nibble to character
-jCON_SHFTNIB	equ JUMPTAB+$27
-jCON_PRINTHNIB:	equ JUMPTAB+$2a
-jCON_PRINTHBYTE:	equ JUMPTAB+$2d
-jCON_PRINTHWORD:	equ JUMPTAB+$30
-jCON_CHAR2NIB	equ JUMPTAB+$33
-jCON_CHARS2BYTE	equ JUMPTAB+$36
-jCON_TO_UPPER	equ JUMPTAB+$39
-jdel00		equ JUMPTAB+$3c
-jdelay		equ JUMPTAB+$3f
-jchime		equ JUMPTAB+$42
-jbeep		equ JUMPTAB+$45
-jymzinit	equ JUMPTAB+$48
-jymzwr		equ JUMPTAB+$4b
-jymzsetreg	equ JUMPTAB+$4e
-jepp_prep	equ JUMPTAB+$51
-jepp_upda	equ JUMPTAB+$54
-jepp_prog	equ JUMPTAB+$57
+jCON_RX_CHK:	equ JUMPTAB+$03	; non-blocking check if char is available in console buffer
+jCON_RX		equ JUMPTAB+$06	; receive char on console
+jCON_TX		equ JUMPTAB+$09	; send char on console
+jCON_PRT_STR_SP	equ JUMPTAB+$0c	; print string pointed to by stack
+jCON_PRT_STR:	equ JUMPTAB+$0f	; print string pointed to by HL
+jCON_PRT_CHAR:	equ JUMPTAB+$12	; print character
+jCON_PRT_NL:	equ JUMPTAB+$15	; print CR LF
+jCON_GET_CHAR	equ JUMPTAB+$18	; get character
+jCON_CHAR_ISHEX	equ JUMPTAB+$1b	; is character valid hex
+jCON_GETHEXNIB	equ JUMPTAB+$1e	; get hex nibble
+jCON_GETHEXBYTE	equ JUMPTAB+$21	; get hex byte
+jCON_GETHEXWORD	equ JUMPTAB+$24	; get hex word
+jCON_NIB2CHAR	equ JUMPTAB+$27	; nibble to character
+jCON_SHFTNIB	equ JUMPTAB+$2a
+jCON_PRINTHNIB:	equ JUMPTAB+$2d
+jCON_PRINTHBYTE:	equ JUMPTAB+$30
+jCON_PRINTHWORD:	equ JUMPTAB+$33
+jCON_CHAR2NIB	equ JUMPTAB+$36
+jCON_CHARS2BYTE	equ JUMPTAB+$39
+jCON_TO_UPPER	equ JUMPTAB+$3c
+jdel00		equ JUMPTAB+$3f
+jdelay		equ JUMPTAB+$42
+jchime		equ JUMPTAB+$45
+jbeep		equ JUMPTAB+$48
+jymzinit	equ JUMPTAB+$4b
+jymzwr		equ JUMPTAB+$4e
+jymzsetreg	equ JUMPTAB+$51
+jepp_prep	equ JUMPTAB+$54
+jepp_upda	equ JUMPTAB+$57
 jCTC_INIT_ALL	equ JUMPTAB+$5a
 jCTC0_INIT	equ JUMPTAB+$5d
 jCTC1_INIT	equ JUMPTAB+$60
