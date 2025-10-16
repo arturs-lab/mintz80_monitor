@@ -42,6 +42,7 @@ epp_upda:	push hl
 		CP E_NONE
 		jr NZ,epp_upd1		; skip if invalid entry
 		ld (epp_tmp+epp_tgta-epp_prog+1),hl
+		LD (MVADDR+0), HL
 
 		; update byte count
 epp_upd1:	ld hl,epp_numbyte
@@ -51,6 +52,8 @@ epp_upd1:	ld hl,epp_numbyte
 		CP E_NONE
 		jr NZ,epp_upd2		; skip if invalid entry
 		ld (epp_tmp+epp_lena-epp_prog+1),hl
+		add hl,(MVADDR+0)
+		LD (MVADDR+2), HL
 
 		; update target page
 epp_upd2:	ld hl,epp_page
@@ -126,10 +129,10 @@ epp_exit:	ld (MONVARS+$f0),hl
 		pop de
 		pop hl
 	if def ROM_BOTTOM_c000
-		ret
+		jp CCKSM_DO
 	else
 		if def ROM_BOTTOM_a000
-		ret
+		jp CCKSM_DO
 		else
 		jp $0000		; since we've potentially changed the location of code that got us here, just start over
 		endif

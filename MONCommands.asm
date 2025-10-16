@@ -495,7 +495,7 @@ CCKSM_COMMAND:	LD		HL, CCKSM_1
         INC	HL
         LD      (MVADDR+2), HL
         
-        LD      BC, (MVADDR+0)  ; starting point
+CCKSM_DO: LD      BC, (MVADDR+0)  ; starting point
         LD      DE, (MVADDR+2)  ; end point
         LD      HL, 0           ; the checksum value
         LD      A, 0
