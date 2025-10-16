@@ -1,14 +1,16 @@
 ; Constants, extracted to make the versioned file hardware agnostic
 
-; ### MEM map
-ROM_BOTTOM: EQU    00000h       ; Bottom address of ROM
-ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
+SCAN:        EQU     005FEh
 
+; ### MEM map
 RAM_BOTTOM: EQU    02000H       ; Bottom address of RAM
 RAM_TOP:     EQU    $ffff
 
 
 	if def ROM_BOTTOM_c000
+ROM_BOTTOM: EQU    $c000       ; Bottom address of ROM
+ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
+
 JUMPTAB:	EQU	RAM_TOP - $2FF	; jump table for monitor routines
 IRQTAB:	EQU	RAM_TOP - $3FF	; interrupt vector table
 SP_INIT	EQU 0				; initial value of SP
@@ -17,6 +19,9 @@ MONVARS	EQU	RAM_TOP - $1ff	; SP goes at the top of memory. Put monitor vars and 
 epp_tmp:	equ RAM_TOP - $ff	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
 	else
 		if def ROM_BOTTOM_a000
+ROM_BOTTOM: EQU    $a000       ; Bottom address of ROM
+ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
+
 JUMPTAB:	EQU $c000 - $300	; jump table for monitor routines
 IRQTAB:	EQU $c000 - $400	; interrupt vector table
 SP_INIT	EQU $c000			; initial value of SP
@@ -24,6 +29,9 @@ CFSECT_BUF_V	EQU $C000		; value for CFSECT_BUF variable. Defaults to $c000 in pr
 MONVARS	EQU $c000 - $200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	equ $c000 - $100	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
 		else
+ROM_BOTTOM: EQU    00000h       ; Bottom address of ROM
+ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
+
 JUMPTAB:	EQU	RAM_BOTTOM + $0000	; jump table for monitor routines
 IRQTAB:	EQU	RAM_BOTTOM + $0100	; interrupt vector table
 SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
