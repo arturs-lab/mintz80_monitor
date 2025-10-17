@@ -52,7 +52,8 @@ epp_upd1:	ld hl,epp_numbyte
 		CP E_NONE
 		jr NZ,epp_upd2		; skip if invalid entry
 		ld (epp_tmp+epp_lena-epp_prog+1),hl
-		add hl,(MVADDR+0)
+		ld bc,(MVADDR+0)
+		add hl,bc
 		LD (MVADDR+2), HL
 
 		; update target page
@@ -87,6 +88,8 @@ epp_p1:	ld a,b		; check if remaining bytes = 0
 		or c
 		jr z,epp_exit	; yes, end the procedure
 		ld a,(de)		; no, fetch next byte
+		cp (hl)		; compare with EEPROM content
+		jr z,epp_p4	; skip programming if already equal
 		ld (hl),a		; store it in target address
 		jr epp_p3
 epp_p2:	push af		; save programmed byte
@@ -101,7 +104,7 @@ epp_del1:	dec a
 epp_p3:	out (beepr),a
 		cp (hl)		; compare with EEPROM content
 		jr nz,epp_p2	; repeat till readback = programmed data
-		inc hl
+epp_p4:	inc hl
 		inc de
 		dec bc
 	if def ROM_BOTTOM_a000
