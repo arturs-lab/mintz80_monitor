@@ -40,11 +40,11 @@ NMI:		jp IRQTAB+(NMIV-IRQTABR)
 
 
 ; we want all drivers at the beginning so they stay the same even if we remove monitor code
-		include "eeprom_prog.asm";
+		include "EEPROMProg.asm";
 		include "CTCDriver.asm"
 		include "SIODriver.asm"
 		include "PIODriver.asm"
-		include "ymzdrvr.asm";
+		include "YMZDrvr.asm";
 
 		INCLUDE "CFDriver.asm"
 		INCLUDE	"CONIO.asm"		; use UART for console
