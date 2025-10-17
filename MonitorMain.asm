@@ -277,6 +277,8 @@ MON_COMMAND:    ; Inserted ERROR_CHK for all commands requiring input
         CALL    CLEAR_ERROR
         CP      "?"
         CALL    Z,HELP_COMMAND
+        CP      "A"
+        CALL    Z,hex_compare
         CP      "D"
         CALL    Z,MDCMD
         CP      "C"
