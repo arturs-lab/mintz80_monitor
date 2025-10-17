@@ -170,35 +170,35 @@ FB51	di			; make sure interrupts turned off
 	and a,$7f
 	jr prs
 prsp:	add a," "
-prs:	call jUART_TX
+prs:	call jCON_TX
 	ld a," "
-	call jUART_TX
+	call jCON_TX
 	call	FC9D		; process it
 	ld	hl,CHAMUSICPTR	; channel A music data address
 	call	FBD0		; get note and reg value
 	ld a,"#"
 	add b
-	call jUART_TX
+	call jCON_TX
 	ld a," "
-	call jUART_TX
+	call jCON_TX
 	ld	a,$01		; channel number
 	call	FBF4
 	ld	hl,CHBMUSICPTR	; channel B music data address
 	call	FBD0		; get note and reg value
 	ld a,"#"
 	add b
-	call jUART_TX
+	call jCON_TX
 	ld a," "
-	call jUART_TX
+	call jCON_TX
 	ld	a,$02		; channel number
 	call	FBF4
 	ld	hl,CHCMUSICPTR	; channel C music data address
 	call	FBD0		; get note and reg value
 	ld a,"#"
 	add b
-	call jUART_TX
+	call jCON_TX
 	ld a," "
-	call jUART_TX
+	call jCON_TX
 	ld	a,$03		; channel number
 	call	FBF4
 	call jCON_PRT_NL
@@ -619,7 +619,7 @@ FDD5	ld	hl,RAMPLIT	; point to amplitudes table
 	ret
 
 rtrn	ld e,$ff
-	call jUART_RX_CHK
+	call jCON_RX_CHK
 	add $ff
 	ld e,a
 	ret
