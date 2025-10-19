@@ -133,12 +133,10 @@ epp_exit:	ld (MONVARS+$f0),hl
 		pop hl
 	if def ROM_BOTTOM_c000
 		jp CCKSM_DO
-	else
-		if def ROM_BOTTOM_a000
+	elseif def ROM_BOTTOM_a000
 		jp CCKSM_DO
-		else
+	else
 		jp $0000		; since we've potentially changed the location of code that got us here, just start over
-		endif
 	endif
 
 epp_switch:	in a,(memmap)	; call this at $ffnn after executing epp_prep
