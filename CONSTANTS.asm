@@ -8,6 +8,7 @@ RAM_TOP:     EQU    $ffff
 
 
 	if def ROM_BOTTOM_c000
+
 ROM_BOTTOM: EQU    $c000       ; Bottom address of ROM
 ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 
@@ -17,8 +18,9 @@ SP_INIT	EQU 0				; initial value of SP
 CFSECT_BUF_V	EQU $A000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
 MONVARS	EQU	RAM_TOP - $1ff	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	equ RAM_TOP - $ff	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
-	else
-		if def ROM_BOTTOM_a000
+
+	elseif def ROM_BOTTOM_a000
+
 ROM_BOTTOM: EQU    $a000       ; Bottom address of ROM
 ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 
@@ -28,7 +30,9 @@ SP_INIT	EQU $c000			; initial value of SP
 CFSECT_BUF_V	EQU $C000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
 MONVARS	EQU $c000 - $200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	equ $c000 - $100	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
-		else
+
+	else
+
 ROM_BOTTOM: EQU    00000h       ; Bottom address of ROM
 ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 
@@ -38,7 +42,7 @@ SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
 CFSECT_BUF_V	EQU $C000			; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
 MONVARS	EQU	RAM_BOTTOM + $0200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
-		endif
+
 	endif
 
 
@@ -136,8 +140,8 @@ memmap:	equ 	$d8	; memory map $d8-$df
 ; CTC time constants values
 CTC_CH0_TV:	EQU $9c
 CTC_CH1_TV:	EQU $9c
-CTC_CH2_TV:	EQU $68	; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
-CTC_CH3_TV:	EQU $d0
+CTC_CH2_TV:	EQU $f0	;$68	; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
+CTC_CH3_TV:	EQU $f0	;$d0	; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 
 ; SIO interrupt vector
 SIO_INT_VECT	EQU $0
@@ -172,10 +176,10 @@ HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 
 
 ;$0000-$1fff ROM	d8
-;$2000-$3fff RAM	d9
-;$4000-$5fff RAM	da
-;$6000-$7fff RAM	db
-;$8000-$9fff RAM	dc
-;$a000-$bfff RAM	dd
-;$c000-$dfff RAM	de
-;$e000-$ffff RAM	df
+;$2000-$3fff RAM	d9 00->rom1, 02->rom4
+;$4000-$5fff RAM	da 00->rom0, 02->rom2
+;$6000-$7fff RAM	db 00->rom1, 02->rom4
+;$8000-$9fff RAM	dc 00->rom0, 02->rom2
+;$a000-$bfff RAM	dd 00->rom1, 02->rom4
+;$c000-$dfff RAM	de 00->rom0, 02->rom2
+;$e000-$ffff RAM	df 00->rom1, 02->rom4
