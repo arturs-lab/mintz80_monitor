@@ -8,6 +8,8 @@
 ;  Changed to use Z80 SIO
 ;***************************************************************************
 
+CONIO_SIO:	equ true
+
 ;***************************************************************************
 ; CON_RX_CHK
 ;Function: non-blocking check if char is available in SIOA buffer
