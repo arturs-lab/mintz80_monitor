@@ -16,6 +16,12 @@ ROM_BOTTOM_a000	equ true
 
 endprog	equ $
 
+	if def CONIO_SIO
+	output_bin "z80monitor_a000_SIO.bin",ROM_BOTTOM,endprog-ROM_BOTTOM	; 
+	output_intel "z80monitor_a000_SIO.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
+	output_list "z80monitor_a000_SIO.lst"
+	else
 	output_bin "z80monitor_a000.bin",ROM_BOTTOM,endprog-ROM_BOTTOM	; 
 	output_intel "z80monitor_a000.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
 	output_list "z80monitor_a000.lst"
+	endif
