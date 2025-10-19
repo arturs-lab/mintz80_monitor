@@ -354,11 +354,13 @@ zoWarnFlow = true
 	call CON_PRINTHWORD
 	call CON_PRT_STR_SP
 zoWarnFlow = false
-	db $0d,$0a,"Run it? (y/n) ",$0d,$0a,0
+	db $0d,$0a,"Run it? (y/n/q) ",$0d,$0a,0
 zoWarnFlow = true
 	call CON_GET_CHAR
+	cp a,"N"
+	jr z, CF_LD_SYS
 	cp a,"Y"
-	jr nz, CF_LD_SYS
+	ret nz
 	call jphl
 	ret		; after executing code from CF go to main loop. Unless code from CF does something else
 
@@ -386,8 +388,10 @@ zoWarnFlow = false
 	db $0d,$0a,"Run it? (y/n) ",$0d,$0a,0
 zoWarnFlow = true
 	call CON_GET_CHAR
+	cp a,"N"
+	jr z, CF_LD_PART
 	cp a,"Y"
-	jp nz, CF_LD_PART
+	ret nz
 	call jphl
 	ret		; after executing code from CF go to main loop. Unless code from CF does something else
 
