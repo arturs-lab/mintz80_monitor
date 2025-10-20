@@ -79,21 +79,26 @@ ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 byt
 ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
 MSGBUF:     EQU    UPLOADBUF
 
+; CTC prescaler value locations
+CTC_CH0_CNF	equ MONVARS + $f8
+CTC_CH1_CNF	equ MONVARS + $f9
+CTC_CH2_CNF	equ MONVARS + $fa
+CTC_CH3_CNF	equ MONVARS + $fb
 ; location of time constant values for CTC channels
-CTC_CH0_TC	equ	MONVARS + $fc		; time constant for channel 0
+CTC_CH0_TC	equ	MONVARS + $fc		; time constant for channel 0 system interrupt 200Hz
 CTC_CH1_TC	equ	MONVARS + $fd		; time constant for channel 1
-CTC_CH2_TC	equ	MONVARS + $fe		; time constant for channel 2
-CTC_CH3_TC	equ	MONVARS + $ff		; time constant for channel 3
+CTC_CH2_TC	equ	MONVARS + $fe		; time constant for channel 2 this feeds SIOB
+CTC_CH3_TC	equ	MONVARS + $ff		; time constant for channel 3 this feeds SIOA
 
 
 ; ### IO map
 ;IOM-MPF-IP ports:
 UART_BASE:  EQU    008h         ; Base port address, P8250A/USART uses 2 ports.
 CTC_BASE:   EQU    010H         ; Base port address for Z80 CTC, only CTC2 is used. 64h
-CTC_CH0:	equ CTC_BASE
+CTC_CH0:	equ CTC_BASE		; system interrupt 200Hz
 CTC_CH1:	equ CTC_BASE+1
-CTC_CH2:	equ CTC_BASE+2
-CTC_CH3:	equ CTC_BASE+3
+CTC_CH2:	equ CTC_BASE+2		; this feeds SIOB
+CTC_CH3:	equ CTC_BASE+3		; this feeds SIOA
 SIO_BASE:	EQU  018h			; SIO port
 SIO_DA      equ SIO_BASE
 SIO_CA      equ SIO_BASE+1
@@ -137,11 +142,16 @@ memmap:	equ 	$d8	; memory map $d8-$df
 
 ; ### other
 
+; CTC config values
+CTC_CH0_CNFV:	equ 00100111b
+CTC_CH1_CNFV:	equ 00000111b
+CTC_CH2_CNFV:	equ 01110111b
+CTC_CH3_CNFV:	equ 01110111b
 ; CTC time constants values
-CTC_CH0_TV:	EQU 180
+CTC_CH0_TV:	EQU 180	; system interrupt, 200Hz
 CTC_CH1_TV:	EQU $b4
-CTC_CH2_TV:	EQU $3c	; 2400 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
-CTC_CH3_TV:	EQU $3c	; 2400 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
+CTC_CH2_TV:	EQU $3c	; SIOB 2400 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
+CTC_CH3_TV:	EQU $3c	; SIOA 2400 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 
 ; SIO interrupt vector
 SIO_INT_VECT	EQU $0

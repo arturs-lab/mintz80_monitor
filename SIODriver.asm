@@ -8,7 +8,7 @@
 		
 ; initialize both SIO channels
 SIO_INIT:	call SIOA_INIT	; first init SIO A
-		call SIOB_INIT	; first init SIO A
+		call SIOB_INIT	; then SIOB
 		call jSIO_A_INT_SET	; initialize SIOA interrupts
 		call jSIO_A_EI		; more interrupt code
 		ret
