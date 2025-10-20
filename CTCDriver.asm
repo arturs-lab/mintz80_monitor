@@ -43,13 +43,11 @@ CTC3_INIT:	ld a,(CTC_CH3_CNF)      ; interrupt off, counter mode, prescaler=256 
         ret
 
 
-CTC_TC_INIT: ld a,CTC_CH0_TV
-		ld (CTC_CH0_TC),a
-		ld a,CTC_CH1_TV
-		ld (CTC_CH1_TC),a
-		ld a,CTC_CH2_TV
-		ld (CTC_CH2_TC),a
-		ld a,CTC_CH3_TV
-		ld (CTC_CH3_TC),a
-
+CTC_TC_INIT: ld hl,CTC_DEFAULTS
+		ld de,CTC_CH0_CNF
+		ld b,8
+		ldir
 		ret
+
+CTC_DEFAULTS: db CTC_CH0_CNFV,CTC_CH1_CNFV,CTC_CH2_CNFV,CTC_CH3_CNFV
+			CTC_CH0_TV,CTC_CH1_TV,CTC_CH2_TV,CTC_CH3_TV
