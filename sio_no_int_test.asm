@@ -42,7 +42,7 @@ main:		call setPIO         ; set PIO
         ld a,$20      ; load initial LED pattern into RAM
         ld (RAMCELL),a
 
-		ld b,$20
+		ld b,$60
 
 ; print welcome string
 		ld hl,hlo
@@ -103,6 +103,28 @@ loop3:  dec c
         jr nz, loop1
         pop bc
         ret
+
+reconfig:	ld a,00000100b      ; write into WR0: select WR4
+	out (SIO_CA),a
+	ld a,01000100b      ; write into WR4: presc. 16x, 1 stop bit, no parity
+	out (SIO_CA),a
+;	ld a,$1e			; $1e = 4800 baud
+;	ld a,$3c			; $3c = 2400 baud
+	ld a,$78			; $78 = 1200 baud
+	ld (CTC_CH2_TC),a
+	ld (CTC_CH3_TC),a
+	call jCTC2_INIT
+	call jCTC3_INIT
+
+	ret
+
+	ld a,01110111b      ; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
+                         ; start upon loading time constant, time constant follows,sw reset, command word
+	out (CTC_CH2),a
+	ld A,(CTC_CH2_TC)           ; time constant 
+	out (CTC_CH2),a         ; loaded into channel 3 which drives SIOA
+	ret
+
 
 endprog	equ $
 
