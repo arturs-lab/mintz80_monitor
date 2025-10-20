@@ -14,6 +14,12 @@
 
 endprog	equ $
 
-	output_bin "z80monitor.bin",0,endprog    ; 
-	output_intel "z80monitor.hex",0,endprog    ;
+	if def USE_UART
+	output_bin "z80monitor_UART.bin",ROM_BOTTOM,endprog-ROM_BOTTOM	; 
+	output_intel "z80monitor_UART.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
+	output_list "z80monitor_UART.lst"
+	else
+	output_bin "z80monitor.bin",ROM_BOTTOM,endprog-ROM_BOTTOM	; 
+	output_intel "z80monitor.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
 	output_list "z80monitor.lst"
+	endif

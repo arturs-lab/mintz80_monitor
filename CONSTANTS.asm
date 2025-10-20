@@ -1,16 +1,16 @@
 ; Constants, extracted to make the versioned file hardware agnostic
 
-SCAN:        EQU     005FEh
+USE_UART	EQU true
 
 ; ### MEM map
-RAM_BOTTOM: EQU    02000H       ; Bottom address of RAM
-RAM_TOP:     EQU    $ffff
+RAM_BOTTOM:	EQU    02000H       ; Bottom address of RAM
+RAM_TOP:		EQU    $ffff
 
 
 	if def ROM_BOTTOM_c000
 
-ROM_BOTTOM: EQU    $c000       ; Bottom address of ROM
-ROM_TOP:     EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
+ROM_BOTTOM:	EQU    $c000       ; Bottom address of ROM
+ROM_TOP:		EQU    ROM_BOTTOM + 01FFFh		; Top address of ROM
 
 JUMPTAB:	EQU	RAM_TOP - $2FF	; jump table for monitor routines
 IRQTAB:	EQU	RAM_TOP - $3FF	; interrupt vector table

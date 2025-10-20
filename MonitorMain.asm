@@ -47,8 +47,11 @@ NMI:		jp IRQTAB+(NMIV-IRQTABR)
 		include "YMZDrvr.asm";
 
 		INCLUDE "CFDriver.asm"
+	if def USE_UART
 		INCLUDE	"CONIO.asm"		; use UART for console
-;		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
+	else
+		INCLUDE	"CONIO_SIO.asm"		; use SIO for console
+	endif
 
 ; triangular progression delay
 ; at CPU CLK = 1.333MHz:
