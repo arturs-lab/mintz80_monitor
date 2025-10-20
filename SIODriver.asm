@@ -15,7 +15,7 @@ SIO_INIT:	call SIOA_INIT	; first init SIO A
 
 ;***************************************************************************
 ;SIOA_INIT
-;Function: Initialize the SIOA to BAUD Rate 4800 
+;Function: Initialize the SIOA to BAUD Rate 2400 
 ;the followings are settings for channel A
 ;***************************************************************************
 SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
@@ -24,7 +24,7 @@ SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
         out (SIO_CA),a
         ld a,00000100b      ; write into WR0: select WR4
         out (SIO_CA),a
-        ld a,00000100b      ; write into WR4: presc. 1x, 1 stop bit, no parity
+        ld a,01000100b      ; write into WR4: presc. 16x, 1 stop bit, no parity
         out (SIO_CA),a
         ld a,00000101b      ; write into WR0: select WR5
         out (SIO_CA),a
@@ -142,14 +142,12 @@ SIOA_TX:		CALL  SIOA_TX_RDY			;Make sure UART is ready to receive
 ;SIOA_RX_WAIT blocking
 ;Function: wait for SIOA to receive char
 ;***************************************************************************
-SIOA_RX_WAIT:	PUSH 	AF					
-SIOA_RX_WAIT_LP:	sub a               ;clear a, write into WR0: select RR0
+SIOA_RX_WAIT:	sub a               ;clear a, write into WR0: select RR0
 		out (SIO_CA),a
 		in a,(SIO_CA)       ;read RRx
 		bit 0,a
-		jr z,SIOA_RX_WAIT_LP	;if any rx char left in rx buffer
-			POP     AF
-			RET
+		jr z,SIOA_RX_WAIT	;if any rx char left in rx buffer
+		RET
 	
 ;***************************************************************************
 ;SIOA_RX_CHK

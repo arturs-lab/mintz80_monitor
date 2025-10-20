@@ -138,10 +138,10 @@ memmap:	equ 	$d8	; memory map $d8-$df
 ; ### other
 
 ; CTC time constants values
-CTC_CH0_TV:	EQU $9c
-CTC_CH1_TV:	EQU $9c
-CTC_CH2_TV:	EQU $f0	;$68	; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
-CTC_CH3_TV:	EQU $f0	;$d0	; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
+CTC_CH0_TV:	EQU 180
+CTC_CH1_TV:	EQU $b4
+CTC_CH2_TV:	EQU $3c	; 2400 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
+CTC_CH3_TV:	EQU $3c	; 2400 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 
 ; SIO interrupt vector
 SIO_INT_VECT	EQU $0
@@ -183,3 +183,9 @@ HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 ;$a000-$bfff RAM	dd 00->rom1, 02->rom4
 ;$c000-$dfff RAM	de 00->rom0, 02->rom2
 ;$e000-$ffff RAM	df 00->rom1, 02->rom4
+
+; current ROM:
+; 0 regular rom
+; 1 rom $a000
+; 2 rom $a000 SIO
+; 3 rom $c000

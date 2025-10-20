@@ -7,8 +7,8 @@ CTC_INIT_ALL: push af
 		pop af
 		ret
 
-;CH0 divides CPU CLK by (256*156) providing a clock signal at TO0. TO0 is connected to TRG1.
-; T01 outputs f= CPU_CLK/(256*156) => 4MHz / ( 256 * 156 ) => 100Hz
+;CH0 divides CPU CLK by (256*CTC_CH0_TC) providing a clock signal at TO0. TO0 is connected to TRG1.
+; T01 outputs f= CPU_CLK/(256*CTC_CH0_TC) => 9.216MHz / ( 256 * 180 ) => 200Hz
 CTC0_INIT:	ld a,00100111b      ; interrupt off; timer mode; prescaler=256; don't care ext; automatic trigger;
                             ; time constant follows; cont. operation; command word
         out (CTC_CH0),a
@@ -17,11 +17,11 @@ CTC0_INIT:	ld a,00100111b      ; interrupt off; timer mode; prescaler=256; don't
 
 ;init CH1
 ;CH1 disabled
-CTC1_INIT:	ld a,00000011b      ; interrupt off, timer mode, prescaler=16, don't care ext. TRG edge,
-                            ; start timer on loading constant, no time constant follows, software reset, command word
+CTC1_INIT:	ld a,00000111b      ; interrupt off, timer mode, prescaler=16, don't care ext. TRG edge,
+                            ; start timer on loading constant, time constant follows, software reset, command word
         out (CTC_CH1),a         ; CH1 is halted
-;        ld A,(CTC_CH1_TC)           ; time constant 56d
-;        out (CTC_CH1),a         ; loaded into channel 1
+        ld A,(CTC_CH1_TC)           ; time constant 56d
+        out (CTC_CH1),a         ; loaded into channel 1
 
 ;init CH2
 ;CH2 divides CLK/TRG2 clock providing a clock signal at TO2.
