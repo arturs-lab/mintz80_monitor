@@ -17,7 +17,8 @@ IRQTAB:	EQU	RAM_TOP - $3FF	; interrupt vector table
 SP_INIT	EQU 0				; initial value of SP
 CFSECT_BUF_V	EQU $A000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
 MONVARS	EQU	RAM_TOP - $1ff	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
-epp_tmp:	equ RAM_TOP - $ff	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+epp_tmp:	equ RAM_TOP - $ff	; this is where EEPROM programming code is copied before execution to avoid it
+						; clashing with new data being programmed into its location in EEPROM
 
 	elseif def ROM_BOTTOM_a000
 
@@ -29,7 +30,8 @@ IRQTAB:	EQU $c000 - $400	; interrupt vector table
 SP_INIT	EQU $c000			; initial value of SP
 CFSECT_BUF_V	EQU $C000		; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
 MONVARS	EQU $c000 - $200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
-epp_tmp:	equ $c000 - $100	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+epp_tmp:	equ $c000 - $100	; this is where EEPROM programming code is copied before execution to avoid it
+						; clashing with new data being programmed into its location in EEPROM
 
 	else
 
@@ -41,7 +43,8 @@ IRQTAB:	EQU	RAM_BOTTOM + $0100	; interrupt vector table
 SP_INIT	EQU RAM_BOTTOM + $0400	; initial value of SP
 CFSECT_BUF_V	EQU $C000			; value for CFSECT_BUF variable. Defaults to $c000 in preparation for CPM loader
 MONVARS	EQU	RAM_BOTTOM + $0200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
-epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to avoid it clashing with new data being programmed into its location in EEPROM
+epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to
+							; avoid it clashing with new data being programmed into its location in EEPROM
 
 	endif
 
