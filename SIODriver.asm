@@ -151,15 +151,13 @@ SIOA_RX_WAIT:	sub a               ;clear a, write into WR0: select RR0
 	
 ;***************************************************************************
 ;SIOA_RX_CHK
-;Function: Non-blocking receive char
-; returns 0 if no data or char if data present
+;Function: Non-blocking check for received byte present
+; returns 0 if no data or 1 if data present
 ;***************************************************************************
 SIOA_RX_CHK:	sub a               ;clear a, write into WR0: select RR0
 		out (SIO_CA),a
 		in a,(SIO_CA)       ;read RRx
-		bit 0,a
-		ret z			;if any rx char left in rx buffer
-		in a,(SIO_DA)       ;read that char
+		and 1
 		ret			; return status
 
 
