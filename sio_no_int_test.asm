@@ -128,6 +128,6 @@ reconfig:	ld a,00000100b      ; write into WR0: select WR4
 
 endprog	equ $
 
-	output_bin "sio_no_int_test.bin",main,endprog-main    ; 
+;	output_bin "sio_no_int_test.bin",main,endprog-main    ; 
 	output_intel "sio_no_int_test.hex",main,endprog-main    ;
 	output_list "sio_no_int_test.lst"
