@@ -32,12 +32,13 @@ IRQ:		ex af,af'
 
 irq_end:	ex af,af'
 		exx
+		ei
 irq_exit:	reti
 
             ORG ROM_BOTTOM + $66     ; nmi routine
 
 NMI:		jp IRQTAB+(NMIV-IRQTABR)
-
+nmi_end:	retn
 
 ; we want all drivers at the beginning so they stay the same even if we remove monitor code
 		include "EEPROMProg.asm";
@@ -162,20 +163,22 @@ MAIN:
 	ld a,$b1
 	out ($f1),a
 	ld sp,SP_INIT
+	ld a,$01
+	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority
 ;	call memmap_init
 	ld a,$20
 	call delay		; looks like Z80 needs this delay to successfully write to IO ports
 	ld a,$01		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
-	call ymzinit
 	call chime
+	call ymzinit
 	call IRQTAB_INIT	; copy interrupt jump table from (IRQTABR) in eeprom to (IRQTAB) in ram
 	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
 	call PIO_INIT		; init PIO
 	call CTC_INIT_ALL     ; init CTC
 	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
-	CALL UART_INIT		;Initialize UART
-	call CON_PRT_STR_SP	; see if user wants to jump to it
+	CALL UART_INIT		; Initialize UART
+	call CON_PRT_STR_SP	; print banner
 zoWarnFlow = false
 	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
 zoWarnFlow = true

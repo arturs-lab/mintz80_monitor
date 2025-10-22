@@ -45,7 +45,7 @@ CTC3_INIT:	ld a,(CTC_CH3_CNF)      ; interrupt off, counter mode, prescaler=256 
 
 CTC_TC_INIT: ld hl,CTC_DEFAULTS
 		ld de,CTC_CH0_CNF
-		ld b,8
+		ld bc,8
 		ldir
 		ret
 
