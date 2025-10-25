@@ -159,14 +159,19 @@ TAB_INIT:		ldir
 ;***************************************************************************
 MAIN:
 	di
+
 	ld a,$7b	; disable wdt
 	out ($f0),a
 	ld a,$b1
 	out ($f1),a
+
 	ld sp,SP_INIT
+
 	ld a,$01
-	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority
+	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority. section 3.9, page 149
+
 ;	call memmap_init
+
 	ld a,$20
 	call delay		; looks like Z80 needs this delay to successfully write to IO ports
 	ld a,$01		; (SYSCLK MHz/2/(value+1))
