@@ -26,7 +26,8 @@ R_PRT_STR:  JP      CON_PRT_STR    ; sends a NULL terminated string
 
             ORG ROM_BOTTOM + $38     ; IRQ routine
 
-IRQ:		ex af,af'
+IRQ:		di
+		ex af,af'
 		exx
 		jp IRQTAB+(IRQV-IRQTABR)
 
