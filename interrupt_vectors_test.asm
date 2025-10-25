@@ -15,32 +15,45 @@ main:	ld a,11001111b      ; mode 3 (bit control)
 	out (PIO_CA),a
 	ld a,$07			; disable interrupt
 	out (PIO_CA),a
-	ld a,PIOV			; set IM2 PIO vector
+
+	ld a,11001111b      ; mode 3 (bit control)
+	out (PIO_CB),a
+	ld a,$0			; set pins of port A to OUTPUT
+	out (PIO_CB),a
+	out (PIO_DB),a		; zero the output
+	ld a,PIOV+2		; set IM2 PIO vector
 	out (PIO_CB),a
 	ld a,$07			; disable interrupt
 	out (PIO_CB),a
 
 	ld a,00000001b      ; write into WR0: select WR1
 	out (SIO_CA),a
-	ld a,00000100b      ; write into WR0: status affects interrupt vectors
+	ld a,00000100b      ; write into WR1: status affects interrupt vectors
 	out (SIO_CA),a
 	ld a,00000001b      ; write into WR0: select WR1
 	out (SIO_CB),a
-	ld a,00000100b      ; write into WR0: status affects interrupt vectors
+	ld a,00000100b      ; write into WR1: status affects interrupt vectors
 	out (SIO_CB),a
 
 
-	ld a,high IRQTAB	; load high byte of interrupt vector table address
+	ld a,$0
+	out ($f4),a		; set INT priority order section 3.9, page 149
+
+	ld a,$24	;high IRQTAB	; load high byte of interrupt vector table address
 	ld i,a			; set interrupt vector for IM2
 	im 2				; enable interrupt mode 2
 
-	ld a,CTCV			; load CTC interrupt vector
-	out (CTC_CH0),a		; set CTC T0 to that vector
+	ld hl,$5000
+	ld de,$5001
+	ld bc,$ff
+	ld a,0
+	ld (hl),a
+	ldir
 
 	ld de,int_tgt
-	ld hl,IRQTAB
-	ld bc,$08
-	ld a,32
+	ld hl,$2400	;IRQTAB
+	ld bc,15
+	ld a,0
 
 intvinitl:	ld (hl),e		; initialize interrupt jump table
 	inc hl
@@ -52,20 +65,32 @@ intvinitl:	ld (hl),e		; initialize interrupt jump table
 	dec a
 	jr nz,intvinitl
 
-;	ld a,(CTC_CH0_CNF)	; get T0 configuration default
-;	or a,$80			; enable interrupt bit
-;;	and a,!$04			; no time constant follows
-;	out (CTC_CH0),a
-;	ld a,(CTC_CH0_TC)	; reset time constant
-;	out (CTC_CH0),a
 	xor a				; make sure A is 0
 	ret
 
-do_test:	xor a
-	ld sp,$23d0
-	ei
+do_test:	ld (SP_INIT-$100),sp
+	ld sp,SP_INIT-$30
+	ld hl,SP_INIT-$100+3
+	xor a
+	ld (hl),a
+	dec hl
+	ld (hl),a
+	ld ix,$5000
 
-int_test: nop	; give interrupt time to occur during nops rather than outside the loop
+	ld a,CTCV			; load CTC interrupt vector
+	out (CTC_CH0),a		; set CTC T0 to that vector
+
+	ld a,$27			; get T0 configuration default
+	or a,$80			; enable interrupt bit
+	and a,$ff			; no time constant follows
+	out (CTC_CH3),a
+	ld a,$54			; reset time constant
+	out (CTC_CH3),a
+
+int_test: 	ei
+;	out (PIO_DB),a
+;	inc (hl)
+	nop	; give interrupt time to occur during nops rather than outside the loop
 	nop
 	nop
 	nop
@@ -80,18 +105,23 @@ int_test: nop	; give interrupt time to occur during nops rather than outside the
 	di
 	push af
 	call jCON_RX_CHK
+	or a
 	jr z,cont
-	call jCON_RX
 	pop af
 	xor a
+;	inc (hl)
+	ld sp,(SP_INIT-$100)
 	ret
 cont:	pop af
-	ei
+;	ei
 	or a
 	jr z,int_test
 
+;	inc (hl)
+;	inc (hl)
 	out (PIO_DA),a
-	call jCON_PRINTHBYTE
+	di
+;	call jCON_PRINTHBYTE
 	ld a,"x"
 	call jCON_PRT_CHAR
 	call jCON_PRT_NL
@@ -99,11 +129,49 @@ cont:	pop af
 	or a
 	jr z,int_test
 	di
-	call jCON_RX
 	xor a
+	ld sp,(SP_INIT-$100)
 	ret
 
-im1:	ld hl,CTC_CH0_CNF
+tc0ei:	ld a,(CTC_CH3_CNF)	; get T0 configuration default
+	or a,$80			; enable interrupt bit
+	and a,$fb			; no time constant follows
+	out (CTC_CH3),a
+
+tc0di:	ld a,(CTC_CH3_CNF)	; get T0 configuration default
+	and a,$fb			; no time constant follows
+	out (CTC_CH3),a
+
+tc1ei:	ld a,(CTC_CH1_CNF)	; get T0 configuration default
+	or a,$80			; enable interrupt bit
+	and a,$fb			; no time constant follows
+	out (CTC_CH1),a
+
+tc1di:	ld a,(CTC_CH1_CNF)	; get T0 configuration default
+	and a,$fb			; no time constant follows
+	out (CTC_CH1),a
+
+tc2ei:	ld a,(CTC_CH2_CNF)	; get T0 configuration default
+	or a,$80			; enable interrupt bit
+	and a,$fb			; no time constant follows
+	out (CTC_CH2),a
+
+tc2di:	ld a,(CTC_CH2_CNF)	; get T0 configuration default
+	and a,$fb			; no time constant follows
+	out (CTC_CH2),a
+
+tc3ei:	ld a,(CTC_CH3_CNF)	; get T0 configuration default
+	or a,$80			; enable interrupt bit
+	and a,$fb			; no time constant follows
+	out (CTC_CH3),a
+
+tc3di:	ld a,(CTC_CH3_CNF)	; get T0 configuration default
+	and a,$fb			; no time constant follows
+	out (CTC_CH3),a
+
+
+im1:	im 1
+	ld hl,CTC_CH0_CNF
 	ld a,$27
 	ld (hl),a
 	inc hl
@@ -122,24 +190,27 @@ im1:	ld hl,CTC_CH0_CNF
 	ld ($211d),hl		; insert it into jump instruction of RST38 INT ISR code
 	ld a,(CTC_CH0_CNF)	; get T0 configuration default
 	or a,$80			; enable interrupt bit
-;	and a,!$04			; no time constant follows
+	and a,$ff			; $fb -> no time constant follows
 	out (CTC_CH0),a
 	ld a,(CTC_CH0_TC)	; reset time constant
 	out (CTC_CH0),a
-	im 1
 	xor a
 	ret
 
 doei:	ei
 	ret
 
-intsrvc:	out (beepr),a
+intsrvc:	di
+	out (beepr),a
+	in a,(PIO_DB)
+	xor a,$ff
+	out (PIO_DB),a
 ;	ld a,(CTC_CH0_CNF)	; get T0 configuration default
 ;	or a,$80			; enable interrupt bit
 ;;	and a,!$04			; no time constant follows
-;	out (CTC_CH0),a
-;	ld a,(CTC_CH0_TC)	; reset time constant
-;	out (CTC_CH0),a
+;	out (CTC_CH3),a
+;	ld a,(CTC_CH3_TC)	; reset time constant
+;	out (CTC_CH3),a
 	exx
 	ex af,af'
 	ei
@@ -155,205 +226,36 @@ bl1:	in a,($10)
 bl2:	ld b,a
 	jr bl1
 	
-int_tgt: ld a,1
-	call jCON_PRINTHBYTE
+int_tgt:
+value=0
+	repeat
+	di
+	in a,(PIO_DB)
+	xor a,$ff
+	out (PIO_DB),a
+	ld a,value+1
+; 	ld (SP_INIT-$100+3),a
+	inc (ix + value)
 	ei
 	reti
 
-	ld a,2
-	call jCON_PRINTHBYTE
+	value=value+1
+	until value=128
+
+value=0
+	repeat
+	di
+	in a,(PIO_DB)
+	xor a,$ff
+	out (PIO_DB),a
+	ld a,value+1-128
+; 	ld (SP_INIT-$100+3),a
+	inc (ix + value-128)
 	ei
 	reti
 
-	ld a,3
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,4
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,5
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,6
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,7
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,8
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,9
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$a
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$b
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$c
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$d
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$e
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$f
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$10
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$11
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$12
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$13
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$14
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$15
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$16
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$17
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$18
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$19
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$1a
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$1b
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$1c
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$1d
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$1e
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$1f
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$20
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$21
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$22
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$23
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$24
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$25
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$26
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$27
-	call jCON_PRINTHBYTE
-	ei
-	reti
-
-	ld a,$28
-	call jCON_PRINTHBYTE
-	ei
-	reti
+	value=value+1
+	until value=128
 
 endprog	equ $
 
