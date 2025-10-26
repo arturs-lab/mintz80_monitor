@@ -139,15 +139,15 @@ epp_exit:	ld (MONVARS+$f0),hl
 		jp $0000		; since we've potentially changed the location of code that got us here, just start over
 	endif
 
-epp_switch:	in a,(memmap)	; call this at $ffnn after executing epp_prep
+epp_switch:	in a,(memmap)	; toggle other bank. call this at $ffnn after executing epp_prep
 		xor a,$02
 		out (memmap),a
 		jp $0
 
 ; call this at $ffnn after executing epp_prep
-epp_jmp_bnk:	ld a,epp_bank	; by default program second bank of boot EEPROM and jump to it.
-		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
-		jp $0000		; since we've potentially changed the location of code that got us here, just start over
+;epp_jmp_bnk:	ld a,epp_bank	; jump to whatever bank is indicated in epp_bank
+;		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
+;		jp $0000		; since we've potentially changed the location of code that got us here, just start over
 
 ;deltest:	ld b,0
 ;dt1:		out (beepr),a
