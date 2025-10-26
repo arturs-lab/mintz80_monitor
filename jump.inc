@@ -1,6 +1,6 @@
 		include "CONSTANTS.asm"
 
-jJUMPTAB_INIT:	equ JUMPTAB+$00	; initialize jump table
+jepp_switch	equ JUMPTAB+$00	; toggle EEPROM/RAM banks and jump to address 0
 jCON_RX_CHK:	equ JUMPTAB+$03	; non-blocking check if char is available in console buffer
 jCON_RX		equ JUMPTAB+$06	; receive char on console
 jCON_TX		equ JUMPTAB+$09	; send char on console
@@ -72,10 +72,11 @@ jCF_SETUP_PART	equ JUMPTAB+$cc
 jCF_PART_NEXT	equ JUMPTAB+$cf
 jCF_SYSLD	equ JUMPTAB+$d2
 jCCKSM_DO	equ JUMPTAB+$d5
-jUART_RX_RDY	equ JUMPTAB+$d8
-jUART_RX	equ JUMPTAB+$db
-jUART_RX_CHK	equ JUMPTAB+$de
-jUART_TX_RDY	equ JUMPTAB+$e1
-jUART_TX	equ JUMPTAB+$e4
-jUART_PRNT_SP	equ JUMPTAB+$e7
-jUART_PRNT_STR	equ JUMPTAB+$ea
+jJUMPTAB_INIT:	equ JUMPTAB+$d8	; initialize jump table
+jUART_RX_RDY	equ JUMPTAB+$db
+jUART_RX	equ JUMPTAB+$de
+jUART_RX_CHK	equ JUMPTAB+$e1
+jUART_TX_RDY	equ JUMPTAB+$e4
+jUART_TX	equ JUMPTAB+$e7
+jUART_PRNT_SP	equ JUMPTAB+$ea
+jUART_PRNT_STR	equ JUMPTAB+$ed

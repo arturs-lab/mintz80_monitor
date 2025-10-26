@@ -4,7 +4,7 @@
 ;          as their actual addresses change with monitor updates
 ;***************************************************************************
 JUMPTABR:		; jump table in ROM to be copied to JUMPTAB in RAM
-jJUMPTAB_INIT:	jp JUMPTAB_INIT
+jepp_switch	jp epp_switch
 jCON_RX_CHK	jp CON_RX_CHK
 jCON_RX		jp CON_RX
 jCON_TX		jp CON_TX
@@ -76,6 +76,7 @@ jCF_SETUP_PART:	jp CF_SETUP_PART
 jCF_PART_NEXT:	jp CF_PART_NEXT
 jCF_SYSLD:		jp CF_SYSLD
 jCCKSM_DO:		jp CCKSM_DO
+jJUMPTAB_INIT:	jp JUMPTAB_INIT
 jUART_RX_RDY	jp UART_RX_RDY
 jUART_RX		jp UART_RX
 jUART_RX_CHK	jp UART_RX_CHK
