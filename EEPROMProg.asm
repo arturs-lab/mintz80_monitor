@@ -144,10 +144,12 @@ epp_switch:	in a,(memmap)	; toggle other bank. call this at $ffnn after executin
 		out (memmap),a
 		jp $0
 
+epp_end:	equ $
+
 ; call this at $ffnn after executing epp_prep
-;epp_jmp_bnk:	ld a,epp_bank	; jump to whatever bank is indicated in epp_bank
-;		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
-;		jp $0000		; since we've potentially changed the location of code that got us here, just start over
+epp_jmp_bnk:	ld a,epp_bank	; jump to whatever bank is indicated in epp_bank
+		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
+		jp $0000		; since we've potentially changed the location of code that got us here, just start over
 
 ;deltest:	ld b,0
 ;dt1:		out (beepr),a
@@ -157,4 +159,3 @@ epp_switch:	in a,(memmap)	; toggle other bank. call this at $ffnn after executin
 ;		jr nz,dt1
 ;		ret
 
-epp_end:	equ $
