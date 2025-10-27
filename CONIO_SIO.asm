@@ -272,14 +272,14 @@ CON_PRINTHBYTE:
 ;Function: Prints the four hex digits of a word to the serial line from HL
 ;***************************************************************************
 CON_PRINTHWORD:     
-;       PUSH    HL
+;       PUSH    HL		; HL is not garbled here, no idea why it was being pushed in original code
         PUSH    AF
         LD      A,H
         CALL    CON_PRINTHBYTE      ;Print high byte
         LD      A,L
         CALL    CON_PRINTHBYTE      ;Print low byte
         POP     AF
-;       POP     HL
+;       POP     HL		; HL is not garbled here, no idea why it was being pushed in original code
         RET
 
 ;***************************************************************************
