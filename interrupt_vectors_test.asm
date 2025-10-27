@@ -182,7 +182,7 @@ intsrvc:	di
 	out (PIO_DB),a
 ;	ld a,(CTC_CH0_CNF)	; get T0 configuration default
 ;	or a,$80			; enable interrupt bit
-;;	and a,!$04			; no time constant follows
+;;	and a,$fb			; no time constant follows
 ;	out (CTC_CH0),a
 ;	ld a,(CTC_CH0_TC)	; reset time constant
 ;	out (CTC_CH0),a
