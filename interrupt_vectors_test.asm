@@ -70,11 +70,6 @@ intvinitl:	ld (hl),e		; initialize interrupt jump table
 
 do_test:	ld (SP_INIT-$100),sp
 	ld sp,SP_INIT-$30
-	ld hl,SP_INIT-$100+3
-	xor a
-	ld (hl),a
-	dec hl
-	ld (hl),a
 	ld ix,$5000
 
 	ld a,CTCV			; load CTC interrupt vector
@@ -83,13 +78,14 @@ do_test:	ld (SP_INIT-$100),sp
 	ld a,$27			; get T0 configuration default
 	or a,$80			; enable interrupt bit
 	and a,$ff			; no time constant follows
-	out (CTC_CH3),a
-	ld a,$54			; reset time constant
-	out (CTC_CH3),a
+	out (CTC_CH0),a
+	ld a,$12			; reset time constant $12=1ms
+	out (CTC_CH0),a
 
-int_test: 	ei
+	push af			; just so stack is clean
+int_test: 	pop af
+	ei
 ;	out (PIO_DB),a
-;	inc (hl)
 	nop	; give interrupt time to occur during nops rather than outside the loop
 	nop
 	nop
@@ -106,41 +102,20 @@ int_test: 	ei
 	push af
 	call jCON_RX_CHK
 	or a
-	jr z,cont
+	jr z,int_test
 	pop af
 	xor a
-;	inc (hl)
-	ld sp,(SP_INIT-$100)
-	ret
-cont:	pop af
-;	ei
-	or a
-	jr z,int_test
-
-;	inc (hl)
-;	inc (hl)
-	out (PIO_DA),a
-	di
-;	call jCON_PRINTHBYTE
-	ld a,"x"
-	call jCON_PRT_CHAR
-	call jCON_PRT_NL
-	call jCON_RX_CHK
-	or a
-	jr z,int_test
-	di
-	xor a
 	ld sp,(SP_INIT-$100)
 	ret
 
-tc0ei:	ld a,(CTC_CH3_CNF)	; get T0 configuration default
+tc0ei:	ld a,(CTC_CH0_CNF)	; get T0 configuration default
 	or a,$80			; enable interrupt bit
 	and a,$fb			; no time constant follows
-	out (CTC_CH3),a
+	out (CTC_CH0),a
 
-tc0di:	ld a,(CTC_CH3_CNF)	; get T0 configuration default
+tc0di:	ld a,(CTC_CH0_CNF)	; get T0 configuration default
 	and a,$fb			; no time constant follows
-	out (CTC_CH3),a
+	out (CTC_CH0),a
 
 tc1ei:	ld a,(CTC_CH1_CNF)	; get T0 configuration default
 	or a,$80			; enable interrupt bit
@@ -208,9 +183,9 @@ intsrvc:	di
 ;	ld a,(CTC_CH0_CNF)	; get T0 configuration default
 ;	or a,$80			; enable interrupt bit
 ;;	and a,!$04			; no time constant follows
-;	out (CTC_CH3),a
-;	ld a,(CTC_CH3_TC)	; reset time constant
-;	out (CTC_CH3),a
+;	out (CTC_CH0),a
+;	ld a,(CTC_CH0_TC)	; reset time constant
+;	out (CTC_CH0),a
 	exx
 	ex af,af'
 	ei
@@ -234,7 +209,6 @@ value=0
 	xor a,$ff
 	out (PIO_DB),a
 	ld a,value+1
-; 	ld (SP_INIT-$100+3),a
 	inc (ix + value)
 	ei
 	reti
@@ -249,7 +223,6 @@ value=0
 	xor a,$ff
 	out (PIO_DB),a
 	ld a,value+1-128
-; 	ld (SP_INIT-$100+3),a
 	inc (ix + value-128)
 	ei
 	reti
