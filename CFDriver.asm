@@ -134,7 +134,7 @@ CF_RD_CMD:	CALL 	CF_LP_BUSY
 	IN		A,(CFSTAT)					;Read status
 	AND		000000001b					;mask off error bit
 	JR		Z,CF_RD_NOERR			; no error, read data
-	call UART_PRNT_SP
+	call CON_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"CF card read error: ",0
 zoWarnFlow = true
@@ -158,7 +158,7 @@ CF_RD_SECT:	CALL	CF_LP_DAT_RDY
 	xor a						; zero A to indicate success
 	RET
 	
-CF_RD_CMD_TOUT:	call UART_PRNT_SP
+CF_RD_CMD_TOUT:	call CON_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"CF card read timeout",$0d,$0a,0
 zoWarnFlow = true
@@ -210,7 +210,7 @@ CF_WR_SECT_L:	LD 		A,(HL)
 	xor a						; zero A to indicate success
 	ret
 
-CF_WR_CMD_TOUT:	call UART_PRNT_SP
+CF_WR_CMD_TOUT:	call CON_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"CF card write timeout",$0d,$0a,0
 zoWarnFlow = true
@@ -273,7 +273,7 @@ CF_SETUP_X:	pop bc
 	pop hl
 	ret
 
-CF_SETUP_PART_LAST: call UART_PRNT_SP
+CF_SETUP_PART_LAST: call CON_PRNT_SP
 zoWarnFlow = false
 	db $0d,$0a,"No valid partition found",$0d,$0a,0
 zoWarnFlow = true
