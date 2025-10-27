@@ -14,6 +14,9 @@ ROM_BOTTOM_a000	equ true
                                   ; CONSTANTS.asm
 		include "MonitorMain.asm"
 
+		org $BFFD
+	db $0a,$42,$99
+
 endprog	equ $
 
 	if def USE_UART
