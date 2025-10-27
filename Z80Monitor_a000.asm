@@ -14,8 +14,11 @@ ROM_BOTTOM_a000	equ true
                                   ; CONSTANTS.asm
 		include "MonitorMain.asm"
 
+		org $BFE0
+	db "z80monitor_a000_UART_0A41A1",0
+
 		org $BFFD
-	db $0a,$42,$99
+	db $0a,$41,$a1
 
 endprog	equ $
 
