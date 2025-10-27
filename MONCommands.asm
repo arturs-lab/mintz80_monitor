@@ -569,75 +569,69 @@ CL_COMMAND:	LD		HL, MCl_1	; Print some messages
 ; Checksum generator. Add memory values in a three byte counter. The last
 ; included location is end point - 1.
 ; Function: Calculate checksum for address range in three bytes
+; Exit: Checksum MSB in A, middle and LSB in HL
 ;***************************************************************************
 
-CCKSM_1:	DEFB	"Calculate checksum for memory range", 0Dh, 0Ah
-
-CCKSM_2:	DEFB	"Start location: ", EOS
-
-CCKSM_3:	DEFB	$0d,$0a,"End location: ", EOS
-
-CCKSM_4:    DEFB    $0d,$0a,"Checksum: ", EOS
-
-CCKSM_COMMAND:	LD		HL, CCKSM_1
-        CALL	CON_PRT_STR
+CCKSM_COMMAND:	CALL	CON_PRT_STR_SP
+zoWarnFlow = false
+	DEFB    "Calculate checksum for memory range", 0Dh, 0Ah, "Start location: ", EOS
+zoWarnFlow = true
         
-;        LD		HL, CCKSM_2	    ; start
-;        CALL	CON_PRT_STR
-        CALL	CON_GETHEXWORD
-        LD		A, (ERRFLAG)
-        CP		E_NONE
-        RET	NZ
-        LD      (MVADDR+0), HL
+	CALL	CON_GETHEXWORD
+	LD		A, (ERRFLAG)
+	CP		E_NONE
+	RET	NZ
+	LD      (MVADDR+0), HL
         
-        LD		HL, CCKSM_3     ; end
-        CALL	CON_PRT_STR
-        CALL	CON_GETHEXWORD
-        LD		A, (ERRFLAG)
-        CP		E_NONE
-        RET	NZ
-        INC	HL
-        LD      (MVADDR+2), HL
+	CALL	CON_PRT_STR_SP
+zoWarnFlow = false
+	DEFB    $0d,$0a,"End location: ", EOS
+zoWarnFlow = true
+	CALL	CON_GETHEXWORD
+	LD		A, (ERRFLAG)
+	CP		E_NONE
+	RET	NZ
+	INC	HL
+	LD      (MVADDR+2), HL
         
 CCKSM_DO: LD      BC, (MVADDR+0)  ; starting point
-        LD      DE, (MVADDR+2)  ; end point
-        LD      HL, 0           ; the checksum value
-        LD      A, 0
-        LD      (CHKSUM_C), A   ; checksum overflow
+	LD      DE, (MVADDR+2)  ; end point
+	LD      HL, 0           ; the checksum value
+	LD      A, 0
+	LD      (CHKSUM_C), A   ; checksum overflow
 CCSM_1:                     ; main checksum loop
-        LD      A, C
-        CP      E
-        JR      NZ, CCSM_3      ; on no match in LSB, skip the MSB
-        LD      A, B
-        CP      D
-        JR      Z, CCSM_4       ; MSB matches too
+	LD      A, C
+	CP      E
+	JR      NZ, CCSM_3      ; on no match in LSB, skip the MSB
+	LD      A, B
+	CP      D
+	JR      Z, CCSM_4       ; MSB matches too
 CCSM_3:                     ; still going, add next value to checksum
-        LD      A, (BC)
-        ADD     A, L
-        LD      L, A
-        JR      NC, CCSM_2      ; check carry in checksum LSB
-        LD      A, H
-        ADD     A, 1
-        LD      H, A
-        JR      NC, CCSM_2
-        LD      A, (CHKSUM_C)
-        INC     A
-        LD      (CHKSUM_C), A
+	LD      A, (BC)
+	ADD     A, L
+	LD      L, A
+	JR      NC, CCSM_2      ; check carry in checksum LSB
+	LD      A, H
+	ADD     A, 1
+	LD      H, A
+	JR      NC, CCSM_2
+	LD      A, (CHKSUM_C)
+	INC     A
+	LD      (CHKSUM_C), A
 CCSM_2:                     ; done this value
-        INC     BC
-        JR      CCSM_1
+	INC     BC
+	JR      CCSM_1
         
-CCSM_4:                     ; running address matches end, done
-        PUSH    HL
-        LD		HL, CCKSM_4     ; end
-        CALL	CON_PRT_STR
-        LD      A, (CHKSUM_C)
-        CALL    CON_PRINTHBYTE      ; checksum overflow first
-        POP     HL
-        CALL    CON_PRINTHWORD
-        CALL    CON_PRT_NL
+CCSM_4:	CALL	CON_PRT_STR_SP	; running address matches end, done
+zoWarnFlow = false
+	DEFB    $0d,$0a,"Checksum: ", EOS	; calling it this way preserves HL
+zoWarnFlow = true
+	LD      A, (CHKSUM_C)
+	CALL    CON_PRINTHBYTE      ; checksum overflow first
+	CALL    CON_PRINTHWORD
+	CALL    CON_PRT_NL
 
-        RET
+	RET				; returns with checksum in A,HL
 
 ;***************************************************************************
 ; Load hex-intel record
