@@ -50,9 +50,9 @@ epp_tmp:	equ RAM_BOTTOM + $0300	; this is where EEPROM programming code is copie
 
 
 ; these interrupt bases are added to Z80 interrupt vector register I to form final vector in IM2
-SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to interrupt type
-CTCV:		equ $10		; CTC interrupt vector base
-PIOV:		equ $20		; PIO interrupt vector base
+SIOV:		equ $0		; SIO interrupt vector base except bits 2-0 are set according to interrupt type, 16 interrupts
+CTCV:		equ $10		; CTC interrupt vector base, 4 interrupts
+PIOV:		equ $18		; PIO interrupt vector base, 2 interrupts
 
 MPFMON:     EQU    0000h
 ASCDMPBUF:  EQU    MONVARS + 0h      ;Buffer to construct ASCII part of memory dump
@@ -189,16 +189,16 @@ HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 
 
 ;$0000-$1fff ROM	d8
-;$2000-$3fff RAM	d9 00->rom1, 02->rom4
+;$2000-$3fff RAM	d9 00->rom1, 02->rom3
 ;$4000-$5fff RAM	da 00->rom0, 02->rom2
-;$6000-$7fff RAM	db 00->rom1, 02->rom4
+;$6000-$7fff RAM	db 00->rom1, 02->rom3
 ;$8000-$9fff RAM	dc 00->rom0, 02->rom2
-;$a000-$bfff RAM	dd 00->rom1, 02->rom4
+;$a000-$bfff RAM	dd 00->rom1, 02->rom3
 ;$c000-$dfff RAM	de 00->rom0, 02->rom2
-;$e000-$ffff RAM	df 00->rom1, 02->rom4
+;$e000-$ffff RAM	df 00->rom1, 02->rom3
 
 ; current ROM:
-; 0 regular rom
-; 1 rom $a000
-; 2 rom $a000 SIO
-; 3 rom $c000
+; 0 rom $0000 SIO 2400 baud 088B5D
+; 1 rom $a000 UART 9600 baud 08810B
+; 2 rom $0000 UART 9600 baud 088F64
+; 3 rom $a000 SIO 2400 baud 0A48F3
