@@ -12,6 +12,8 @@
                                   ; CONSTANTS.asm
 		include "MonitorMain.asm"
 
+endcode	equ $
+
 endprog	equ $
 
 	if def USE_UART
