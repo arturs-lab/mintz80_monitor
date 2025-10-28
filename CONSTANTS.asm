@@ -188,7 +188,7 @@ epp_bank:	equ $01	; eeprom bank to select. by default program RAM bank to allow 
 HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 
 
-;$0000-$1fff ROM	d8
+;$0000-$1fff ROM	d8 00->rom0, 02->rom2
 ;$2000-$3fff RAM	d9 00->rom1, 02->rom3
 ;$4000-$5fff RAM	da 00->rom0, 02->rom2
 ;$6000-$7fff RAM	db 00->rom1, 02->rom3
@@ -198,7 +198,7 @@ HEXLINES:	EQU	17 ; FIXIT: There is a off-by-one-error here
 ;$e000-$ffff RAM	df 00->rom1, 02->rom3
 
 ; current ROM:
-; 0 rom $0000 SIO 2400 baud 088B5D
-; 1 rom $a000 UART 9600 baud 08810B
-; 2 rom $0000 UART 9600 baud 088F64
-; 3 rom $a000 SIO 2400 baud 0A48F3
+; 0 rom $0000 SIO 2400 baud 08BCB8
+; 1 rom $a000 UART 9600 baud 0A867B
+; 2 rom $0000 UART 9600 baud 08BF96
+; 3 rom $a000 SIO 2400 baud 0A839D
