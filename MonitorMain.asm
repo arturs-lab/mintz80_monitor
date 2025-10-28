@@ -41,6 +41,8 @@ irq_exit:	reti
 NMI:		jp IRQTAB+(NMIV-IRQTABR)
 nmi_end:	retn
 
+code_end:	dw endcode				; store address of last byte of this code in a defined place for checksum calculation
+
 ; we want all drivers at the beginning so they stay the same even if we remove monitor code
 		include "EEPROMProg.asm";
 		include "CTCDriver.asm"
@@ -189,9 +191,15 @@ zoWarnFlow = false
 	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
 zoWarnFlow = true
 
-	call dmpio
+	call dmpio			; dump CPLD configuration
 
-	call CF_BOOT
+	ld hl,R_MAIN		; Calculate my own checksum
+	ld (MVADDR+0),hl
+	ld hl,(code_end)
+	ld (MVADDR+2),hl
+	call CCKSM_DO
+
+	call CF_BOOT		; try to boot from CF
 
 gomain:	CALL PRINT_MON_HDR	;Print the monitor header info
 	LD A, 00h
