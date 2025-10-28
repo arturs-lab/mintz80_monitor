@@ -14,11 +14,21 @@ ROM_BOTTOM_a000	equ true
                                   ; CONSTANTS.asm
 		include "MonitorMain.asm"
 
+endcode	equ $
+
+	if def USE_UART
 		org $BFE0
-	db "z80monitor_a000_UART_0A41A1",0
+	db "z80monitor_a000_UART_0A867B",0
 
 		org $BFFD
-	db $0a,$41,$a1
+	db $0a,$86,$7b
+	else
+		org $BFE0
+	db "z80monitor_a000_SIO_0A839D",0
+
+		org $BFFD
+	db $0a,$83,$9d
+	endif
 
 endprog	equ $
 
@@ -27,7 +37,7 @@ endprog	equ $
 	output_intel "z80monitor_a000_UART.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
 	output_list "z80monitor_a000_UART.lst"
 	else
-	output_bin "z80monitor_a000.bin",ROM_BOTTOM,endprog-ROM_BOTTOM	; 
-	output_intel "z80monitor_a000.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
-	output_list "z80monitor_a000.lst"
+	output_bin "z80monitor_a000_SIO.bin",ROM_BOTTOM,endprog-ROM_BOTTOM	; 
+	output_intel "z80monitor_a000_SIO.hex",ROM_BOTTOM,endprog-ROM_BOTTOM	;
+	output_list "z80monitor_a000_SIO.lst"
 	endif
