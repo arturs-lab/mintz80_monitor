@@ -16,19 +16,7 @@ ROM_BOTTOM_a000	equ true
 
 endcode	equ $
 
-	if def USE_UART
-		org $BFE0
-	db "z80monitor_a000_UART_0A867B",0
-
-		org $BFFD
-	db $0a,$86,$7b
-	else
-		org $BFE0
-	db "z80monitor_a000_SIO_0A839D",0
-
-		org $BFFD
-	db $0a,$83,$9d
-	endif
+		include "checksums_a000.asm"
 
 endprog	equ $
 

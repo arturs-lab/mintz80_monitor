@@ -2,8 +2,8 @@
 *.hex
 *.lst
 eeprom_write.*
-Z80Monitor_091425.*
 BASIC-4k*
 attic
 basic_rc2014
-
+checksums_a000.asm
+checksums_c000.asm
