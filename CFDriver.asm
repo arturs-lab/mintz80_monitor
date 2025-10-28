@@ -352,7 +352,28 @@ zoWarnFlow = false
 	db "CF MBR executable found at ",0
 zoWarnFlow = true
 	call CON_PRINTHWORD
-	call CON_PRT_STR_SP
+
+	ld hl,(CFSECT_BUF)	; calculate location of label
+	ld bc,$01a0
+	add hl,bc
+	ld a,(hl)
+	cp a," "			; if (boot_dest + $1fe0) < " " then no label to print
+	jr c,ask_run
+	cp a,$7f			; if (boot_dest + $1fe0) > "" then no label to print
+	jr nc,ask_run
+	call jCON_PRT_STR_SP	; otherwise print label
+zoWarnFlow = false
+	db $0d,$0a,"Found label: ",0
+zoWarnFlow = true
+	call jCON_PRT_STR
+
+; here HL points to 0 terminating bootloader label
+	inc hl
+	ld a,(hl)
+	cp $aa	; if $aa follows label, then skip asking whether to run and autorun
+	jr z,gohl
+
+ask_run:	call CON_PRT_STR_SP
 zoWarnFlow = false
 	db $0d,$0a,"Run it? (y/n/q) ",$0d,$0a,0
 zoWarnFlow = true
@@ -361,6 +382,9 @@ zoWarnFlow = true
 	jr z, CF_LD_SYS
 	cp a,"Y"
 	ret nz
+gohl:	ld hl,(CFSECT_BUF)	; jump target may have gotten overwritten in HL during checks
+	inc hl
+	inc hl
 	call jphl
 	ret		; after executing code from CF go to main loop. Unless code from CF does something else
 
