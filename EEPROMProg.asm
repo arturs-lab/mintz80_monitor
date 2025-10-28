@@ -54,6 +54,7 @@ epp_upd1:	ld hl,epp_numbyte
 		ld (epp_tmp+epp_lena-epp_prog+1),hl
 		ld bc,(MVADDR+0)
 		add hl,bc
+		dec hl
 		LD (MVADDR+2), HL
 
 		; update target page
