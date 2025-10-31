@@ -29,16 +29,16 @@ CF_INIT:	ld a,$0E			; issue software reset
 	ld (CFSECT_BUF),hl	; by default point to this location for CF data buffer
 
 	xor a
-CF_INIT_LP:	push af
+CF_INIT_LP:	push af	; iteration counter for timeout
 	CALL	CF_LP_BUSY
 	jr z,CF_INIT_GO
 	pop af
-	dec a
+	inc a
 	jr nz,CF_INIT_LP
 	jr CF_INIT_TOUT
 
-CF_INIT_GO:	pop af
-	ld (ULBEND+1),a
+CF_INIT_GO:	pop af	; remove timeout counter off the stack
+	ld (IECHECKSUM),a	; stick it somewhere for debugging to see how long the wait was typically
 	LD		A,01h						;LD features register to enable 8 bit
 	OUT		(CFFEAT),A
 	CALL	CF_LP_BUSY
@@ -333,13 +333,18 @@ CF_BOOT:	call CF_INIT		; initialize CF
 	ld hl,(CFSECT_BUF)
 	ld a,(hl)
 	cp a,"Z"			; check if first byte = "Z"
-	jp nz,CF_SECT_ERR	; no, invalid CF
+	jr nz,CF_SECT_ERR_MBR	; no, invalid CF
 	inc hl
 	ld a,(hl)
 	cp a,$80			; check if 2nd byte = $80
-	jp nz,CF_SECT_ERR	; no, invalid CF
+	jr z,CF_MBR_TEST	; yes, magic present, should be valid CF
+CF_SECT_ERR_MBR:	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db "CF card no magic in MBR",$0d,$0a,0
+zoWarnFlow = true
+	ret
 
-	inc hl
+CF_MBR_TEST:	inc hl
 	ld a,(hl)
 	cp a,0
 	jp z,CF_LD_SYS		; if (CFSECT_BUF + 2) = 0 then no code to run, but we have valid CF signature, so load system sectors
@@ -435,13 +440,18 @@ CF_LD_PART: ld hl,0	; lastly check if active partition has code to run and offer
 	add hl,bc
 	ld a,(hl)
 	cp a,"Z"			; check if first byte = "Z"
-	jp nz,CF_SECT_ERR	; no, invalid CF
+	jr nz,CF_SECT_ERR_PART	; no, invalid CF
 	inc hl
 	ld a,(hl)
 	cp a,$80			; check if 2nd byte = $80
-	jp nz,CF_SECT_ERR	; no, invalid CF
+	jr z,CF_SECT_TEST	; yes, magic present, should be valid CF
+CF_SECT_ERR_PART:	call CON_PRT_STR_SP
+zoWarnFlow = false
+	db "CF card no magic in partition",$0d,$0a,0
+zoWarnFlow = true
+	ret
 
-	inc hl
+CF_SECT_TEST:	inc hl
 	ld a,(hl)
 	cp a,0
 	ret z		; if (CFSECT_BUF + 2) = 0 then no code to run, jump to monitor
@@ -471,8 +481,4 @@ zoWarnFlow = false
 zoWarnFlow = true
 	ret
 
-CF_SECT_ERR:	call CON_PRT_STR_SP
-zoWarnFlow = false
-	db "CF card no magic",$0d,$0a,0
-zoWarnFlow = true
-	ret
+
