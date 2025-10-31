@@ -33,9 +33,9 @@ FA00	ld a,$10	; frequency source
 	out (04),a
 	ld a,$10	; freq divider
 	out (05),a
-	ld a,$0	; cpu frequency
+	ld a,$1	; cpu frequency
 	out ($d0),a
-	ld a,$e2		; playback speed
+	ld a,$e0		; playback speed
 	ld (PBSPEED),a
 	call jCON_PRT_NL
 	jp	FBA5		; initialize note pointers and start playing
