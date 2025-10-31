@@ -55,33 +55,36 @@ CTCV:		equ $10		; CTC interrupt vector base, 4 interrupts
 PIOV:		equ $18		; PIO interrupt vector base, 2 interrupts
 
 MPFMON:     EQU    0000h
-ASCDMPBUF:  EQU    MONVARS + 0h      ;Buffer to construct ASCII part of memory dump
-ASCDMPEND:  EQU    MONVARS + 10h     ;End of buffer, fill with EOS
-DMPADDR:    EQU    MONVARS + 11h     ;Last dump address
-MVADDR:     EQU    MONVARS + 12h     ; 6 bytes: start-address, end-address, dest-address or fill-value (23, 24, 25, 26, 27, 28)
-ERRFLAG:    EQU    MONVARS + 18h     ; Location to store 
-MUTE:       EQU    MONVARS + 19h     ; 0 - print received chars, 1 - do not print received chars
-ULSIZE:     EQU    MONVARS + 1Ah     ; actual size of current/last hex-intel message
-IECHECKSUM: EQU    MONVARS + 1Bh        ; hex-intel record checksum
-IECADDR:    EQU    MONVARS + 1Ch        ; hex-intel record address (2 bytes)
-IERECTYPE:  EQU    MONVARS + 1Eh        ; hex-intel record type
-DEBUG:      EQU    MONVARS + 1Fh
-MTPHFLAG:	 EQU    MONVARS + 1Fh     ; Phase counter: phase 1 doesn't check old value (being unknown)
-RX_READ_P:  EQU    MONVARS + 20h     ; read pointer
-RX_WRITE_P: EQU    MONVARS + 22h     ; write pointer
-CHKSUM_C:   EQU    MONVARS + 24h     ; uses 3 bytes
-CF_SECCNT:  EQU    MONVARS + 27h 
-CF_LBA0:    EQU    MONVARS + 28h
-CF_LBA1:    EQU    MONVARS + 29h
-CF_LBA2:    EQU    MONVARS + 2Ah
-CF_LBA3:    EQU    MONVARS + 2Bh
-CF_PART_CUR:	EQU    MONVARS + 2Ch	; Current partition offset into MBR
-CFSECT_BUF: EQU    MONVARS + 2Eh	; pointer to location of CF data buffer. Need $200 byte buffer
-UPLOADBUF:  EQU    MONVARS + 30h     ; Buffer for hex-intel upload. Allows up to 32 bytes (20h) per line.
-ULBUFSIZE:  EQU    50h                  ; a 20h byte hex-intel record use 75 bytes...
+UPLOADBUF:  EQU    MONVARS + 0h     ; Buffer for hex-intel upload. Allows up to 128 bytes (80h) per line.
+ULBUFSIZE:  EQU    80h                  ; a 20h byte hex-intel record use 75 bytes...
 ULBEND:     EQU    UPLOADBUF + ULBUFSIZE
 MSGBUF:     EQU    UPLOADBUF
+RX_READ_P:  EQU    MONVARS + 80h     ; read pointer
+RX_WRITE_P: EQU    MONVARS + 82h     ; write pointer
+ASCDMPBUF:  EQU    MONVARS + 84h      ;Buffer to construct ASCII part of memory dump
+ASCDMPEND:  EQU    MONVARS + 94h     ;End of buffer, fill with EOS
+DMPADDR:    EQU    MONVARS + 95h     ;Last dump address
+MVADDR:     EQU    MONVARS + 96h     ; 6 bytes: start-address, end-address, dest-address or fill-value (23, 24, 25, 26, 27, 28)
+ERRFLAG:    EQU    MONVARS + 9ch     ; Location to store 
+MUTE:       EQU    MONVARS + 9dh     ; 0 - print received chars, 1 - do not print received chars
+ULSIZE:     EQU    MONVARS + 9eh     ; actual size of current/last hex-intel message
+IECHECKSUM: EQU    MONVARS + 9fh        ; hex-intel record checksum
+IECADDR:    EQU    MONVARS + a0h        ; hex-intel record address (2 bytes)
+IERECTYPE:  EQU    MONVARS + a2h        ; hex-intel record type
+DEBUG:	EQU    MONVARS + a3h
+MTPHFLAG:	EQU    MONVARS + a3h     ; Phase counter: phase 1 doesn't check old value (being unknown)
+CHKSUM_C:   EQU    MONVARS + a4h     ; uses 3 bytes
+CF_SECCNT:  EQU    MONVARS + a7h 
+CF_LBA0:    EQU    MONVARS + a8h
+CF_LBA1:    EQU    MONVARS + a9h
+CF_LBA2:    EQU    MONVARS + aAh
+CF_LBA3:    EQU    MONVARS + aBh
+CF_PART_CUR:	EQU    MONVARS + aCh	; Current partition offset into MBR
+CFSECT_BUF: EQU    MONVARS + aEh	; pointer to location of CF data buffer. Need $200 byte buffer
 
+; PIO
+PIO_CH0_CNF	equ MONVARS + $f6
+PIO_CH1_CNF	equ MONVARS + $f7
 ; CTC prescaler value locations
 CTC_CH0_CNF	equ MONVARS + $f8
 CTC_CH1_CNF	equ MONVARS + $f9
