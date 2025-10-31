@@ -90,10 +90,4 @@ epp_go_ram:	ld a,1
 		out (memmap),a
 		jp $0
 
-epp_toggle:	in a,(memmap)	; call this at $ffnn after executing epp_prep
-		xor a,$02
-		out (memmap),a
-		jp $0
-
-
 JUMPTAB_END:	equ $
