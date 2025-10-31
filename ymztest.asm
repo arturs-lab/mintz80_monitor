@@ -10,10 +10,21 @@
 ;
 ; SAVE "name" CODE 60000 5024
 
+CHIP		EQU "AY"
+;CHIP		EQU "YMZ"
+
+if CHIP = "AY"
 AYSEL		EQU	$00
 AYDTA		EQU	$01
-
 PLAYER	EQU	$2400
+FRQDIV	EQU	$20
+else
+AYSEL		EQU	$02
+AYDTA		EQU	$03
+PLAYER	EQU	$3800
+FRQDIV	EQU	$10
+endif
+
 MUSIC1	EQU	PLAYER + $0500
 MUSIC2	EQU	PLAYER + $08E8
 MUSIC3	EQU	PLAYER + $0cD0
@@ -31,7 +42,7 @@ XTRAEND	EQU	XTRA + 385
 
 FA00	ld a,$10	; frequency source
 	out (04),a
-	ld a,$10	; freq divider
+	ld a,FRQDIV	; freq divider
 	out (05),a
 	ld a,$1	; cpu frequency
 	out ($d0),a
@@ -739,7 +750,12 @@ XTRAEND	DB	$3f
 
 endprog	equ $
 
+if CHIP = "AY"
+	output_bin "aytest.bin",PLAYER,endprog-PLAYER		; The binary file
+	output_intel "aytest.hex",PLAYER,endprog-PLAYER		; The binary file
+	output_list "aytest.lst"
+else
 	output_bin "ymztest.bin",PLAYER,endprog-PLAYER		; The binary file
 	output_intel "ymztest.hex",PLAYER,endprog-PLAYER		; The binary file
 	output_list "ymztest.lst"
-
+endif
