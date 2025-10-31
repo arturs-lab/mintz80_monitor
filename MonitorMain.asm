@@ -224,7 +224,7 @@ CLEAR_SCREEN:
 ;Function: Software Reset to $0000
 ;***************************************************************************
 RESET_COMMAND:
-	JP MPFMON		;Jumps to 0000 (MPF-1 monitor re-entry)	
+	JP R_MAIN		;Jumps to 0000 (MPF-1 monitor re-entry)	
 			
 ;***************************************************************************
 ;PRINT_MON_HDR

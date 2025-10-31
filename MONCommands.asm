@@ -820,7 +820,7 @@ REGDUMP_COMMAND:	LD      HL, RDLN_1
         
 REGDMPJ:
         CALL    REGDUMP_COMMAND
-        JP      MPFMON  ; return to monitor
+        JP      R_MAIN  ; return to monitor
 
 ; RAM test
 ; Tssss eeee
