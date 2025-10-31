@@ -1,7 +1,7 @@
 ;initialize both PIO ports
-PIO_INIT:	ld a,11001111b      ; PIO channel A default config mode 3 (bit control)
+PIO_INIT:	ld a,PIO_CH0_CNFV      ; PIO channel A default config mode 3 (bit control)
 	ld (PIO_CH0_CNF),a
-	ld a,11001111b      ; PIO channel B default config mode 3 (bit control)
+	ld a,PIO_CH1_CNFV      ; PIO channel B default config mode 3 (bit control)
 	ld (PIO_CH1_CNF),a
 	call PIOA_INIT	; first initialize PIO A, then fall through to PIO B
 

@@ -148,6 +148,9 @@ memmap:	EQU $d8	; memory map $d8-$df
 
 ; ### other
 
+; PIO config values
+PIO_CH0_CNFV:	EQU 11001111b
+PIO_CH1_CNFV:	EQU 11001111b
 ; CTC config values
 CTC_CH0_CNFV:	EQU 00100111b
 CTC_CH1_CNFV:	EQU 00000111b
@@ -156,8 +159,9 @@ CTC_CH3_CNFV:	EQU 01110111b
 ; CTC time constants values
 CTC_CH0_TV:	EQU 180	; system interrupt, 200Hz
 CTC_CH1_TV:	EQU $b4
-CTC_CH2_TV:	EQU $3c	; SIOB 2400 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
-CTC_CH3_TV:	EQU $3c	; SIOA 2400 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
+CTC_CH2_TV:	EQU $0f	; SIOB 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
+CTC_CH3_TV:	EQU $0f	; SIOA 9600 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
+					; with 256x prescaler in SIO ; @9.216MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
 
 ; SIO interrupt vector
 SIO_INT_VECT:	EQU $0
