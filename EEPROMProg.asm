@@ -124,11 +124,13 @@ epp_p4:	inc hl
 	endif
 		jr epp_p1
 
-epp_exit:	ld (MONVARS+$f0),hl
-		ld (MONVARS+$f2),de
-		ld (MONVARS+$f4),bc
-		ld (MONVARS+$f6),a
-		pop af
+; this was just for troubleshooting
+;epp_exit:	ld (MONVARS+$f0),hl
+;		ld (MONVARS+$f2),de
+;		ld (MONVARS+$f4),bc
+;		ld (MONVARS+$f6),a
+		
+epp_exit:	pop af
 		pop bc
 		pop de
 		pop hl
@@ -145,12 +147,12 @@ epp_switch:	in a,(memmap)	; toggle other bank. call this at $ffnn after executin
 		out (memmap),a
 		jp $0
 
-epp_end:	equ $
-
 ; call this at $ffnn after executing epp_prep
 epp_jmp_bnk:	ld a,epp_bank	; jump to whatever bank is indicated in epp_bank
 		out (memmap),a	; if programming fails, can just reset and boot to previous EEPROM
 		jp $0000		; since we've potentially changed the location of code that got us here, just start over
+
+epp_end:	equ $
 
 ;deltest:	ld b,0
 ;dt1:		out (beepr),a
