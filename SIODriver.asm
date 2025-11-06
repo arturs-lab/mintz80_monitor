@@ -5,12 +5,43 @@
 ;  Version:			1.0
 ;***************************************************************************
 
-		
+SIO_INIT_VARS:	ld a,SIOA_WR0_CV	; initialize variables with defaults for channel A
+		ld (SIOA_WR0),a
+		ld a,SIOA_WR1_CV
+		ld (SIOA_WR1),a
+		ld a,SIOA_WR3_CV
+		ld (SIOA_WR3),a
+		ld a,SIOA_WR4_CV
+		ld (SIOA_WR4),a
+		ld a,SIOA_WR5_CV
+		ld (SIOA_WR5),a
+		ld a,SIOA_WR6_CV
+		ld (SIOA_WR6),a
+		ld a,SIOA_WR7_CV
+		ld (SIOA_WR7),a
+
+		ld a,SIOB_WR0_CV	; then for channel B
+		ld (SIOB_WR0),a
+		ld a,SIOB_WR1_CV
+		ld (SIOB_WR1),a
+		ld a,SIOB_WR2_CV
+		ld (SIOB_WR2),a
+		ld a,SIOB_WR3_CV
+		ld (SIOB_WR3),a
+		ld a,SIOB_WR4_CV
+		ld (SIOB_WR4),a
+		ld a,SIOB_WR5_CV
+		ld (SIOB_WR5),a
+		ld a,SIOB_WR6_CV
+		ld (SIOB_WR6),a
+		ld a,SIOB_WR7_CV
+		ld (SIOB_WR7),a		; then fall through to initializing ports
+
 ; initialize both SIO channels
 SIO_INIT:	call SIOA_INIT	; first init SIO A
 		call SIOB_INIT	; then SIOB
-		call jSIO_A_INT_SET	; initialize SIOA interrupts
-		call jSIO_A_EI		; more interrupt code
+		call SIO_A_INT_SET	; initialize SIOA interrupts
+		call SIO_A_EI		; more interrupt code
 		ret
 
 ;***************************************************************************
@@ -34,16 +65,16 @@ SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
 
 ;***************************************************************************
 ;SIOB_INIT
-;Function: Initialize the SIOB to BAUD Rate 4800 
+;Function: Initialize the SIOB
 ;the followings are settings for channel B
 ;***************************************************************************
-SIOB_INIT:	ld a,00000001b      ; write into WR0: select WR1
+SIOB_INIT:	ld a,00000001b	; write into WR0: select WR1
         out (SIO_CB),a
-        ld a,00000100b      ; write into WR0: status affects interrupt vectors
+        ld a,00000100b	; write into WR0: RX int disable, status affects interrupt vectors
         out (SIO_CB),a
-        ld a,00000010b      ; write into WR0: select WR2
+        ld a,00000010b	; write into WR0: select WR2
         out (SIO_CB),a
-        ld a,SIO_INT_VECT   ; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
+        ld a,SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
                             ; will be affected by the channel & condition that raised the interrupt
                             ; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
                             ; for special conditions
@@ -58,6 +89,16 @@ SIO_A_INT_SET:
         ld a,00011000b      ; interrupts on every RX char; parity is no special condition;
                             ; buffer overrun is special condition
         out (SIO_CA),a
+		ret
+
+; set up interrupts for channel B
+SIO_B_INT_SET:
+        ; the following are settings for channel B
+        ld a,01h            ; write into WR0: select WR1
+        out (SIO_CB),a
+        ld a,00011000b      ; interrupts on every RX char; parity is no special condition;
+                            ; buffer overrun is special condition
+        out (SIO_CB),a
 		ret
 
 ;-------------------------------------------------------------------------------
@@ -258,4 +299,58 @@ SIOB_RX:	CALL  SIOB_RX_WAIT			;wait to receive char
 SIOB_RX1:	in a,(SIO_DB)       ;read that char
 		RET			
 
+;***************************************************************************
+;***************************************************************************
+;***************************************************************************
 
+;***************************************************************************
+; SIO Interrupt Service Routines
+;***************************************************************************
+
+SIOA_INT_INIT:	call SIOB_INIT	; set interrupt vector
+		call SIO_A_INT_SET	; turn on interrupts and fall through to buffer reset
+
+
+SIOA_BUF_RST:	ld hl,UPLOADBUF
+		ld (RX_READ_P),hl
+		ld (RX_WRITE_P),hl
+		ret
+
+SIOA_RX_ISR:	push af		; save AF
+		in a,(SIO_DA)		; get received char
+		push hl			; save HL
+		ld hl,(RX_WRITE_P)	; get write pointer to buffer
+		ld (hl),a			; store received byte there
+		ld a,l			; increment L
+		inc a
+		cp a,$80			; but rotate to 0 if reached end of buffer
+		jr nz,SIOA_RX_ISR_1
+		xor a
+SIOA_RX_ISR_1:	ld l,a
+		ld (RX_WRITE_P),hl	; store in var to point to next free location
+		pop hl
+		pop af
+		ei
+		reti
+
+SIOA_RD_RX:	push hl		; preserve hl
+		ld hl,(RX_READ_P)	; get pointer to current read location
+		ld a,(hl)			; get char to read
+		push af			; save for later
+		ld a,l			; increment L
+		inc a
+		cp a,$80			; but rotate to 0 if reached end of buffer
+		jr nz,SIOA_RD_RX_1
+		xor a
+SIOA_RD_RX_1:	ld l,a
+		ld (RX_READ_P),hl	; store in var to point to next location to read from
+		pop af
+		pop hl
+		ret
+
+SIOA_ISR_BYTE:	push hl
+		ld hl,RX_READ_P+1
+		ld a,(RX_WRITE_P+1)	; get lower byte of write pointer
+		sub a,(hl)			; subtract lower byte of read pointer
+		pop hl
+		ret				; upon return if A=0 - no bytes available (or clash - we're not testing)
