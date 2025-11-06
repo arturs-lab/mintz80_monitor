@@ -82,6 +82,22 @@ CF_LBA3:	EQU MONVARS + $aB
 CF_PART_CUR:	EQU MONVARS + $aC	; Current partition offset into MBR
 CFSECT_BUF:	EQU MONVARS + $aE	; pointer to location of CF data buffer. Need $200 byte buffer
 
+; SIO
+SIOA_WR0:		EQU MONVARS + $e7
+SIOA_WR1:		EQU MONVARS + $e8
+SIOA_WR3:		EQU MONVARS + $e9
+SIOA_WR4:		EQU MONVARS + $ea
+SIOA_WR5:		EQU MONVARS + $eb
+SIOA_WR6:		EQU MONVARS + $ec
+SIOA_WR7:		EQU MONVARS + $ed
+SIOB_WR0:		EQU MONVARS + $ee
+SIOB_WR1:		EQU MONVARS + $ef
+SIOB_WR2:		EQU MONVARS + $f0
+SIOB_WR3:		EQU MONVARS + $f1
+SIOB_WR4:		EQU MONVARS + $f2
+SIOB_WR5:		EQU MONVARS + $f3
+SIOB_WR6:		EQU MONVARS + $f4
+SIOB_WR7:		EQU MONVARS + $f5
 ; PIO
 PIO_CH0_CNF:	EQU MONVARS + $f6
 PIO_CH1_CNF:	EQU MONVARS + $f7
@@ -147,6 +163,26 @@ beepr:	EQU $d1	; speaker beeper
 memmap:	EQU $d8	; memory map $d8-$df
 
 ; ### other
+; SIO config values
+SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
+SIOA_WR1_CV:		EQU 00011000b	; interrupts on every RX char; parity is no special condition;
+							; buffer overrun is special condition
+SIOA_WR3_CV:		EQU 00001100b	; write into WR3: RX disable;
+SIOA_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
+SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
+SIOA_WR6_CV:		EQU 0
+SIOA_WR7_CV:		EQU 0
+SIOB_WR0_CV:		EQU 0
+SIOB_WR1_CV:		EQU 00000100b	; write into WR0: RX int disable, status affects interrupt vectors
+SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
+							; will be affected by the channel & condition that raised the interrupt
+							; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
+							; for special conditions
+SIOB_WR3_CV:		EQU 0
+SIOB_WR4_CV:		EQU 0
+SIOB_WR5_CV:		EQU 0
+SIOB_WR6_CV:		EQU 0
+SIOB_WR7_CV:		EQU 0
 
 ; PIO config values
 PIO_CH0_CNFV:	EQU 11001111b
@@ -162,9 +198,6 @@ CTC_CH1_TV:	EQU $b4
 CTC_CH2_TV:	EQU $0f	; SIOB 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
 CTC_CH3_TV:	EQU $0f	; SIOA 9600 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 					; with 256x prescaler in SIO ; @9.216MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
-
-; SIO interrupt vector
-SIO_INT_VECT:	EQU $0
 
 ; Error codes intel Hex record
 E_NONE:	EQU 00h
