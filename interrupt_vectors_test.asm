@@ -79,7 +79,8 @@ do_test:	ld (SP_INIT-$100),sp
 	or a,$80			; enable interrupt bit
 	and a,$ff			; no time constant follows
 	out (CTC_CH0),a
-	ld a,$12			; reset time constant $12=1ms
+;	ld a,$12			; reset time constant $12=1ms
+	ld a,$b4			; reset time constant $b4=10ms
 	out (CTC_CH0),a
 
 	push af			; just so stack is clean
