@@ -36,7 +36,7 @@ CF_INIT:	ld a,$0E			; issue software reset
 CF_INIT_LP:	push af	; iteration counter for timeout
 	CALL	CF_LP_BUSY
 	jr z,CF_INIT_GO
-	ld a,$ff
+	ld a,$40
 	call delay		; reset delay
 	pop af
 	inc a
@@ -80,6 +80,8 @@ CF_LP_BUSY:	push bc
 	ld c,0
 CF_LP_BUSY_1:	dec c
 	jr z,CF_LP_BUSY_X
+	ld a,$1
+	call delay
 	IN		A, (CFSTAT)					;Read status
 	AND		010000000b					;Mask busy bit
 	JR		NZ,CF_LP_BUSY_1				;Loop until busy(7) is 0
@@ -95,6 +97,8 @@ CF_LP_CMD_RDY:	push bc
 	ld c,0
 CF_LP_CMD_RDY_1:	dec c
 	jr z,CF_LP_CMD_RDY_X
+	ld a,$1
+	call delay
 	IN		A,(CFSTAT)					;Read status
 	AND		011000000b					;mask off busy and rdy bits
 	XOR		001000000b					;we want busy(7) to be 0 and drvrdy(6) to be 1
@@ -112,6 +116,8 @@ CF_LP_DAT_RDY:	push bc
 CF_LP_DAT_RDY_1:	dec c
 	jr z,CF_LP_DAT_RDY_X
 
+	ld a,$1
+	call delay
 	IN		A,(CFSTAT)					;Read status
 	AND		010001000b					;mask off busy and drq bits
 	XOR		000001000b					;we want busy(7) to be 0 and drq(3) to be 1
@@ -164,11 +170,14 @@ CF_RD_SECT:	CALL	CF_LP_DAT_RDY
 	xor a						; zero A to indicate success
 	RET
 	
-CF_RD_CMD_TOUT:	call CON_PRT_STR_SP
+CF_RD_CMD_TOUT:	push af
+	call CON_PRT_STR_SP
 zoWarnFlow = false
-	db $0d,$0a,"CF card read timeout",$0d,$0a,0
+	db $0d,$0a,"CF card read timeout ",0
 zoWarnFlow = true
-	ld (ULBEND+1),a
+	pop af
+	call CON_PRINTHBYTE
+	call CON_PRT_NL
 	xor a
 	dec a		; return $ff
 	ret
@@ -218,10 +227,11 @@ CF_WR_SECT_L:	LD 		A,(HL)
 
 CF_WR_CMD_TOUT:	call CON_PRT_STR_SP
 zoWarnFlow = false
-	db $0d,$0a,"CF card write timeout",$0d,$0a,0
+	db $0d,$0a,"CF card write timeout ",0
 zoWarnFlow = true
 	ld a,c
-	ld (ULBEND+1),a
+	call CON_PRINTHBYTE
+	call CON_PRT_NL
 	pop bc
 	xor a
 	dec a	; return $ff
@@ -300,7 +310,7 @@ CF_SYSLD:	push hl
 	ld (CFSECT_BUF),hl
 	ld a,1
 	ld (CF_SECCNT),a
-CF_SYSLD_LOOP:	call	jCF_RD_CMD
+CF_SYSLD_LOOP:	call CF_RD_CMD
 	or a
 	jr nz,CF_SYSLD_ERR
 	ld hl,(CFSECT_BUF)
