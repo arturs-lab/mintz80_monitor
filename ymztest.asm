@@ -10,8 +10,9 @@
 ;
 ; SAVE "name" CODE 60000 5024
 
-CHIP		EQU "AY"
-;CHIP		EQU "YMZ"
+CLKDIV	EQU 1
+;CHIP		EQU "AY"
+CHIP		EQU "YMZ"
 
 if CHIP = "AY"
 AYSEL		EQU	$00
@@ -19,8 +20,10 @@ AYDTA		EQU	$01
 PLAYER	EQU	$2400
 FRQDIV	EQU	$20
 else
-AYSEL		EQU	$02
-AYDTA		EQU	$03
+AYSEL		EQU	$b0
+AYDTA		EQU	$b1
+;AYSEL		EQU	$02
+;AYDTA		EQU	$03
 PLAYER	EQU	$3800
 FRQDIV	EQU	$10
 endif
@@ -44,9 +47,19 @@ FA00	ld a,$10	; frequency source
 	out (04),a
 	ld a,FRQDIV	; freq divider
 	out (05),a
+	in a,($d0)		; get current clock divider
+	push af
+if CLKDIV = 0
+	ld a,$0	; cpu frequency
+else
 	ld a,$1	; cpu frequency
+endif
 	out ($d0),a
+if CLKDIV = 0
+	ld a,$bc		; playback speed
+else
 	ld a,$e0		; playback speed
+endif
 	ld (PBSPEED),a
 	call jCON_PRT_NL
 	jp	FBA5		; initialize note pointers and start playing
@@ -244,6 +257,9 @@ FBC7	ld	d,$07	; Write FF to register 7 - disable all channels. Should be 3F to n
 	ld	e,$FF
 	call	AYWRITE
 ;	ei
+	pop af			; restore original clock
+	out ($d0),a
+	xor a				; return with A=0
 	ret		; exit
 
 ; entry:
