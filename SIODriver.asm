@@ -182,13 +182,16 @@ SIOA_TX:		CALL  SIOA_TX_RDY			;Make sure UART is ready to receive
 ;***************************************************************************
 ;SIOA_RX_WAIT blocking
 ;Function: wait for SIOA to receive char
+; since we're not using this in SIOA_RX, we might as well preserve AF
 ;***************************************************************************
-SIOA_RX_WAIT:	sub a               ;clear a, write into WR0: select RR0
-		out (SIO_CA),a
-		in a,(SIO_CA)       ;read RRx
-		bit 0,a
-		jr z,SIOA_RX_WAIT	;if any rx char left in rx buffer
-		RET
+SIOA_RX_WAIT:	push af
+		sub a			; 4c clear a, write into WR0: select RR0
+		out (SIO_CA),a		; 11c
+SIOA_RX_W1:	in a,(SIO_CA)		; 11c read RRx
+		and $01			; 7c
+		jr z,SIOA_RX_W1	; 12/7c if any rx char left in rx buffer
+		pop af
+		RET				; 10c
 	
 ;***************************************************************************
 ;SIOA_RX_CHK
@@ -208,10 +211,15 @@ SIOA_RX_CHK:	sub a               ;clear a, write into WR0: select RR0
 ; either wait for it if called at SIOA_RX
 ; or just fetch it without waiting if called at SIOA_RX1
 ; the latter is in case we already tested for and know char is available
+; we could call SIO_RX_WAIT, but rolling this code in here saves 27 cycles
 ;***************************************************************************
-SIOA_RX:	CALL  SIOA_RX_WAIT			;wait to receive char
-SIOA_RX1:	in a,(SIO_DA)       ;read that char
-		RET			
+SIOA_RX:	sub a				; 4c clear a, write into WR0: select RR0
+		out (SIO_CA),a		; 11c
+SIOA_RX2:	in a,(SIO_CA)		; 11c read RR0
+		and $01			; 7c
+		jr z,SIOA_RX2		; 12/7c if any rx char left in rx buffer
+SIOA_RX1:	in a,(SIO_DA)		; 11c read that char
+		RET				; 10c
 
 ;#######
 ;***************************************************************************
@@ -265,14 +273,14 @@ SIOB_TX:		CALL  SIOB_TX_RDY			;Make sure UART is ready to receive
 ;SIOB_RX_WAIT blocking
 ;Function: wait for SIOB to receive char
 ;***************************************************************************
-SIOB_RX_WAIT:	PUSH 	AF					
-SIOB_RX_WAIT_LP:	sub a               ;clear a, write into WR0: select RR0
+SIOB_RX_WAIT:	push af
+		sub a               ;clear a, write into WR0: select RR0
 		out (SIO_CB),a
-		in a,(SIO_CB)       ;read RRx
-		bit 0,a
-		jr z,SIOB_RX_WAIT_LP	;if any rx char left in rx buffer
-			POP     AF
-			RET
+SIOB_RX_W1:	in a,(SIO_CB)       ;read RRx
+		and $01
+		jr z,SIOB_RX_W1	;if any rx char left in rx buffer
+		pop af
+		RET
 	
 ;***************************************************************************
 ;SIOB_RX_CHK
@@ -295,9 +303,13 @@ SIOB_RX_CHK:	sub a               ;clear a, write into WR0: select RR0
 ; or just fetch it without waiting if called at SIOB_RX1
 ; the latter is in case we already tested for and know char is available
 ;***************************************************************************
-SIOB_RX:	CALL  SIOB_RX_WAIT			;wait to receive char
-SIOB_RX1:	in a,(SIO_DB)       ;read that char
-		RET			
+SIOB_RX:	sub a               ;clear a, write into WR0: select RR0
+		out (SIO_CB),a
+SIOB_RX2:	in a,(SIO_CB)       ;read RRx
+		and $01
+		jr z,SIOB_RX2	;if any rx char left in rx buffer
+SIOB_RX1:	in a,(SIO_DB)		; 11c read that char
+		RET				; 10c
 
 ;***************************************************************************
 ;***************************************************************************
