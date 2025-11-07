@@ -10,7 +10,7 @@
 ;
 ; SAVE "name" CODE 60000 5024
 
-CLKDIV	EQU 1
+CLKDIV	EQU 0
 ;CHIP		EQU "AY"
 CHIP		EQU "YMZ"
 
@@ -56,7 +56,7 @@ else
 endif
 	out ($d0),a
 if CLKDIV = 0
-	ld a,$bc		; playback speed
+	ld a,$c0		; playback speed
 else
 	ld a,$e0		; playback speed
 endif
