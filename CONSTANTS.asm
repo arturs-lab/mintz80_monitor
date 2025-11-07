@@ -1,6 +1,6 @@
 ; Constants, extracted to make the versioned file hardware agnostic
 
-USE_UART:	EQU true
+; USE_UART:	EQU true
 
 ; ### MEM map
 RAM_BOTTOM:	EQU 02000H       ; Bottom address of RAM
