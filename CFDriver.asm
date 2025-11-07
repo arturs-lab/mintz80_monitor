@@ -15,8 +15,12 @@
 ;***************************************************************************	
 CF_INIT:	ld a,$0E			; issue software reset
 	out (CFCTL),a
+	ld a,$20
+	call delay		; reset delay
 	ld a,$0A				; exit reset
 	out (CFCTL),a
+	ld a,$20
+	call delay		; reset delay
 
 	xor a
 	LD		(CF_LBA0), A
@@ -32,6 +36,8 @@ CF_INIT:	ld a,$0E			; issue software reset
 CF_INIT_LP:	push af	; iteration counter for timeout
 	CALL	CF_LP_BUSY
 	jr z,CF_INIT_GO
+	ld a,$ff
+	call delay		; reset delay
 	pop af
 	inc a
 	jr nz,CF_INIT_LP
