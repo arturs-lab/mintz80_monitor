@@ -23,14 +23,19 @@ CF_INIT:	ld a,$0E			; issue software reset
 	call delay		; reset delay
 
 	xor a
-	LD		(CF_LBA0), A
-	LD		(CF_LBA1), A
-	LD		(CF_LBA2), A
-	LD		(CF_LBA3), A
-	INC		A
-	LD		(CF_SECCNT), A
+	LD (CF_LBA0), A
+	LD (CF_LBA1), A
+	LD (CF_LBA2), A
+	LD (CF_LBA3), A
+	INC A
+	LD (CF_SECCNT), A
 	ld hl,CFSECT_BUF_V	; = $c000 in preparation for CPM loader which will load data from CF into $c000-$ffff
 	ld (CFSECT_BUF),hl	; by default point to this location for CF data buffer
+	ld de,CFSECT_BUF_V+1
+	ld bc,511
+	xor a
+	ld (hl),a
+	ldir				; zero out CF buffer to not accidentally read old data
 
 	xor a
 CF_INIT_LP:	push af	; iteration counter for timeout
