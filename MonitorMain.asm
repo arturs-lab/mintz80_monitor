@@ -7,9 +7,6 @@
 ;  CREATE DATE :	05 May 15 / 2022-03-28
 ;***************************************************************************
 
-VERSMYR:    EQU     "1"
-VERSMIN:    EQU     "3"
-
             ORG ROM_BOTTOM
 
 ROUTINES:
@@ -176,7 +173,7 @@ MAIN:
 
 	ld a,$20
 	call delay		; looks like Z80 needs this delay to successfully write to IO ports
-	ld a,$01		; (SYSCLK MHz/2/(value+1))
+	ld a,CLKDIV		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
 	call chime
 	call ymzinit
@@ -192,6 +189,11 @@ zoWarnFlow = false
 zoWarnFlow = true
 
 	call dmpio			; dump CPLD configuration
+
+	call CON_PRT_STR_SP	; print banner
+zoWarnFlow = false
+	db "System clock ",SYSCLK,"MHz",$0d,$0a,0
+zoWarnFlow = true
 
 	ld hl,R_MAIN		; Calculate my own checksum
 	ld (MVADDR+0),hl
