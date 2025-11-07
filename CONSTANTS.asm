@@ -1,3 +1,10 @@
+VERSMYR:    EQU     "1"
+VERSMIN:    EQU     "3"
+
+; clock divider
+CLKDIV	EQU	0	; (SYSCLK MHz/2/(value+1))
+SYSCLK	EQU "9.216"
+
 ; Constants, extracted to make the versioned file hardware agnostic
 
 ; USE_UART:	EQU true
@@ -132,14 +139,7 @@ PIO_DB:	EQU $1e
 PIO_CA:	EQU $1d
 PIO_CB:	EQU $1f
 
-;SPEED:	EQU 06Ch         ; DIP-switches for BAUD rate.
-
 ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
-
-;aybase:	EQU $00	; myz80 IO board
-;ymcs:	EQU $02	; 02 address reg 03 data reg, on mint board $70/$b0
-;sndclksrc:	EQU $04	; source of sound clock on z80 board 10=sysclk, 20=?, 40=uartclk 1.84MHz 
-;sndclkdiv:	EQU $05	; sound clock divider 00=/1, 10=/2, 20=/4, 30=/8
 
 CFBASE:	EQU 080h
 ;The addresses that the CF Card resides in I/O space.
@@ -196,8 +196,9 @@ CTC_CH3_CNFV:	EQU 01110111b
 CTC_CH0_TV:	EQU 180	; system interrupt, 200Hz
 CTC_CH1_TV:	EQU $b4
 CTC_CH2_TV:	EQU $0f	; SIOB 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
-CTC_CH3_TV:	EQU $0f	; SIOA 9600 baud with 16x prescaler in SIO ; @9.216MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
-					; with 256x prescaler in SIO ; @9.216MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
+CTC_CH3_TV:	EQU $0f	; SIOA 9600 baud with 16x prescaler in SIO ; @4.608MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
+					; with 256x prescaler in SIO ; @4.608MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
+					; with 256x prescaler in SIO ; @9.216MHz CPU: 0f=19200, 14=14400, 1e=9600, 3c=4800, 78=2400
 
 ; Error codes intel Hex record
 E_NONE:	EQU 00h
