@@ -18,13 +18,15 @@ Memory map
 
 After reset, memory mapper at IO d8-df points to EEPROM for first bank 0000-1fff and to 
 RAM for rest of memory 2000-ffff. This means that 8K of memory is initially used for 
-boot code/monitor. If more memory is needed, additional 8K of EEPROM may be unveiled 
+boot code/monitor. If more EEPROM is needed, additional 8K of EEPROM may be unveiled 
 by switching bank 2000-3fff to EEPROM by writing 0 to IO D9. This will reduce available RAM.
+
+Page layout and EEPROM mapping is documented at the bottom of CONSTANTS.asm file.
 
 Notes on programming new version of EEPROM code.
 
 I recommend programming new code into RAM first, thoroughly testing it and then writing to EEPROM
-This can be done by skipping jumper moving and using page 01 as target
+This can be done by skipping jumper moving and using page 01 as target in the steps below.
 
 It is possible to use current monitor to program new one in. I would only do this to 
 program page 02 or RAM with new version of monitor for testing. After programming, new code 
@@ -34,7 +36,10 @@ Preferred method is to use special version of monitor which loads at A000 and us
 to alter EEPROM. 
 
 To prepare new Intel HEX file for writing to EEPROM at 0000-1fff, edit it and replace addresses 
-to load into 4000-5fff range instead. ```sed -i -e 's/^:100/:104/;s/^:101/:105/' myhexfile.hex```
+to load into 4000-5fff range instead. ```sed -i -e 's/^:100/:104/;s/^:101/:105/' myhexfile.hex``` 
+Last line of Intel Hex data may be less than 16 bytes and needs to be edited manually.
+
+Steps to program EEPROM:
 * move EEPROM WR jumper to active position
 * zero all RAM just to keep things neat. F 2000 ffff 00
 * load special version of monitor into RAM at $A000
