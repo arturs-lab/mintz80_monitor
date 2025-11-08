@@ -182,7 +182,9 @@ MAIN:
 	call PIO_INIT		; init PIO
 	call CTC_INIT_ALL     ; init CTC
 	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
+if def UART_INIT
 	CALL UART_INIT		; Initialize UART
+endif
 	call CON_PRT_STR_SP	; print banner
 zoWarnFlow = false
 	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
