@@ -390,5 +390,5 @@ zero_ram_end:	equ $
 jphl:		jp (hl)
 
 ;		INCLUDE	"DARTDriver.asm"
-		INCLUDE	"UARTDriver.asm"
+;		INCLUDE	"UARTDriver.asm"
 
