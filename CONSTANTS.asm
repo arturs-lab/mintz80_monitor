@@ -7,6 +7,8 @@ SYSCLK	EQU "9.216"
 
 ; Constants, extracted to make the versioned file hardware agnostic
 
+; we could use this to trigger including UART code
+; but I want flexibility to include it but not use for console.
 ; USE_UART:	EQU true
 
 ; ### MEM map
