@@ -12,9 +12,13 @@ epp_prep	push hl
 		push de
 		push bc
 		
-		ld hl,epp_prog
+		ld hl,epp_prog			; first copy epp_prog into temp space
 		ld de,epp_tmp
 		ld bc,epp_end-epp_prog
+		ldir
+
+		ld hl,epp_switch		; copy epp_switch and epp_jmp_bnk behind epp_prog
+		ld bc,epp_prog-epp_switch
 		ldir
 
 		pop bc
@@ -67,7 +71,7 @@ epp_upd2:	ld hl,epp_page
 		jr NZ,epp_upd3		; skip if invalid entry
 		ld a,l			; restore
 		ld (epp_tmp+epp_banka-epp_prog+1),a
-		ld (epp_tmp+epp_jmp_bnk-epp_prog+1),a
+		ld (epp_tmp+epp_end-epp_prog+epp_jmp_bnk-epp_switch+1),a	; funny math because we're copying epp_jmp_bnk behind epp_prog in temp space
 
 epp_upd3:	pop af
 		pop hl
