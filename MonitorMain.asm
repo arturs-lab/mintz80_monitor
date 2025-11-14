@@ -30,7 +30,7 @@ IRQ:		di
 
 irq_end:	ex af,af'
 		exx
-		ei
+irq_x_1:	ei
 irq_exit:	reti
 
             ORG ROM_BOTTOM + $66     ; nmi routine
@@ -120,14 +120,6 @@ IRQTAB_INIT:	push HL
 			push DE
 			push BC
 
-			ld hl,irq_exit
-			ld (IRQTAB),hl		; initialize vector to interrupt return
-
-			ld hl,IRQTAB
-			ld de,IRQTAB+2
-			ld bc,256/2
-			ldir				; fill vector table with vectors pointing to interrupt exit
-
 			ld hl,IRQTABR
 			ld de,IRQTAB
 			ld bc,IRQTABEND-IRQTABR
@@ -172,16 +164,20 @@ MAIN:
 ;	call memmap_init
 
 	ld a,$20
-	call delay		; looks like Z80 needs this delay to successfully write to IO ports
+	call delay			; looks like Z80 needs this delay to successfully write to IO ports
 	ld a,CLKDIV		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
 	call chime
 	call ymzinit
 	call IRQTAB_INIT	; copy interrupt jump table from (IRQTABR) in eeprom to (IRQTAB) in ram
+	ld a,high IRQTAB	; load high byte of interrupt vector table address
+	ld i,a			; set interrupt vector for IM2
+	im 2				; enable interrupt mode 2
+	ei
 	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
 	call PIO_INIT		; init PIO
-	call CTC_INIT_ALL     ; init CTC
-	call SIO_INIT         ; init SIO, CTC drives SIO, so has to be set first
+	call CTC_INIT_ALL	; init CTC
+	call SIO_INIT_VARS	; init SIO, CTC drives SIO, so has to be set first
 if def UART_INIT
 	CALL UART_INIT		; Initialize UART
 endif
@@ -189,6 +185,11 @@ endif
 zoWarnFlow = false
 	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
 zoWarnFlow = true
+
+;	call SIOB_PRNT_SP
+;zoWarnFlow = false
+;	db $0d,$0a,"Hellorld",$0d,$0a,0
+;zoWarnFlow = true
 
 	call dmpio			; dump CPLD configuration
 
@@ -386,7 +387,7 @@ zero_ram_r:	ld hl,RAM_BOTTOM + (zero_ram_end - zero_ram_r)
 		xor a
 		ld (hl),a
 		ldir
-		jp 0
+		ret
 zero_ram_end:	equ $
 
 jphl:		jp (hl)
