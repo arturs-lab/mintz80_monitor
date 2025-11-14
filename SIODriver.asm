@@ -5,37 +5,26 @@
 ;  Version:			1.0
 ;***************************************************************************
 
-SIO_INIT_VARS:	ld a,SIOA_WR0_CV	; initialize variables with defaults for channel A
-		ld (SIOA_WR0),a
-		ld a,SIOA_WR1_CV
-		ld (SIOA_WR1),a
-		ld a,SIOA_WR3_CV
-		ld (SIOA_WR3),a
-		ld a,SIOA_WR4_CV
-		ld (SIOA_WR4),a
-		ld a,SIOA_WR5_CV
-		ld (SIOA_WR5),a
-		ld a,SIOA_WR6_CV
-		ld (SIOA_WR6),a
-		ld a,SIOA_WR7_CV
-		ld (SIOA_WR7),a
+SIO_WR_DEFAULTS: db SIOA_WR0_CV
+		db SIOA_WR1_CV
+		db SIOA_WR3_CV
+		db SIOA_WR4_CV
+		db SIOA_WR5_CV
+		db SIOA_WR6_CV
+		db SIOA_WR7_CV
+		db SIOB_WR0_CV
+		db SIOB_WR1_CV
+		db SIOB_WR2_CV
+		db SIOB_WR3_CV
+		db SIOB_WR4_CV
+		db SIOB_WR5_CV
+		db SIOB_WR6_CV
+		db SIOB_WR7_CV
 
-		ld a,SIOB_WR0_CV	; then for channel B
-		ld (SIOB_WR0),a
-		ld a,SIOB_WR1_CV
-		ld (SIOB_WR1),a
-		ld a,SIOB_WR2_CV
-		ld (SIOB_WR2),a
-		ld a,SIOB_WR3_CV
-		ld (SIOB_WR3),a
-		ld a,SIOB_WR4_CV
-		ld (SIOB_WR4),a
-		ld a,SIOB_WR5_CV
-		ld (SIOB_WR5),a
-		ld a,SIOB_WR6_CV
-		ld (SIOB_WR6),a
-		ld a,SIOB_WR7_CV
-		ld (SIOB_WR7),a		; then fall through to initializing ports
+SIO_INIT_VARS:	ld hl,SIO_WR_DEFAULTS
+		ld de,SIOA_WR0
+		ld bc,7+8
+		ldir
 
 ; initialize both SIO channels
 SIO_INIT:	call SIOA_INIT	; first init SIO A
@@ -55,11 +44,11 @@ SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
         out (SIO_CA),a
         ld a,00000100b      ; write into WR0: select WR4
         out (SIO_CA),a
-        ld a,01000100b      ; write into WR4: presc. 16x, 1 stop bit, no parity
+        ld a,(SIOA_WR4)      ; write into WR4: presc. 16x, 1 stop bit, no parity
         out (SIO_CA),a
         ld a,00000101b      ; write into WR0: select WR5
         out (SIO_CA),a
-        ld a,11101000b      ; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
+        ld a,(SIOA_WR5)      ; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
         out (SIO_CA),a
 		ret
 
@@ -70,7 +59,7 @@ SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
 ;***************************************************************************
 SIOB_INIT:	ld a,00000001b	; write into WR0: select WR1
         out (SIO_CB),a
-        ld a,00000100b	; write into WR0: RX int disable, status affects interrupt vectors
+        ld a,(SIOB_WR1)	; write into WR0: RX int disable, status affects interrupt vectors
         out (SIO_CB),a
         ld a,00000010b	; write into WR0: select WR2
         out (SIO_CB),a
@@ -86,7 +75,7 @@ SIO_A_INT_SET:
         ; the following are settings for channel A
         ld a,01h            ; write into WR0: select WR1
         out (SIO_CA),a
-        ld a,00011000b      ; interrupts on every RX char; parity is no special condition;
+        ld a,(SIOA_WR1)		; interrupts on every RX char; parity is no special condition;
                             ; buffer overrun is special condition
         out (SIO_CA),a
 		ret
@@ -96,7 +85,7 @@ SIO_B_INT_SET:
         ; the following are settings for channel B
         ld a,01h            ; write into WR0: select WR1
         out (SIO_CB),a
-        ld a,00011000b      ; interrupts on every RX char; parity is no special condition;
+        ld a,(SIOB_WR1)      ; interrupts on every RX char; parity is no special condition;
                             ; buffer overrun is special condition
         out (SIO_CB),a
 		ret
@@ -106,13 +95,15 @@ SIO_B_INT_SET:
 
 SIOA_RTS_OFF:	ld a,00000101b      ; write into WR0: select WR5
         out (SIO_CA),a
-        ld a,11101000b      ; 8 bits/TX char; TX enable; RTS disable
+        ld a,(SIOA_WR5); 8 bits/TX char; TX enable; RTS disable
+	and a,11111101b
         out (SIO_CA),a
         ret
 
 SIOA_RTS_ON:	ld a,00000101b      ; write into WR0: select WR5
         out (SIO_CA),a
-        ld a,11101010b      ; 8 bits/TX char; TX enable; RTS enable
+        ld a,(SIOA_WR5)      ; 8 bits/TX char; TX enable; RTS enable
+	or a,00000010b
         out (SIO_CA),a
         ret
 
