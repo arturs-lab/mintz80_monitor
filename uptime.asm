@@ -61,9 +61,11 @@ up_isr_3:	ld (TIMR_2),a
 up_isr_4:	ld (TIMR_3),a
 		jr nz,up_isr_x
 
+		push hl
 		ld hl,(TIMR_4)	; days
 		inc hl
 		ld (TIMR_4),hl
+		pop hl
 
 up_isr_x:	pop af
 up_isr_j:	jp 0		; this gets replaced with address of original ISR to be executed after this one
