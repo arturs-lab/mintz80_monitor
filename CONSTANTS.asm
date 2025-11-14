@@ -154,7 +154,7 @@ PIO_CB:	EQU $1f
 CNFIGSW	EQU $a0	; config switch read only
 ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
 
-CF_RESET	EQU 0B8h	; CF soft reset write only
+CF_RESET	EQU 0B8h	; CF soft reset write only if configured by jumper
 CFBASE:	EQU 080h
 ;The addresses that the CF Card resides in I/O space.
 ;Change to suit hardware.
@@ -179,15 +179,14 @@ memmap:	EQU $d8	; memory map $d8-$df
 ; ### other
 ; SIO config values
 SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
-SIOA_WR1_CV:		EQU 00000000b	; 00011000b interrupts on every RX char; parity is no special condition;
-							; buffer overrun is special condition
+SIOA_WR1_CV:		EQU 00000000b	; no interrupts
 SIOA_WR3_CV:		EQU 00001100b	; write into WR3: RX disable;
 SIOA_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
 SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOA_WR6_CV:		EQU 0
 SIOA_WR7_CV:		EQU 0
 SIOB_WR0_CV:		EQU 0
-SIOB_WR1_CV:		EQU 00011100b	; 00000100b write into WR0: RX int disable, status affects interrupt vectors
+SIOB_WR1_CV:		EQU 00011100b	; RX int enable, parity does not affect vector, status affects vector
 SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
 							; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
