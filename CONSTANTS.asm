@@ -83,13 +83,23 @@ IERECTYPE:	EQU MONVARS + $a2        ; hex-intel record type
 DEBUG:	EQU MONVARS + $a3
 MTPHFLAG:	EQU MONVARS + $a3     ; Phase counter: phase 1 doesn't check old value (being unknown)
 CHKSUM_C:	EQU MONVARS + $a4     ; uses 3 bytes
+
 CF_SECCNT:	EQU MONVARS + $a7 
 CF_LBA0:	EQU MONVARS + $a8
 CF_LBA1:	EQU MONVARS + $a9
-CF_LBA2:	EQU MONVARS + $aA
-CF_LBA3:	EQU MONVARS + $aB
-CF_PART_CUR:	EQU MONVARS + $aC	; Current partition offset into MBR
-CFSECT_BUF:	EQU MONVARS + $aE	; pointer to location of CF data buffer. Need $200 byte buffer
+CF_LBA2:	EQU MONVARS + $aa
+CF_LBA3:	EQU MONVARS + $ab
+CF_PART_CUR:	EQU MONVARS + $ac	; Current partition offset into MBR
+CFSECT_BUF:	EQU MONVARS + $ae	; pointer to location of CF data buffer. Need $200 byte buffer
+
+SYSTMR0:	EQU MONVARS + $b0		; system timers. SYSTMR0 overflowing into SYSTMR2 gets incremented on T0 interrupt every 1ms
+SYSTMR2:	EQU MONVARS + $b2
+SYSTMR4:	EQU MONVARS + $b4		; SYSTMR4 overflowing into SYSTMR6 gets incremented on T1 interrupt, 5ms
+SYSTMR5:	EQU MONVARS + $b5		; seconds
+SYSTMR6:	EQU MONVARS + $b6		; minutes
+SYSTMR7:	EQU MONVARS + $b7		; hours
+SYSTMR8:	EQU MONVARS + $b8		; days, 16 bit
+SYSTMR9:	EQU MONVARS + $b9
 
 ; SIO
 SIOA_WR0:		EQU MONVARS + $e7
@@ -141,8 +151,10 @@ PIO_DB:	EQU $1e
 PIO_CA:	EQU $1d
 PIO_CB:	EQU $1f
 
+CNFIGSW	EQU $a0	; config switch read only
 ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
 
+CF_RESET	EQU 0B8h	; CF soft reset write only
 CFBASE:	EQU 080h
 ;The addresses that the CF Card resides in I/O space.
 ;Change to suit hardware.
@@ -167,7 +179,7 @@ memmap:	EQU $d8	; memory map $d8-$df
 ; ### other
 ; SIO config values
 SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
-SIOA_WR1_CV:		EQU 00011000b	; interrupts on every RX char; parity is no special condition;
+SIOA_WR1_CV:		EQU 00000000b	; 00011000b interrupts on every RX char; parity is no special condition;
 							; buffer overrun is special condition
 SIOA_WR3_CV:		EQU 00001100b	; write into WR3: RX disable;
 SIOA_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
@@ -175,7 +187,7 @@ SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX o
 SIOA_WR6_CV:		EQU 0
 SIOA_WR7_CV:		EQU 0
 SIOB_WR0_CV:		EQU 0
-SIOB_WR1_CV:		EQU 00000100b	; write into WR0: RX int disable, status affects interrupt vectors
+SIOB_WR1_CV:		EQU 00011100b	; 00000100b write into WR0: RX int disable, status affects interrupt vectors
 SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
 							; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
@@ -190,13 +202,13 @@ SIOB_WR7_CV:		EQU 0
 PIO_CH0_CNFV:	EQU 11001111b
 PIO_CH1_CNFV:	EQU 11001111b
 ; CTC config values
-CTC_CH0_CNFV:	EQU 00100111b
-CTC_CH1_CNFV:	EQU 00000111b
+CTC_CH0_CNFV:	EQU 10100111b
+CTC_CH1_CNFV:	EQU 10100111b
 CTC_CH2_CNFV:	EQU 01110111b
 CTC_CH3_CNFV:	EQU 01110111b
 ; CTC time constants values
-CTC_CH0_TV:	EQU 180	; system interrupt, 200Hz
-CTC_CH1_TV:	EQU $b4
+CTC_CH0_TV:	EQU $24	; $24 -> 1000Hz, 1ms, $12 -> 2000Hz, 500us
+CTC_CH1_TV:	EQU $b4	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
 CTC_CH2_TV:	EQU $0f	; SIOB 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
 CTC_CH3_TV:	EQU $0f	; SIOA 9600 baud with 16x prescaler in SIO ; @4.608MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 					; with 256x prescaler in SIO ; @4.608MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
@@ -240,8 +252,4 @@ HEXLINES:	EQU 17 ; FIXIT: There is a off-by-one-error here
 ;$c000-$dfff RAM	de 00->rom0, 02->rom2
 ;$e000-$ffff RAM	df 00->rom1, 02->rom3
 
-; current ROM:
-; 0 rom $0000 SIO 2400 baud 08BCB8
-; 1 rom $a000 UART 9600 baud 0A867B
-; 2 rom $0000 UART 9600 baud 08BF96
-; 3 rom $a000 SIO 2400 baud 0A839D
+; rom0-rom3 refer to 8K chunks of 28C256 32K EEPROM
