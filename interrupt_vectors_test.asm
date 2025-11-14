@@ -26,24 +26,26 @@ main:	ld a,11001111b      ; mode 3 (bit control)
 	ld a,$07			; disable interrupt
 	out (PIO_CB),a
 
+; channel A is INT vector 6?
 	ld a,00000001b      ; write into WR0: select WR1
 	out (SIO_CA),a
-	ld a,00000100b      ; write into WR1: status affects interrupt vectors
+	ld a,00000100b      ; write into WR1: No interrupt, status affects interrupt vectors
 	out (SIO_CA),a
+
 	ld a,00000001b      ; write into WR0: select WR1
 	out (SIO_CB),a
-	ld a,00000100b      ; write into WR1: status affects interrupt vectors
+	ld a,00000100b      ; write into WR1: No interrupt, status affects interrupt vectors
 	out (SIO_CB),a
 
 
-	ld a,$0
-	out ($f4),a		; set INT priority order section 3.9, page 149
+;	ld a,$0
+;	out ($f4),a		; set INT priority order section 3.9, page 149
 
 	ld a,$24	;high IRQTAB	; load high byte of interrupt vector table address
 	ld i,a			; set interrupt vector for IM2
 	im 2				; enable interrupt mode 2
 
-	ld hl,$5000
+	ld hl,$5000		; zero counter table
 	ld de,$5001
 	ld bc,$ff
 	ld a,0
@@ -68,6 +70,7 @@ intvinitl:	ld (hl),e		; initialize interrupt jump table
 	xor a				; make sure A is 0
 	ret
 
+; CTC CH0 is INT vector 8
 do_test:	ld (SP_INIT-$100),sp
 	ld sp,SP_INIT-$30
 	ld ix,$5000
@@ -107,6 +110,12 @@ int_test: 	pop af
 	pop af
 	xor a
 	ld sp,(SP_INIT-$100)
+	ret
+
+do_ei:	ei
+	ret
+
+do_di:	di
 	ret
 
 tc0ei:	ld a,(CTC_CH0_CNF)	; get T0 configuration default
