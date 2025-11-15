@@ -119,7 +119,7 @@ up_isr_3:	ld (SYSTMR6),a
 
 		ld a,(SYSTMR7)	; hours
 		inc a
-		cp 60
+		cp 24
 		jr nz,up_isr_4
 		xor a
 up_isr_4:	ld (SYSTMR7),a
