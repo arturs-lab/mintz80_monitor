@@ -146,6 +146,8 @@ sp_p16a:	ld a,(hl)
 ;LOAD_EEPROM_COMMAND
 ;Function: Load code from EEPROM and execute it
 ;***************************************************************************
+LE_TMP	EQU $FF00	; temporary code location
+
 LOAD_EEPROM:	call jCON_PRT_STR_SP
 zoWarnFlow = false
 	db $0d,$0a,"Run from EEPROM",0Dh,0Ah,"1 - monitor at $A000",$0d,$0a,"2 - Basic 9k",$0d,$0a,"3 - Hot start Basic 9k",$0d,$0a,EOS
@@ -154,10 +156,10 @@ zoWarnFlow = true
 	cp a,"1"
 	jr nz,LE2
 	ld hl,LE_A
-	ld de,$8000
+	ld de,LE_TMP
 	ld bc,LE2-LE_A
 	ldir
-	jp $8000
+	jp LE_TMP
 
 LE_A:	ld a,00
 	out ($db),a
@@ -172,18 +174,18 @@ LE_A:	ld a,00
 LE2:	cp a,"2"
 	jr nz,LE_3
 	ld hl,LE_RUN
-	ld de,$8000
+	ld de,LE_TMP
 	ld bc,LE_REND-LE_RUN
 	ldir
-	jp $8000
+	jp LE_TMP
 
 LE_3:	cp a,"3"
 	ret nz
 	ld hl,LE_hot
-	ld de,$8000
+	ld de,LE_TMP
 	ld bc,LE_REND-LE_hot
 	ldir
-	jp $8000
+	jp LE_TMP
 
 LE_RUN:	di
 	ld a,03		; switch first 2 banks to RAM
