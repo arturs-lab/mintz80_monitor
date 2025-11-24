@@ -2,14 +2,14 @@
 
 		org $2400
 
-start:	ld a,02
-		out ($da),a
-		ld hl,$4000
+start:	ld a,00
+		out ($db),a
+		ld hl,$6000
 		ld de,$a000
 		ld bc,$2000
 		ldir
 		ld a,01
-		out ($da),a
+		out ($db),a
 		jp $a000
 
 endprog	equ $
