@@ -2,7 +2,8 @@
 
 		org $8000
 
-start:	ld a,03		; switch first 2 banks to RAM
+start:	di
+		ld a,03		; switch first 2 banks to RAM
 		out ($d8),a
 		out ($d9),a
 		ld a,02		; switch next two banks to EEPROM2,3
@@ -15,7 +16,8 @@ start:	ld a,03		; switch first 2 banks to RAM
 		ld a,01		; switch bank 2,3 to RAM
 		out ($da),a
 		out ($db),a
-hot:		ld a,03		; switch first 2 banks to RAM. We can enter here if basic was already loaded
+hot:		di			; have to do it here again in case we come in through here and miss first time
+		ld a,03		; switch first 2 banks to RAM. We can enter here if basic was already loaded
 		out ($d8),a
 		out ($d9),a
 		jp $0000
