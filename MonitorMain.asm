@@ -304,6 +304,8 @@ MON_COMMAND:    ; Inserted ERROR_CHK for all commands requiring input
         CALL    Z,HELP_COMMAND
         CP      "A"
         CALL    Z,hex_compare
+        CP      "B"
+        CALL    Z,LOAD_EEPROM
         CP      "D"
         CALL    Z,MDCMD
         CP      "C"

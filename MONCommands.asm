@@ -14,6 +14,7 @@
 HLPMSG1: DEFB "ZMC80 Monitor Command List", 0Dh, 0Ah
 HLPMSG2: DEFB "? - view command list", 0Dh, 0Ah
          DEFB "A - address range compare", 0Dh, 0Ah
+         DEFB "B - load and run code from EEPROM", 0Dh, 0Ah
 HLPMSGc: DEFB "C - clear screen", 0Dh, 0Ah
 HLPMSGd: DEFB "D - print 100h bytes from specified location", 0Dh, 0Ah
 HLPMSGe: DEFB "E - edit bytes in memory", 0Dh, 0Ah
@@ -140,6 +141,72 @@ sp_p16a:	ld a,(hl)
 	djnz sp_p16a
 	call jCON_PRT_NL
 	ret
+
+;***************************************************************************
+;LOAD_EEPROM_COMMAND
+;Function: Load code from EEPROM and execute it
+;***************************************************************************
+LOAD_EEPROM:	call jCON_PRT_STR_SP
+zoWarnFlow = false
+	db $0d,$0a,"Run from EEPROM",0Dh,0Ah,"1 - monitor at $A000",$0d,$0a,"2 - Basic 9k",$0d,$0a,"3 - Hot start Basic 9k",$0d,$0a,EOS
+zoWarnFlow = true
+	call CON_GET_CHAR
+	cp a,"1"
+	jr nz,LE2
+	ld hl,LE_A
+	ld de,$8000
+	ld bc,LE2-LE_A
+	ldir
+	jp $8000
+
+LE_A:	ld a,00
+	out ($db),a
+	ld hl,$6000
+	ld de,$a000
+	ld bc,$2000
+	ldir
+	ld a,01
+	out ($db),a
+	jp $a000
+
+LE2:	cp a,"2"
+	jr nz,LE_3
+	ld hl,LE_RUN
+	ld de,$8000
+	ld bc,LE_REND-LE_RUN
+	ldir
+	jp $8000
+
+LE_3:	cp a,"3"
+	ret nz
+	ld hl,LE_hot
+	ld de,$8000
+	ld bc,LE_REND-LE_hot
+	ldir
+	jp $8000
+
+LE_RUN:	di
+	ld a,03		; switch first 2 banks to RAM
+	out ($d8),a
+	out ($d9),a
+	ld a,02		; switch next two banks to EEPROM2,3
+	out ($da),a
+	out ($db),a
+	ld hl,$4000
+	ld de,$0000
+	ld bc,$4000
+	ldir
+	ld a,01		; switch bank 2,3 to RAM
+	out ($da),a
+	out ($db),a
+LE_hot:	di
+	ld a,03		; switch first 2 banks to RAM. We can enter here if basic was already loaded
+	out ($d8),a
+	out ($d9),a
+	jp $0000
+LE_REND:
+
+
 
 ;***************************************************************************
 ;MEMORY_DUMP_COMMAND
