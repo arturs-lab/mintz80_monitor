@@ -89,7 +89,7 @@ zoWarnFlow = true
 	call jCON_GET_CHAR
 	cp a,"Y"
 	ret nz
-; aven if we get Y here, since checksum invalid, we don't trust other data
+; even if we get Y here, since checksum invalid, we don't trust other data
 ; there and go with bootloader's defaults
 
 boot_go:	call jCON_PRT_STR_SP	; announce loading code
@@ -118,14 +118,14 @@ sw_mem:	di		; Disable interrupts before we switch out memory containing ISR
 	out ($d8),a	; do it twice to be sure
 	in a,($d8)		; read it back
 	and $07		; only keep lower 3 bits
-	cp $03		; should be 1
+	cp $03		; should be 3
 	jr nz,boot_err
 	ld a,03
 	out ($d9),a
 	out ($d9),a	; do it twice to be sure
 	in a,($d9)		; read it back
 	and $07		; only keep lower 3 bits
-	cp $03		; should be 1
+	cp $03		; should be 3
 	jr nz,boot_err
 
 boot_cnt:	ld hl,CFSECT_BUF_V+$200
