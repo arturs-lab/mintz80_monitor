@@ -112,7 +112,8 @@ zoWarnFlow = true
 	call jCON_PRINTHWORD
 	call jCON_PRT_NL
 
-sw_mem:	ld a,03
+sw_mem:	di		; Disable interrupts before we switch out memory containing ISR
+	ld a,03
 	out ($d8),a
 	out ($d8),a	; do it twice to be sure
 	in a,($d8)		; read it back
@@ -129,12 +130,13 @@ sw_mem:	ld a,03
 
 boot_cnt:	ld hl,CFSECT_BUF_V+$200
 	ld de,(boot_dest)		; if found code, copy it to $0000-$3cff
-	ld bc,dta_size
+	ld bc,(dta_size)
 	ldir
 
-;would be nice to pring jump message here, but monitor may be switched out now
+;would be nice to print jump message here, but monitor may be switched out now
 
-	jp (hl)			; and jump to beginning of it
+	ld hl,(jmp_dest)	; load destination of jump
+	jp (hl)			; and jump to it
 
 boot_err:	ld a,00		; restore default values
 	out ($d8),a
@@ -150,7 +152,7 @@ zoWarnFlow = true
 	ret
 
 	org $c1a0
-code_label:	db "Boot Loader 0000",0		; label of this program for monitor loader to display
+code_label:	db "Universal Bootloader",0		; label of this program for monitor loader to display
 
 	org $c1b8
 dta_size	dw $3e00		; default $3e00
