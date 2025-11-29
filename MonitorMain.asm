@@ -173,13 +173,16 @@ MAIN:
 	ld a,high IRQTAB	; load high byte of interrupt vector table address
 	ld i,a			; set interrupt vector for IM2
 	im 2				; enable interrupt mode 2
-	ei
 	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
 	call PIO_INIT		; init PIO
 	call CTC_INIT_ALL	; init CTC
 	call SIO_INIT_VARS	; init SIO, CTC drives SIO, so has to be set first
 if def UART_INIT
 	CALL UART_INIT		; Initialize UART
+endif
+; this needs to happen after all hardware was initialized and had a chance to install their ISRs
+if EN_INT
+	ei
 endif
 	call CON_PRT_STR_SP	; print banner
 zoWarnFlow = false
@@ -235,9 +238,10 @@ RESET_COMMAND:
 ;PRINT_MON_HDR
 ;Function: Print out program header info
 ;***************************************************************************
-MNMSG1:     DEFB    0DH, 0Ah, "MintZ80 Computer", 09h, 09h, 09h, "2015 MCook"
-MNMSG2:     DEFB    0DH, 0Ah, " adaptation to MPF-1 / Z80 DART", 09h, "2022 F.J.Kraan", 0Dh, 0Ah
-            DEFB    "Adaptation to MintZ80 2025 Artur's Lab", 0Dh, 0Ah
+MNMSG1:     DEFB    0DH, 0Ah, MACHINE, " Computer", 09h, 09h, 09h, "2025 Artur's Lab"
+MNMSG2:     DEFB    0DH, 0Ah, "Original code 2015 M. Cook",$0d,$0a
+            DEFB    " adaptation to MPF-1 / Z80 DART",09h, "2022 F.J.Kraan", 0Dh, 0Ah
+            DEFB    "Adaptation to ", MACHINE ," 2025 Artur's Lab", 0Dh, 0Ah
 MNMSG3A:    DEFB    "Monitor v", VERSMYR, ".", VERSMIN, ", ROM: ", EOS
 MNMSG3B:    DEFB    "h, RAM: ", EOS
 MNMSG3C:    DEFB    "h, CTC: ", EOS
@@ -365,14 +369,14 @@ MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed)
 
 ;        END
 
-dmpio:	ld c,$d0
-		ld b,$0
+dmpio:	ld bc,$00d0
 		CALL	CON_PRT_NL
 dmpio1:	IN      A, (C)
 		CALL	CON_PRINTHBYTE
 		inc c
 		ld a,c
-		cp $e0
+		and $0f
+		cp $00
 		jr nz,dmpio1
 		CALL	CON_PRT_NL
 		ret

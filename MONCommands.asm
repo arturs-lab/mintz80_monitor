@@ -775,7 +775,7 @@ HXD_LOOP:	CALL    CON_CHARS2BYTE              ; get data byte
         xor a	; checksum being returned in A was matching command checks, so zero A
 HXI_ENDR:	RET
         
-USERRREG:	equ $1fbc
+
 USERAF: EQU     USERRREG+0
 USERBC: EQU     USERRREG+2
 USERDE: EQU     USERRREG+4

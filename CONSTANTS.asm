@@ -4,12 +4,16 @@ VERSMIN:    EQU     "3"
 ; clock divider
 CLKDIV	EQU	0	; (SYSCLK MHz/2/(value+1))
 SYSCLK	EQU "9.216"
+MACHINE	EQU "MintZ80"
 
 ; Constants, extracted to make the versioned file hardware agnostic
 
 ; we could use this to trigger including UART code
 ; but I want flexibility to include it but not use for console.
 ; USE_UART:	EQU true
+
+; do wew want to enable interrupts?
+EN_INT:	EQU true
 
 ; ### MEM map
 RAM_BOTTOM:	EQU 02000H       ; Bottom address of RAM
@@ -28,7 +32,7 @@ CFSECT_BUF_V:	EQU $A000		; value for CFSECT_BUF variable. Defaults to $c000 in p
 MONVARS:	EQU RAM_TOP - $1ff	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	EQU RAM_TOP - $ff	; this is where EEPROM programming code is copied before execution to avoid it
 						; clashing with new data being programmed into its location in EEPROM
-
+USERRREG:	equ RAM_TOP - $37F
 	elseif def ROM_BOTTOM_a000
 
 ROM_BOTTOM:	EQU $a000       ; Bottom address of ROM
@@ -41,7 +45,7 @@ CFSECT_BUF_V:	EQU $C000		; value for CFSECT_BUF variable. Defaults to $c000 in p
 MONVARS:	EQU $c000 - $200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	EQU $c000 - $100	; this is where EEPROM programming code is copied before execution to avoid it
 						; clashing with new data being programmed into its location in EEPROM
-
+USERRREG:	equ $c000 - $380
 	else
 
 ROM_BOTTOM:	EQU 00000h       ; Bottom address of ROM
@@ -54,7 +58,7 @@ CFSECT_BUF_V:	EQU $C000			; value for CFSECT_BUF variable. Defaults to $c000 in 
 MONVARS:	EQU RAM_BOTTOM + $0200	; SP goes at the top of memory. Put monitor vars and buffers 511 bytes below it
 epp_tmp:	EQU RAM_BOTTOM + $0300	; this is where EEPROM programming code is copied before execution to
 							; avoid it clashing with new data being programmed into its location in EEPROM
-
+USERRREG:	equ RAM_BOTTOM + $0180
 	endif
 
 
@@ -134,7 +138,7 @@ CTC_CH3_TC:	EQU MONVARS + $ff		; time constant for channel 3 this feeds SIOA
 
 ; ### IO map
 ;IOM-MPF-IP ports:
-UART_BASE:	EQU 008h         ; Base port address, P8250A/USART uses 2 ports.
+UART_BASE:	EQU 008h         ; Base port address, P8250A/USART uses 8 ports.
 CTC_BASE:	EQU 010H         ; Base port address for Z80 CTC, only CTC2 is used. 64h
 CTC_CH0:	EQU CTC_BASE		; system interrupt 200Hz
 CTC_CH1:	EQU CTC_BASE+1
@@ -145,11 +149,11 @@ SIO_DA:	EQU SIO_BASE
 SIO_CA:	EQU SIO_BASE+1
 SIO_DB:	EQU SIO_BASE+2
 SIO_CB:	EQU SIO_BASE+3
-PIO_BASE:	EQU 01ch         ; Pase port address for Z80 PIO, not used. 68h
-PIO_DA:	EQU $1c
-PIO_DB:	EQU $1e
-PIO_CA:	EQU $1d
-PIO_CB:	EQU $1f
+PIO_BASE:	EQU 01ch         ; Base port address for Z80 PIO, not used. 68h
+PIO_DA:	EQU PIO_BASE
+PIO_CA:	EQU PIO_BASE+1
+PIO_DB:	EQU PIO_BASE+2
+PIO_CB:	EQU PIO_BASE_3
 
 CNFIGSW	EQU $a0	; config switch read only
 ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
