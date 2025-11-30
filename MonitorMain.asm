@@ -7,7 +7,12 @@
 ;  CREATE DATE :	05 May 15 / 2022-03-28
 ;***************************************************************************
 
+if ROM_BOTTOM_0000
             ORG ROM_BOTTOM
+		DISP $4000
+else
+            ORG ROM_BOTTOM
+endif
 
 ROUTINES:
 R_MAIN:     JP      MAIN            ; init DART and starts command loop
@@ -369,7 +374,7 @@ MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed)
 
 ;        END
 
-dmpio:	ld bc,$00d0
+dmpio:	ld bc,turbo
 		CALL	CON_PRT_NL
 dmpio1:	IN      A, (C)
 		CALL	CON_PRINTHBYTE

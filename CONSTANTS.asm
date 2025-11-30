@@ -153,7 +153,7 @@ PIO_BASE:	EQU 01ch         ; Base port address for Z80 PIO, not used. 68h
 PIO_DA:	EQU PIO_BASE
 PIO_CA:	EQU PIO_BASE+1
 PIO_DB:	EQU PIO_BASE+2
-PIO_CB:	EQU PIO_BASE_3
+PIO_CB:	EQU PIO_BASE+3
 
 CNFIGSW	EQU $a0	; config switch read only
 ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
