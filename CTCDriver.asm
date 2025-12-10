@@ -16,6 +16,7 @@ CTC0_INIT: ld a,CTCV		; load CTC interrupt vector
 	out (CTC_CH0),a
 	ld a,(CTC_CH0_TC)	; time constant
 	out (CTC_CH0),a
+	ret
 
 ;init CH1
 ;CH1 disabled
@@ -26,6 +27,7 @@ CTC1_INIT: ld a,CTCV+2	; load CTC interrupt vector
 	out (CTC_CH1),a		; CH1 is halted
 	ld A,(CTC_CH1_TC)	; time constant 56d
 	out (CTC_CH1),a		; loaded into channel 1
+	ret
 
 ;init CH2
 ;CH2 divides CLK/TRG2 clock providing a clock signal at TO2.
@@ -37,6 +39,7 @@ CTC2_INIT: ld a,CTCV+4	; load CTC interrupt vector
 	out (CTC_CH2),a
 	ld A,(CTC_CH2_TC)	; time constant 56d
 	out (CTC_CH2),a		; loaded into channel 2
+	ret
 
 ;init CH3
 ;CH3 divides CLK/TRG3 clock providing a clock signal at TO3.
