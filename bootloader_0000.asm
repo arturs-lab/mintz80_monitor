@@ -114,16 +114,16 @@ zoWarnFlow = true
 
 sw_mem:	di		; Disable interrupts before we switch out memory containing ISR
 	ld a,03
-	out ($d8),a
-	out ($d8),a	; do it twice to be sure
-	in a,($d8)		; read it back
+	out (memmap),a
+	out (memmap),a	; do it twice to be sure
+	in a,(memmap)		; read it back
 	and $07		; only keep lower 3 bits
 	cp $03		; should be 3
 	jr nz,boot_err
 	ld a,03
-	out ($d9),a
-	out ($d9),a	; do it twice to be sure
-	in a,($d9)		; read it back
+	out (memmap+1),a
+	out (memmap+1),a	; do it twice to be sure
+	in a,(memmap+1)		; read it back
 	and $07		; only keep lower 3 bits
 	cp $03		; should be 3
 	jr nz,boot_err
@@ -139,11 +139,11 @@ boot_cnt:	ld hl,CFSECT_BUF_V+$200
 	jp (hl)			; and jump to it
 
 boot_err:	ld a,00		; restore default values
-	out ($d8),a
-	out ($d8),a	; do it twice to be sure
+	out (memmap),a
+	out (memmap),a	; do it twice to be sure
 	ld a,01
-	out ($d9),a
-	out ($d9),a	; do it twice to be sure
+	out (memmap+1),a
+	out (memmap+1),a	; do it twice to be sure
 ; now that hopefully monitor is back, we can try to print message before returning
 	call jCON_PRT_STR_SP	; announce failure
 zoWarnFlow = false
