@@ -86,7 +86,7 @@ del1:	dec a
 	ret
 
 chime:	ld bc,$0200	; bc = duration
-	ld a,$0c		; a = pitch
+	ld a,$10		; a = pitch
 	; fall through to beep
 
 ; bc = duration, a = pitch
