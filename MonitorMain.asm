@@ -104,15 +104,15 @@ bep1:	out (beepr),a
 
 memmap_init:	in a,(beepr)	; unlock memmap
 	ld a,0		; init mem map
-	out ($d8),a
+	out (memmap),a
 	ld a,1
-	out ($d9),a
-	out ($da),a
-	out ($db),a
-	out ($dc),a
-	out ($dd),a
-	out ($de),a
-	out ($df),a
+	out (memmap+1),a
+	out (memmap+2),a
+	out (memmap+3),a
+	out (memmap+4),a
+	out (memmap+5),a
+	out (memmap+6),a
+	out (memmap+7),a
 	out (beepr),a	; lock memmap
 	ret
 
@@ -188,7 +188,10 @@ endif
 ; this needs to happen after all hardware was initialized and had a chance to install their ISRs
 if EN_INT
 	ei
+else
+	nop				; leave room for EI for testing
 endif
+
 	call CON_PRT_STR_SP	; print banner
 zoWarnFlow = false
 	db $0d,$0a,"Hellorld",$0d,$0a,"CPLD config:",0
