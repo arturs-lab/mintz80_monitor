@@ -106,24 +106,28 @@ SYSTMR8:	EQU MONVARS + $b8		; days, 16 bit
 SYSTMR9:	EQU MONVARS + $b9
 
 ; SIO
-SIOA_WR0:		EQU MONVARS + $e7
-SIOA_WR1:		EQU MONVARS + $e8
-SIOA_WR3:		EQU MONVARS + $e9
-SIOA_WR4:		EQU MONVARS + $ea
-SIOA_WR5:		EQU MONVARS + $eb
-SIOA_WR6:		EQU MONVARS + $ec
-SIOA_WR7:		EQU MONVARS + $ed
-SIOB_WR0:		EQU MONVARS + $ee
-SIOB_WR1:		EQU MONVARS + $ef
-SIOB_WR2:		EQU MONVARS + $f0
-SIOB_WR3:		EQU MONVARS + $f1
-SIOB_WR4:		EQU MONVARS + $f2
-SIOB_WR5:		EQU MONVARS + $f3
-SIOB_WR6:		EQU MONVARS + $f4
-SIOB_WR7:		EQU MONVARS + $f5
+SIOA_WR0:		EQU MONVARS + $e3
+SIOA_WR1:		EQU MONVARS + $e4
+SIOA_WR3:		EQU MONVARS + $e5
+SIOA_WR4:		EQU MONVARS + $e6
+SIOA_WR5:		EQU MONVARS + $e7
+SIOA_WR6:		EQU MONVARS + $e8
+SIOA_WR7:		EQU MONVARS + $e9
+SIOB_WR0:		EQU MONVARS + $ea
+SIOB_WR1:		EQU MONVARS + $eb
+SIOB_WR2:		EQU MONVARS + $ec
+SIOB_WR3:		EQU MONVARS + $ed
+SIOB_WR4:		EQU MONVARS + $ee
+SIOB_WR5:		EQU MONVARS + $ef
+SIOB_WR6:		EQU MONVARS + $f0
+SIOB_WR7:		EQU MONVARS + $f1
 ; PIO
-PIO_CH0_CNF:	EQU MONVARS + $f6
-PIO_CH1_CNF:	EQU MONVARS + $f7
+PIOA_CNF:		EQU MONVARS + $f2
+PIOA_INT_CTRL:	EQU MONVARS + $f3
+PIOA_INT_EN:	EQU MONVARS + $f4
+PIOB_CNF:		EQU MONVARS + $f5
+PIOB_INT_CTRL:	EQU MONVARS + $f6
+PIOB_INT_EN:	EQU MONVARS + $f7
 ; CTC prescaler value locations
 CTC_CH0_CNF:	EQU MONVARS + $f8
 CTC_CH1_CNF:	EQU MONVARS + $f9
@@ -137,9 +141,7 @@ CTC_CH3_TC:	EQU MONVARS + $ff		; time constant for channel 3 this feeds SIOA
 
 
 ; ### IO map
-;IOM-MPF-IP ports:
-UART_BASE:	EQU 008h         ; Base port address, P8250A/USART uses 8 ports.
-CTC_BASE:	EQU 010H         ; Base port address for Z80 CTC, only CTC2 is used. 64h
+CTC_BASE:	EQU 010H         ; Base port address for Z80 CTC
 CTC_CH0:	EQU CTC_BASE		; system interrupt 200Hz
 CTC_CH1:	EQU CTC_BASE+1
 CTC_CH2:	EQU CTC_BASE+2		; this feeds SIOB
@@ -149,16 +151,17 @@ SIO_DA:	EQU SIO_BASE
 SIO_CA:	EQU SIO_BASE+1
 SIO_DB:	EQU SIO_BASE+2
 SIO_CB:	EQU SIO_BASE+3
-PIO_BASE:	EQU 01ch         ; Base port address for Z80 PIO, not used. 68h
+PIO_BASE:	EQU 01ch         ; Base port address for Z80 PIO
 PIO_DA:	EQU PIO_BASE
 PIO_CA:	EQU PIO_BASE+1
 PIO_DB:	EQU PIO_BASE+2
 PIO_CB:	EQU PIO_BASE+3
 
-CNFIGSW	EQU $a0	; config switch read only
-ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
+IOAY		EQU 040h		; AY on recovery board
+IOYMZ		EQU 042h		; YMZ on recovery board
+SAA		EQU 044H		; SAA on recovery board
+UART_BASE:	EQU 048h         ; recovery board base port address, P8250A/USART uses 8 ports.
 
-CF_RESET	EQU 0B8h	; CF soft reset write only if configured by jumper
 CFBASE:	EQU 080h
 ;The addresses that the CF Card resides in I/O space.
 ;Change to suit hardware.
@@ -176,6 +179,11 @@ CFCTL:	EQU CFBASE + 08h + 06h	; write: Device control
 CFALTSTAT:	EQU CFBASE + 08h + 06h	; read: Alternate status
 CFADDR:	EQU CFBASE + 08h + 07h	; read: Drive address
 
+CNFIGSW	EQU $a0	; config switch read only
+ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
+
+CF_RESET	EQU 0B8h	; CF soft reset write only if configured by jumper
+
 turbo:	EQU $d0	; clock divider 0=4MHz, 1=2MHz, 2=1.33MHz, 3=1MHz
 beepr:	EQU $d1	; speaker beeper
 memmap:	EQU $d8	; memory map $d8-$df
@@ -190,7 +198,11 @@ SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX o
 SIOA_WR6_CV:		EQU 0
 SIOA_WR7_CV:		EQU 0
 SIOB_WR0_CV:		EQU 0
+if EN_INT
 SIOB_WR1_CV:		EQU 00011100b	; RX int enable, parity does not affect vector, status affects vector
+else
+SIOB_WR1_CV:		EQU 00000100b	; RX int enable, parity does not affect vector, status affects vector
+endif
 SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
 							; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
@@ -205,8 +217,13 @@ SIOB_WR7_CV:		EQU 0
 PIO_CH0_CNFV:	EQU 11001111b
 PIO_CH1_CNFV:	EQU 11001111b
 ; CTC config values
+if EN_INT
 CTC_CH0_CNFV:	EQU 10100111b
 CTC_CH1_CNFV:	EQU 10100111b
+else
+CTC_CH0_CNFV:	EQU 00100111b
+CTC_CH1_CNFV:	EQU 00100111b
+endif
 CTC_CH2_CNFV:	EQU 01110111b
 CTC_CH3_CNFV:	EQU 01110111b
 ; CTC time constants values
