@@ -10,7 +10,9 @@
 ;
 ; SAVE "name" CODE 60000 5024
 
-CLKDIV	EQU 0
+;MUSICSZ	EQU $03E8
+MUSICSZ	EQU $0200 - $0070
+CPUCLKD	EQU 2
 ;CHIP		EQU "AY"
 CHIP		EQU "YMZ"
 
@@ -22,40 +24,31 @@ FRQDIV	EQU	$20
 else
 AYSEL		EQU	$b0
 AYDTA		EQU	$b1
-;AYSEL		EQU	$02
-;AYDTA		EQU	$03
-PLAYER	EQU	$3800
+PLAYER	EQU	$4000
 FRQDIV	EQU	$10
 endif
 
-MUSIC1	EQU	PLAYER + $0500
-MUSIC2	EQU	PLAYER + $08E8
-MUSIC3	EQU	PLAYER + $0cD0
-XTRA		EQU	PLAYER + $10B8
-XTRAEND	EQU	XTRA + 385
-
-;MUSIC1	EQU	$EA60
-;MUSIC2	EQU	$EE48
-;MUSIC3	EQU	$F230
-;XTRA		EQU	$F618
-;XTRAEND	EQU	XTRA + 385
-;PLAYER	EQU	$FA00
+MUSIC1	EQU	PLAYER + $0500 - $00c0
+MUSIC2	EQU	MUSIC1 + MUSICSZ
+MUSIC3	EQU	MUSIC2 + MUSICSZ
+XTRA		EQU	MUSIC3 + MUSICSZ
+XTRAEND	EQU	XTRA + 385	; $181 bytes = 385 - actual length of this song
 
 	ORG	PLAYER
 
-FA00	ld a,$10	; frequency source
+START:
+FA00:
+if CHIP = "AYRESCUE"
+	ld a,$10	; frequency source
 	out (04),a
 	ld a,FRQDIV	; freq divider
 	out (05),a
 	in a,($d0)		; get current clock divider
 	push af
-if CLKDIV = 0
-	ld a,$0	; cpu frequency
-else
-	ld a,$1	; cpu frequency
 endif
-	out ($d0),a
-if CLKDIV = 0
+;	ld a,CPUCLKD	; cpu frequency
+;	out ($d0),a
+if CPUCLKD = 0
 	ld a,$c0		; playback speed
 else
 	ld a,$e0		; playback speed
@@ -128,7 +121,7 @@ CHCMUSICPTR	DW	MUSIC3	; channel C music data address, $F230
 
 ; updated by $FB51 $FBA5
 EFFECTPTR	EQU $
-FA3A	DB	XTRA,XTRA>>8	; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, should be $F618 per new locations
+FA3A	DB	XTRA,XTRA>>8				; some other table, 1000 bytes up from $F23C, CHCMUSICPTR, should be $F618 per new locations
 	DW	XTRA+1
 
 ; read by $FC72
@@ -234,7 +227,7 @@ prs:	call jCON_TX
 ; initialize note pointers 
 FBA5	ld	hl,MUSIC1	; EA60 location of music
 	ld	de,CHAMUSICPTR	; 
-	ld	bc,$03E8	; 1000 decimal - length of channel data
+	ld	bc,MUSICSZ	; 1000 decimal - length of channel data
 	call	FBBD		; store location of data for channel A - EA60 -> FA2E
 	call	FBBD		; store location of data for channel B - EE48 -> FA32
 	call	FBBD		; store location of data for channel C - F230 -> FA36
@@ -257,8 +250,10 @@ FBC7	ld	d,$07	; Write FF to register 7 - disable all channels. Should be 3F to n
 	ld	e,$FF
 	call	AYWRITE
 ;	ei
+if CHIP = "AYRESCUE"
 	pop af			; restore original clock
 	out ($d0),a
+endif
 	xor a				; return with A=0
 	ret		; exit
 
