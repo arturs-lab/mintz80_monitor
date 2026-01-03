@@ -357,3 +357,20 @@ SIOA_ISR_BYTE:	push hl
 		sub a,(hl)			; subtract lower byte of read pointer
 		pop hl
 		ret				; upon return if A=0 - no bytes available (or clash - we're not testing)
+
+; SIOA ISR - read receive register and echo back to TX register
+
+SIOA_ISR:	push af
+	in a,(SIO_DA)
+	out (SIO_DA),a
+	pop af
+	ei
+	reti
+
+SIOB_ISR:	push af
+	in a,(SIO_DB)
+	out (SIO_DB),a
+	pop af
+	ei
+	reti
+
