@@ -150,7 +150,13 @@ LE_TMP	EQU $FF00	; temporary code location
 
 LOAD_EEPROM:	call jCON_PRT_STR_SP
 zoWarnFlow = false
-	db $0d,$0a,"Run from EEPROM",0Dh,0Ah,"1 - monitor at $A000",$0d,$0a,"2 - Basic 9k",$0d,$0a,"3 - Hot start Basic 9k",$0d,$0a,EOS
+	db $0d,$0a,"Run from EEPROM"
+	db 0Dh,0Ah,"1 - monitor at $A000"
+	db $0d,$0a,"2 - Basic 9k"
+	db $0d,$0a,"3 - Hot start Basic 9k"
+	db $0d,$0a,"4 - VTL (RAM @ $4000) at $f800"
+	db $0d,$0a,"5 - Beverly Hills Cop at $4000"
+	db $0d,$0a,EOS
 zoWarnFlow = true
 	call CON_GET_CHAR
 	cp a,"1"
@@ -162,13 +168,13 @@ zoWarnFlow = true
 	jp LE_TMP
 
 LE_A:	ld a,00
-	out ($db),a
-	ld hl,$6000
+	out (memmap+3),a
+	ld hl,$6000	; eeprom $200-$3fff is mirrored here
 	ld de,$a000
 	ld bc,$2000
 	ldir
 	ld a,01
-	out ($db),a
+	out (memmap+3),a
 	jp $a000
 
 LE2:	cp a,"2"
@@ -180,31 +186,66 @@ LE2:	cp a,"2"
 	jp LE_TMP
 
 LE_3:	cp a,"3"
-	ret nz
+	jr nz,LE_4
 	ld hl,LE_hot
 	ld de,LE_TMP
 	ld bc,LE_REND-LE_hot
 	ldir
 	jp LE_TMP
 
+LE_4:	cp a,"4"
+	jr nz,LE_5
+	ld hl,LE_VTL
+	ld de,LE_TMP
+	ld bc,LE_COP-LE_VTL
+	ldir
+	jp LE_TMP
+
+LE_5:	cp a,"5"
+	ret nz
+	ld hl,LE_COP
+	ld de,LE_TMP
+	ld bc,LE_RUN-LE_COP
+	ldir
+	jp LE_TMP
+
+LE_VTL:	ld a,00
+	out (memmap+3),a
+	ld hl,$7c00	; eeprom $3c00-$3fff
+	ld de,$f800
+	ld bc,$0400
+	ldir
+	ld a,01
+	out (memmap+3),a
+	jp $f800
+
+LE_COP:	ld a,02
+	out (memmap+3),a
+	ld hl,$7500	; eeprom $7500-$7fff
+	ld de,$4000
+	ld bc,$0b00
+	ldir
+	ld a,01
+	out (memmap+3),a
+	jp $4000
+
 LE_RUN:	di
 	ld a,03		; switch first 2 banks to RAM
-	out ($d8),a
-	out ($d9),a
+	out (memmap),a
+	out (memmap+1),a
 	ld a,02		; switch next two banks to EEPROM2,3
-	out ($da),a
-	out ($db),a
+	out (memmap+2),a
+	out (memmap+3),a
 	ld hl,$4000
 	ld de,$0000
 	ld bc,$4000
 	ldir
-	ld a,01		; switch bank 2,3 to RAM
-	out ($da),a
-	out ($db),a
 LE_hot:	di
 	ld a,03		; switch first 2 banks to RAM. We can enter here if basic was already loaded
-	out ($d8),a
-	out ($d9),a
+	out (memmap),a
+	out (memmap+1),a
+	out (memmap+2),a
+	out (memmap+3),a
 	jp $0000
 LE_REND:
 
