@@ -7,7 +7,7 @@
 ;  CREATE DATE :	05 May 15 / 2022-03-28
 ;***************************************************************************
 
-if ROM_BOTTOM_0000
+if def ROM_BOTTOM_0000
             ORG ROM_BOTTOM
 		DISP $4000
 else
@@ -204,10 +204,8 @@ zoWarnFlow = true
 
 	call dmpio			; dump CPLD configuration
 
-	call CON_PRT_STR_SP	; print banner
-zoWarnFlow = false
-	db "System clock ",SYSCLK,"MHz",$0d,$0a,0
-zoWarnFlow = true
+	ld hl,banner
+	call CON_PRT_STR	; print banner
 
 	ld hl,R_MAIN		; Calculate my own checksum
 	ld (MVADDR+0),hl
@@ -410,3 +408,6 @@ jphl:		jp (hl)
 ;		INCLUDE	"DARTDriver.asm"
 ;		INCLUDE	"UARTDriver.asm"
 
+banner:	db CPU," System clock ",SYSCLK,"MHz",$0d,$0a,0
+
+testing:	db TESTCLK,TMR0D,TMR1D
