@@ -1,9 +1,42 @@
 VERSMYR:    EQU     "1"
 VERSMIN:    EQU     "3"
 
+BOARD		EQU "REV2"
+CPU		EQU "TOSHIBA"
+;CPU		EQU "ZILOG"
+
+if BOARD == "REV1"
+CPUCLK	EQU	9216000
+else
+if CPU == "ZILOG"
+CPUCLK	EQU	16000000
+else
+CPUCLK	EQU	10000000
+endif
+endif
+
+if BOARD == "REV1"
+SIOCLK	EQU	9216000
+else
+SIOCLK	EQU	3686400
+endif
+
 ; clock divider
-CLKDIV	EQU	0	; (SYSCLK MHz/2/(value+1))
+if CPU == "ZILOG"
+CLKDIV	EQU	1	; (SYSCLK MHz/2/(value+1))
+else
+CLKDIV	EQU	1	; (SYSCLK MHz/2/(value+1))
+endif
+
+if BOARD == "REV1"
 SYSCLK	EQU "9.216"
+else
+if CPU == "ZILOG"
+SYSCLK	EQU "16"
+else
+SYSCLK	EQU "10"
+endif
+endif
 MACHINE	EQU "MintZ80"
 
 ; Constants, extracted to make the versioned file hardware agnostic
@@ -214,25 +247,56 @@ SIOB_WR6_CV:		EQU 0
 SIOB_WR7_CV:		EQU 0
 
 ; PIO config values
-PIO_CH0_CNFV:	EQU 11001111b
-PIO_CH1_CNFV:	EQU 11001111b
+PIOA_CNFV:		EQU 11001111b
+PIOA_INT_CTRV:	EQU 00000111b	; interrupt control word
+PIOA_INT_ENV:	EQU 00000011b	; interrupt disable
+PIOB_CNFV:		EQU 11001111b
+PIOB_INT_CTRV:	EQU 00000111b	; interrupt control word
+PIOB_INT_ENV:	EQU 00000011b	; interrupt disable
+
 ; CTC config values
-if EN_INT
-CTC_CH0_CNFV:	EQU 10100111b
-CTC_CH1_CNFV:	EQU 10100111b
+TESTCLK		EQU SIOCLK/(2*16*19200)
+if CPUCLK > 13056000
+TMR0D			EQU (CPUCLK/(2*256*8017))+0.5
+TMR1D			EQU (CPUCLK/(2*256*1600))+0.5
 else
-CTC_CH0_CNFV:	EQU 00100111b
-CTC_CH1_CNFV:	EQU 00100111b
+TMR0D			EQU (CPUCLK/(2*16*8017))+0.5
+TMR1D			EQU (CPUCLK/(2*16*1600))+0.5
 endif
-CTC_CH2_CNFV:	EQU 01110111b
-CTC_CH3_CNFV:	EQU 01110111b
+
+if EN_INT
+CTC_CH0_CNFV:	EQU 10100111b	; int on, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
+CTC_CH1_CNFV:	EQU 10100111b	; int on, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
+else
+CTC_CH0_CNFV:	EQU 00100111b	; int off, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
+CTC_CH1_CNFV:	EQU 00100111b	; int off, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
+endif
+CTC_CH2_CNFV:	EQU 01110111b	; int off, counter, prescaler 256, rising edge, auto trigger, time constant follows, reset
+CTC_CH3_CNFV:	EQU 01110111b	; int off, counter, prescaler 256, rising edge, auto trigger, time constant follows, reset
+
 ; CTC time constants values
-CTC_CH0_TV:	EQU $24	; $24 -> 1000Hz, 1ms, $12 -> 2000Hz, 500us
+if BOARD == "REV1"
+CTC_CH0_TV:	EQU $24	; $24 -> 1ms, $12 -> 500us
 CTC_CH1_TV:	EQU $b4	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
-CTC_CH2_TV:	EQU $0f	; SIOB 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
-CTC_CH3_TV:	EQU $0f	; SIOA 9600 baud with 16x prescaler in SIO ; @4.608MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
-					; with 256x prescaler in SIO ; @4.608MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
-					; with 256x prescaler in SIO ; @9.216MHz CPU: 0f=19200, 14=14400, 1e=9600, 3c=4800, 78=2400
+else
+CTC_CH0_TV:	EQU $1f	; $1f -> 0.992ms, $0f -> 500us
+CTC_CH1_TV:	EQU $9c	; $9c -> 4.980ms
+endif
+
+if BOARD == "REV1"
+; SIO timing derived from system oscillator @9.216MHz
+CTC_CH2_TV:	EQU $0f	; SIOB 
+CTC_CH3_TV:	EQU $0f	; SIOA 
+else
+; SIO timing derived from separate oscillator @3.6864MHz
+CTC_CH2_TV:	EQU $0c	; SIOB 
+CTC_CH3_TV:	EQU $0c	; SIOA 
+endif
+; 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
+; 9600 baud with 16x prescaler in SIO ; @4.608MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
+; with 256x prescaler in SIO ; @4.608MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
+; with 16x prescaler in SIO ; @9.216MHz CPU: 0f=19200, 14=14400, 1e=9600, 3c=4800, 78=2400
+; with 16x prescaler in SIO ; @3.6864MHz CPU: 01=115200, 02=57600, 03=38400, 06=19200, 8=14400, 0c=9600, 18=4800, 30=2400
 
 ; Error codes intel Hex record
 E_NONE:	EQU 00h

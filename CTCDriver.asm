@@ -1,55 +1,45 @@
 CTC_INIT_ALL: push af
-		call CTC_TC_INIT
-		call CTC0_INIT
+		call CTC_TC_INIT	; initialize table which is used to configure CTC, Entries in this table can be altered and CTC channel init routine called to reprogram CTC channel
+		call CTC0_INIT		; init each channel in turn with defaults
 		call CTC1_INIT
 		call CTC2_INIT
 		call CTC3_INIT
 		pop af
 		ret
 
-;CH0 divides CPU CLK by (256*CTC_CH0_TC) providing a clock signal at TO0. TO0 is connected to TRG1.
-; T01 outputs f= CPU_CLK/(256*CTC_CH0_TC) => 9.216MHz / ( 256 * 180 ) => 200Hz
 CTC0_INIT: ld a,CTCV		; load CTC interrupt vector
 	out (CTC_CH0),a		; set CTC T0 to that vector
-	ld a,(CTC_CH0_CNF)	; interrupt off; timer mode; prescaler=256; don't care ext; automatic trigger;
-					; time constant follows; cont. operation; command word
+	ld a,(CTC_CH0_CNF)	; look in CONSTANTS.asm
 	out (CTC_CH0),a
 	ld a,(CTC_CH0_TC)	; time constant
 	out (CTC_CH0),a
 	ret
 
-;init CH1
-;CH1 disabled
 CTC1_INIT: ld a,CTCV+2	; load CTC interrupt vector
-	out (CTC_CH1),a		; set CTC T0 to that vector
-	ld a,(CTC_CH1_CNF)	; interrupt off, timer mode, prescaler=16, don't care ext. TRG edge,
-					; start timer on loading constant, time constant follows, software reset, command word
-	out (CTC_CH1),a		; CH1 is halted
-	ld A,(CTC_CH1_TC)	; time constant 56d
+	out (CTC_CH1),a		; set CTC T1 to that vector
+	ld a,(CTC_CH1_CNF)	; look in CONSTANTS.asm
+	out (CTC_CH1),a
+	ld A,(CTC_CH1_TC)	; time constant
 	out (CTC_CH1),a		; loaded into channel 1
 	ret
 
 ;init CH2
-;CH2 divides CLK/TRG2 clock providing a clock signal at TO2.
-; T02 outputs f= CLK/TRG / 0x34 => 4MHz / 52 => 38461
+;CH2 divides CLK/TRG2 clock providing a clock signal at TO2 which drives SIO
 CTC2_INIT: ld a,CTCV+4	; load CTC interrupt vector
-	out (CTC_CH2),a		; set CTC T0 to that vector
-	ld a,(CTC_CH2_CNF)	; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
-					; start upon loading time constant, time constant follows,sw reset, command word
+	out (CTC_CH2),a		; set CTC T2 to that vector
+	ld a,(CTC_CH2_CNF)	; look in CONSTANTS.asm
 	out (CTC_CH2),a
-	ld A,(CTC_CH2_TC)	; time constant 56d
+	ld A,(CTC_CH2_TC)	; time constant
 	out (CTC_CH2),a		; loaded into channel 2
 	ret
 
 ;init CH3
-;CH3 divides CLK/TRG3 clock providing a clock signal at TO3.
-; T03 outputs f= CLK/TRG / 4  => 4MHz / 4 => 1MHz
+;CH3 divides CLK/TRG3 clock providing a clock signal at TO3 which drives SIO
 CTC3_INIT: ld a,CTCV+6	; load CTC interrupt vector
-	out (CTC_CH3),a		; set CTC T0 to that vector
-	ld a,(CTC_CH3_CNF)	; interrupt off, counter mode, prescaler=256 (doesn't matter), ext. start,
-					; start upon loading time constant, time constant follows,sw reset, command word
+	out (CTC_CH3),a		; set CTC T3 to that vector
+	ld a,(CTC_CH3_CNF)	; look in CONSTANTS.asm
 	out (CTC_CH3),a
-	ld A,(CTC_CH3_TC)	; time constant 56d
+	ld A,(CTC_CH3_TC)	; time constant
 	out (CTC_CH3),a		; loaded into channel 3
 	ret
 
