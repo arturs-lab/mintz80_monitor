@@ -166,7 +166,7 @@ MAIN:
 	ld a,$01
 	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority. section 3.9, page 149
 
-;	call memmap_init
+	call memmap_init	; before using RAM, make sure all mem pages are set as expected
 
 	ld a,$20
 	call delay			; looks like Z80 needs this delay to successfully write to IO ports
