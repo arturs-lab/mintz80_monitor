@@ -2,41 +2,13 @@ VERSMYR:    EQU     "1"
 VERSMIN:    EQU     "3"
 
 BOARD		EQU "REV2"
-CPU		EQU "TOSHIBA"
-;CPU		EQU "ZILOG"
+;CPU		EQU "TOSHIBA"
+CPU		EQU "ZILOG"
 
-if BOARD == "REV1"
 CPUCLK	EQU	9216000
-else
-if CPU == "ZILOG"
-CPUCLK	EQU	16000000
-else
-CPUCLK	EQU	10000000
-endif
-endif
-
-if BOARD == "REV1"
 SIOCLK	EQU	9216000
-else
-SIOCLK	EQU	3686400
-endif
 
-; clock divider
-if CPU == "ZILOG"
-CLKDIV	EQU	1	; (SYSCLK MHz/2/(value+1))
-else
-CLKDIV	EQU	1	; (SYSCLK MHz/2/(value+1))
-endif
-
-if BOARD == "REV1"
 SYSCLK	EQU "9.216"
-else
-if CPU == "ZILOG"
-SYSCLK	EQU "16"
-else
-SYSCLK	EQU "10"
-endif
-endif
 MACHINE	EQU "MintZ80"
 
 ; Constants, extracted to make the versioned file hardware agnostic
@@ -47,6 +19,9 @@ MACHINE	EQU "MintZ80"
 
 ; do wew want to enable interrupts?
 EN_INT:	EQU true
+
+; initialize memmap?
+INIT_MEMMAP	EQU false
 
 ; ### MEM map
 RAM_BOTTOM:	EQU 02000H       ; Bottom address of RAM
@@ -224,25 +199,30 @@ memmap:	EQU $d8	; memory map $d8-$df
 ; ### other
 ; SIO config values
 SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
-SIOA_WR1_CV:		EQU 00000000b	; no interrupts
+;if EN_INT
+;SIOA_WR1_CV:		EQU 00011000b	; RX int enable, parity does not affect vector, status affects vector
+;else
+SIOA_WR1_CV:		EQU 00000000b	; RX int disable
+;endif
 SIOA_WR3_CV:		EQU 00001100b	; write into WR3: RX disable;
 SIOA_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
 SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOA_WR6_CV:		EQU 0
 SIOA_WR7_CV:		EQU 0
-SIOB_WR0_CV:		EQU 0
+
+SIOB_WR0_CV:		EQU 00110000b	; write into WR0: error reset
 if EN_INT
 SIOB_WR1_CV:		EQU 00011100b	; RX int enable, parity does not affect vector, status affects vector
 else
-SIOB_WR1_CV:		EQU 00000100b	; RX int enable, parity does not affect vector, status affects vector
+SIOB_WR1_CV:		EQU 00000100b	; RX int disable
 endif
 SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
 							; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
 							; for special conditions
 SIOB_WR3_CV:		EQU 0
-SIOB_WR4_CV:		EQU 0
-SIOB_WR5_CV:		EQU 0
+SIOB_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
+SIOB_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOB_WR6_CV:		EQU 0
 SIOB_WR7_CV:		EQU 0
 
@@ -254,16 +234,6 @@ PIOB_CNFV:		EQU 11001111b
 PIOB_INT_CTRV:	EQU 00000111b	; interrupt control word
 PIOB_INT_ENV:	EQU 00000011b	; interrupt disable
 
-; CTC config values
-TESTCLK		EQU SIOCLK/(2*16*19200)
-if CPUCLK > 13056000
-TMR0D			EQU (CPUCLK/(2*256*8017))+0.5
-TMR1D			EQU (CPUCLK/(2*256*1600))+0.5
-else
-TMR0D			EQU (CPUCLK/(2*16*8017))+0.5
-TMR1D			EQU (CPUCLK/(2*16*1600))+0.5
-endif
-
 if EN_INT
 CTC_CH0_CNFV:	EQU 10100111b	; int on, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
 CTC_CH1_CNFV:	EQU 10100111b	; int on, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
@@ -271,27 +241,19 @@ else
 CTC_CH0_CNFV:	EQU 00100111b	; int off, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
 CTC_CH1_CNFV:	EQU 00100111b	; int off, timer, prescaler 256, falling edge, auto trigger, time constant follows, reset
 endif
-CTC_CH2_CNFV:	EQU 01110111b	; int off, counter, prescaler 256, rising edge, auto trigger, time constant follows, reset
-CTC_CH3_CNFV:	EQU 01110111b	; int off, counter, prescaler 256, rising edge, auto trigger, time constant follows, reset
+CTC_CH2_CNFV:	EQU 01110111b	; int off, counter, NO prescaler, rising edge, auto trigger, time constant follows, reset
+CTC_CH3_CNFV:	EQU 01110111b	; int off, counter, NO prescaler, rising edge, auto trigger, time constant follows, reset
 
-; CTC time constants values
-if BOARD == "REV1"
-CTC_CH0_TV:	EQU $24	; $24 -> 1ms, $12 -> 500us
-CTC_CH1_TV:	EQU $b4	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
-else
-CTC_CH0_TV:	EQU $1f	; $1f -> 0.992ms, $0f -> 500us
-CTC_CH1_TV:	EQU $9c	; $9c -> 4.980ms
-endif
+; CTC config values
+TMR0D			EQU (CPUCLK/(1000*256))
+TMR1D			EQU (CPUCLK/(200*256))
 
-if BOARD == "REV1"
-; SIO timing derived from system oscillator @9.216MHz
-CTC_CH2_TV:	EQU $0f	; SIOB 
-CTC_CH3_TV:	EQU $0f	; SIOA 
-else
-; SIO timing derived from separate oscillator @3.6864MHz
-CTC_CH2_TV:	EQU $0c	; SIOB 
-CTC_CH3_TV:	EQU $0c	; SIOA 
-endif
+; CTC time constants values for clock. In timer mode CTC takes clock from CPU
+CTC_CH0_TV:	EQU TMR0D	; $24 -> 1ms, $12 -> 500us
+CTC_CH1_TV:	EQU TMR1D	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
+
+CTC_CH2_TV:	EQU (SIOCLK/(16*19200*2))	; SIOB 19200baud
+CTC_CH3_TV:	EQU (SIOCLK/(16*19200*2))	; SIOA 19200baud
 ; 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
 ; 9600 baud with 16x prescaler in SIO ; @4.608MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 ; with 256x prescaler in SIO ; @4.608MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
