@@ -166,12 +166,20 @@ MAIN:
 	ld a,$01
 	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority. section 3.9, page 149
 
+if INIT_MEMMAP
 	call memmap_init	; before using RAM, make sure all mem pages are set as expected
+else
+	nop
+	nop
+	nop
+endif
 
 	ld a,$20
 	call delay			; looks like Z80 needs this delay to successfully write to IO ports
+if MACHINE = "AL80"
 	ld a,CLKDIV		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
+endif
 	call chime
 	call ymzinit
 	call IRQTAB_INIT	; copy interrupt jump table from (IRQTABR) in eeprom to (IRQTAB) in ram
@@ -375,9 +383,15 @@ MON_CLS: DEFB 0Ch, EOS  				;Escape sequence for CLS. (aka form feed)
 
 ;        END
 
-dmpio:	ld bc,turbo
+dmpio:
+if MACHINE = "AL80"
+		ld bc,turbo
+else
+		ld bc,memmap
+endif
 		CALL	CON_PRT_NL
-dmpio1:	IN      A, (C)
+dmpio1:	IN A, (C)
+		AND $0F
 		CALL	CON_PRINTHBYTE
 		inc c
 		ld a,c
@@ -409,5 +423,3 @@ jphl:		jp (hl)
 ;		INCLUDE	"UARTDriver.asm"
 
 banner:	db CPU," System clock ",SYSCLK,"MHz",$0d,$0a,0
-
-testing:	db TESTCLK,TMR0D,TMR1D
