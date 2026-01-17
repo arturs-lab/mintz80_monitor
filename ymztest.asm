@@ -54,9 +54,15 @@ else
 	ld a,$e0		; playback speed
 endif
 	ld (PBSPEED),a
+	ld a,(ctrl)
+	ld ays+1,a
+	ld a,(dta)
+	ld ayd+1,a
 	call jCON_PRT_NL
 	jp	FBA5		; initialize note pointers and start playing
 
+ctrl	db $b0
+dta	db $b1
 
 ; updated by $FBF4, $FCAB
 ; 
@@ -586,9 +592,9 @@ FDAC	ld	c,h
 	ret
 
 AYWRITE	push	bc		; write value in E to AY register given in D
-	ld	bc,AYSEL	; AY register select
+ays	ld	bc,AYSEL	; AY register select
 	out	(c),d
-	ld	bc,AYDTA	; AY register value
+ayd	ld	bc,AYDTA	; AY register value
 	out	(c),e
 	pop	bc
 	inc	d		; point to next AY register
