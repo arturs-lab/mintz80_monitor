@@ -5,10 +5,22 @@ BOARD		EQU "REV2"
 ;CPU		EQU "TOSHIBA"
 CPU		EQU "ZILOG"
 
+if (CPU == "ZILOG" )
+	if (BOARD == "REV2")
+CPUCLK	EQU	12000000
+SIOCLK	EQU	3686400
+SYSCLK	EQU "12.00"
+	else
 CPUCLK	EQU	9216000
 SIOCLK	EQU	9216000
-
 SYSCLK	EQU "9.216"
+	endif
+else
+CPUCLK	EQU	9216000
+SIOCLK	EQU	9216000
+SYSCLK	EQU "9.216"
+endif
+
 MACHINE	EQU "MintZ80"
 
 ; Constants, extracted to make the versioned file hardware agnostic
@@ -186,8 +198,10 @@ CFCMD:	EQU CFBASE + 07h		; Command (W)
 CFCTL:	EQU CFBASE + 08h + 06h	; write: Device control
 CFALTSTAT:	EQU CFBASE + 08h + 06h	; read: Alternate status
 CFADDR:	EQU CFBASE + 08h + 07h	; read: Drive address
+CFRESET	EQU $b8
 
 CNFIGSW	EQU $a0	; config switch read only
+saa1099	EQU $a8	; saa1099 psg
 ymbase:	EQU $b0	; 02 address reg 03 data reg, on mint board $70/$b0
 
 CF_RESET	EQU 0B8h	; CF soft reset write only if configured by jumper
@@ -244,13 +258,9 @@ endif
 CTC_CH2_CNFV:	EQU 01110111b	; int off, counter, NO prescaler, rising edge, auto trigger, time constant follows, reset
 CTC_CH3_CNFV:	EQU 01110111b	; int off, counter, NO prescaler, rising edge, auto trigger, time constant follows, reset
 
-; CTC config values
-TMR0D			EQU (CPUCLK/(1000*256))
-TMR1D			EQU (CPUCLK/(200*256))
-
 ; CTC time constants values for clock. In timer mode CTC takes clock from CPU
-CTC_CH0_TV:	EQU TMR0D	; $24 -> 1ms, $12 -> 500us
-CTC_CH1_TV:	EQU TMR1D	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
+CTC_CH0_TV:	EQU (CPUCLK/(1000*256))	; $24 -> 1ms, $12 -> 500us
+CTC_CH1_TV:	EQU (CPUCLK/(200*256))	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
 
 CTC_CH2_TV:	EQU (SIOCLK/(16*19200*2))	; SIOB 19200baud
 CTC_CH3_TV:	EQU (SIOCLK/(16*19200*2))	; SIOA 19200baud
