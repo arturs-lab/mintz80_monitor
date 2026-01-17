@@ -240,12 +240,13 @@ LE_RUN:	di
 	ld de,$0000
 	ld bc,$4000
 	ldir
-LE_hot:	di
-	ld a,03		; switch first 2 banks to RAM. We can enter here if basic was already loaded
+LE_hot:	di		; We can enter here if basic was already loaded
+	ld a,03		; switch all banks used by basic to page 3 RAM. 
 	out (memmap),a
 	out (memmap+1),a
 	out (memmap+2),a
 	out (memmap+3),a
+	out (memmap+4),a
 	jp $0000
 LE_REND:
 
