@@ -12,9 +12,9 @@ SIO_WR_DEFAULTS: db SIOA_WR0_CV
 		db SIOA_WR5_CV
 		db SIOA_WR6_CV
 		db SIOA_WR7_CV
+		db SIOB_WR2_CV
 		db SIOB_WR0_CV
 		db SIOB_WR1_CV
-		db SIOB_WR2_CV
 		db SIOB_WR3_CV
 		db SIOB_WR4_CV
 		db SIOB_WR5_CV
@@ -27,11 +27,8 @@ SIO_INIT_VARS:	ld hl,SIO_WR_DEFAULTS
 		ldir
 
 ; initialize both SIO channels
-SIO_INIT:	call SIOA_INIT	; first init SIO A
-		call SIOB_INIT	; then SIOB
-		call SIO_A_INT_SET	; initialize SIOA interrupts
-		call SIO_A_EI		; more interrupt code
-		ret
+SIO_INIT:	call SIOINTVINIT	; initialize interrupt vector
+		call SIOB_INIT	; first init SIO B, then fall through to initializing SIOA
 
 ;***************************************************************************
 ;SIOA_INIT
@@ -42,33 +39,54 @@ SIOA_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
         out (SIO_CA),a
         ld a,00011000b      ; write into WR0: channel reset
         out (SIO_CA),a
-        ld a,00000100b      ; write into WR0: select WR4
+        ld hl,SIOA_WR1
+        ld b,1
+sioail: ld a,b
         out (SIO_CA),a
-        ld a,(SIOA_WR4)      ; write into WR4: presc. 16x, 1 stop bit, no parity
+        ld a,(hl)
         out (SIO_CA),a
-        ld a,00000101b      ; write into WR0: select WR5
-        out (SIO_CA),a
-        ld a,(SIOA_WR5)      ; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
-        out (SIO_CA),a
-		ret
+        inc hl
+        inc b
+        ld a,b
+        cp 2
+        jr nz,sioai2
+        inc b	; after this, we should jump to the loop, but to save eeprom, i'm executing following
+sioai2: cp 8
+        jr nz,sioail
+
+        ret
 
 ;***************************************************************************
 ;SIOB_INIT
 ;Function: Initialize the SIOB
 ;the followings are settings for channel B
 ;***************************************************************************
-SIOB_INIT:	ld a,00000001b	; write into WR0: select WR1
+SIOB_INIT:	ld a,00110000b      ; write into WR0: error reset, select WR0
         out (SIO_CB),a
-        ld a,(SIOB_WR1)	; write into WR0: RX int disable, status affects interrupt vectors
+        ld a,00011000b      ; write into WR0: channel reset
         out (SIO_CB),a
-        ld a,00000010b	; write into WR0: select WR2
+        ld hl,SIOB_WR1
+        ld b,1
+siobil: ld a,b
         out (SIO_CB),a
-        ld a,SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
-                            ; will be affected by the channel & condition that raised the interrupt
-                            ; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
-                            ; for special conditions
+        ld a,(hl)
         out (SIO_CB),a
-		ret
+        inc hl
+        inc b
+        ld a,b
+        cp 2
+        jr nz,siobi2
+        inc b	; after this, we should jump to the loop, but to save eeprom, i'm executing following
+siobi2: cp 8
+        jr nz,siobil
+
+        ret
+
+SIOINTVINIT: ld a,2	; write into WR0: select WR2
+        out (SIO_CB),a
+        ld a,(SIOB_WR2)	; write interrupt vector into WR2
+        out (SIO_CB),a
+        ret
 
 ; set up interrupts for channel A
 SIO_A_INT_SET:
@@ -93,14 +111,14 @@ SIO_B_INT_SET:
 ;-------------------------------------------------------------------------------
 ; serial management
 
-SIOA_RTS_OFF:	ld a,00000101b      ; write into WR0: select WR5
+SIOA_RTS_OFF:	ld a,5      ; write into WR0: select WR5
         out (SIO_CA),a
         ld a,(SIOA_WR5); 8 bits/TX char; TX enable; RTS disable
 	and a,11111101b
         out (SIO_CA),a
         ret
 
-SIOA_RTS_ON:	ld a,00000101b      ; write into WR0: select WR5
+SIOA_RTS_ON:	ld a,5      ; write into WR0: select WR5
         out (SIO_CA),a
         ld a,(SIOA_WR5)      ; 8 bits/TX char; TX enable; RTS enable
 	or a,00000010b
@@ -108,7 +126,7 @@ SIOA_RTS_ON:	ld a,00000101b      ; write into WR0: select WR5
         ret
 
         ;disable SIO channel A RX
-SIO_A_DI:	ld a,00000011b      ; write into WR0: select WR3
+SIO_A_DI:	ld a,3      ; write into WR0: select WR3
         out (SIO_CA),a
         ld a,00001100b      ; write into WR3: RX disable;
         out (SIO_CA),a
@@ -117,7 +135,7 @@ SIO_A_DI:	ld a,00000011b      ; write into WR0: select WR3
 
 ; enable interrupt for SIOA
         ;enable SIO channel A RX
-SIO_A_EI:	ld a,00000011b      ; write into WR0: select WR3
+SIO_A_EI:	ld a,3      ; write into WR0: select WR3
         out (SIO_CA),a
         ld a,11000001b      ; 8 bits/RX char; auto enable OFF; RX enable
         out (SIO_CA),a

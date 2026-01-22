@@ -133,9 +133,9 @@ SIOA_WR4:		EQU MONVARS + $e6
 SIOA_WR5:		EQU MONVARS + $e7
 SIOA_WR6:		EQU MONVARS + $e8
 SIOA_WR7:		EQU MONVARS + $e9
-SIOB_WR0:		EQU MONVARS + $ea
-SIOB_WR1:		EQU MONVARS + $eb
-SIOB_WR2:		EQU MONVARS + $ec
+SIOB_WR2:		EQU MONVARS + $ea
+SIOB_WR0:		EQU MONVARS + $eb
+SIOB_WR1:		EQU MONVARS + $ec
 SIOB_WR3:		EQU MONVARS + $ed
 SIOB_WR4:		EQU MONVARS + $ee
 SIOB_WR5:		EQU MONVARS + $ef
@@ -218,23 +218,22 @@ SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
 ;else
 SIOA_WR1_CV:		EQU 00000000b	; RX int disable
 ;endif
-SIOA_WR3_CV:		EQU 00001100b	; write into WR3: RX disable;
+SIOA_WR3_CV:		EQU 11100001b	; write into WR3: RX enable;
 SIOA_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
 SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOA_WR6_CV:		EQU 0
 SIOA_WR7_CV:		EQU 0
 
 SIOB_WR0_CV:		EQU 00110000b	; write into WR0: error reset
-if EN_INT
-SIOB_WR1_CV:		EQU 00011100b	; RX int enable, parity does not affect vector, status affects vector
-else
+;if EN_INT
+;SIOB_WR1_CV:		EQU 00011100b	; RX int enable, parity does not affect vector, status affects vector
+;else
 SIOB_WR1_CV:		EQU 00000100b	; RX int disable
-endif
+;endif
 SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
-							; (see datasheet): in our example, 0x0C for Ch.A receiving a char, 0x0E
-							; for special conditions
-SIOB_WR3_CV:		EQU 0
+							; (see datasheet)
+SIOB_WR3_CV:		EQU 11100001b	; write into WR3: RX enable;
 SIOB_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
 SIOB_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOB_WR6_CV:		EQU 0
