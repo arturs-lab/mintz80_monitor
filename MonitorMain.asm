@@ -156,15 +156,19 @@ TAB_INIT:		ldir
 MAIN:
 	di
 
+if MACHINE = "MintZ80"
 	ld a,$7b	; disable wdt
 	out ($f0),a
 	ld a,$b1
 	out ($f1),a
+endif
 
 	ld sp,SP_INIT
 
+if MACHINE = "MintZ80"
 	ld a,$01
 	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority. section 3.9, page 149
+endif
 
 if INIT_MEMMAP
 	call memmap_init	; before using RAM, make sure all mem pages are set as expected
@@ -420,6 +424,8 @@ zero_ram_end:	equ $
 jphl:		jp (hl)
 
 ;		INCLUDE	"DARTDriver.asm"
-;		INCLUDE	"UARTDriver.asm"
+if ROM_BOTTOM=0 
+		INCLUDE	"UARTDriver.asm"
+endif
 
 banner:	db CPU," System clock ",SYSCLK,"MHz",$0d,$0a,0
