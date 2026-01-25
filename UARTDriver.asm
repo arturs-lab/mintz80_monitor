@@ -19,19 +19,30 @@ UART6:       EQU    UART_BASE+06h            	;Modem status
 UART7:       EQU    UART_BASE+07h            	;Scratch register		
 		
 ;***************************************************************************
-;UART_INIT
-;Function: Initialize the UART to BAUD Rate 9600 (1.8432 MHz clock input)
+; defaults with which to initialize UART variables at MONVARS
 ;***************************************************************************
-UART_INIT:		LD     A,80h				;Mask to Set DLAB Flag
+UART_DFLT:	db UART_DLL_D,UART_DLM_D,UART_IER_D,UART_LCR_D,UART_MCR_D
+
+;***************************************************************************
+;UART_INIT
+;Function: Initialize the UART to BAUD Rate CONBAUD (UARTCLK clock input)
+;UART_INIT1
+;don't initialize the defaults. can be called when changing parameters
+;***************************************************************************
+UART_INIT:		LD HL,UART_DFLT				; initialize default values in MONVARS
+			LD DE,UART_DLL
+			LD BC,SIOA_WR0-UART_DLL
+			LDIR
+
+UART_INIT1:	LD     A,80h				;Mask to Set DLAB Flag
 			OUT    (UART3),A
-			LD     A,12					;Divisor = 12 @ 9600bps w/ 1.8432 Mhz
-;			LD     A,1					;Divisor = 1 @ 115200bps w/ 1.8432 Mhz
+			LD     A,(UART_DLL)			;Divisor = 12 @ 9600bps w/ 1.8432 Mhz
 			OUT    (UART0),A			;Set BAUD rate to 9600
-			LD     A,00
+			LD     A,(UART_DLM)
 			OUT    (UART1),A			;Set BAUD rate to 9600
-			LD     A,03h
+			LD     A,(UART_LCR)
 			OUT    (UART3),A			;Set 8-bit data, 1 stop bit, reset DLAB Flag
-			LD	   A,00h
+			LD	   A,(UART_IER)
 			OUT    (UART1),A			;no interrupts
 			RET		
 		
@@ -68,10 +79,7 @@ UART_END_PRNT_STR:
 ;Function: Check if UART is ready to transmit
 ;***************************************************************************
 UART_TX_RDY:	PUSH 	AF
-UARTTXRDY_LP:			
-;	ld a,$4e				; reset wdt
-;	out ($F1),a
-			IN		A,(UART5)			;Fetch the control register
+UARTTXRDY_LP:	IN		A,(UART5)			;Fetch the control register
 			BIT 	5,A					;Bit will be set if UART is ready to send
 			JR		Z,UARTTXRDY_LP		
 			POP     AF
@@ -90,10 +98,7 @@ UART_TX:		CALL  UART_TX_RDY			;Make sure UART is ready to receive
 ;Function: Wait for UART to receive a byte
 ;***************************************************************************
 UART_RX_RDY:	PUSH 	AF					
-UART_RXRDY_LP:			
-;	ld a,$4e				; reset wdt
-;	out ($F1),a
-			IN		A,(UART5)			;Fetch the control register
+UART_RXRDY_LP:	IN		A,(UART5)			;Fetch the control register
 			BIT 	0,A					;Bit will be set if UART is ready to receive
 			JR		Z,UART_RXRDY_LP		
 			POP     AF
