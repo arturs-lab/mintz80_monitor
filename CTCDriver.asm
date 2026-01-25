@@ -7,6 +7,7 @@ CTC_INIT_ALL: push af
 		pop af
 		ret
 
+; init CH0 which generates interrupt for millisecond timer stored at SYSTMR0-3
 CTC0_INIT: ld a,CTCV		; load CTC interrupt vector
 	out (CTC_CH0),a		; set CTC T0 to that vector
 	ld a,(CTC_CH0_CNF)	; look in CONSTANTS.asm
@@ -15,6 +16,7 @@ CTC0_INIT: ld a,CTCV		; load CTC interrupt vector
 	out (CTC_CH0),a
 	ret
 
+; init CH1 which generates interrupt for 5 millisecond timer stored at SYSTMR4-9
 CTC1_INIT: ld a,CTCV+2	; load CTC interrupt vector
 	out (CTC_CH1),a		; set CTC T1 to that vector
 	ld a,(CTC_CH1_CNF)	; look in CONSTANTS.asm
@@ -24,7 +26,7 @@ CTC1_INIT: ld a,CTCV+2	; load CTC interrupt vector
 	ret
 
 ;init CH2
-;CH2 divides CLK/TRG2 clock providing a clock signal at TO2 which drives SIO
+;CH2 divides CLK/TRG2 clock providing a clock signal at TO2 which drives SIOB
 CTC2_INIT: ld a,CTCV+4	; load CTC interrupt vector
 	out (CTC_CH2),a		; set CTC T2 to that vector
 	ld a,(CTC_CH2_CNF)	; look in CONSTANTS.asm
@@ -34,7 +36,7 @@ CTC2_INIT: ld a,CTCV+4	; load CTC interrupt vector
 	ret
 
 ;init CH3
-;CH3 divides CLK/TRG3 clock providing a clock signal at TO3 which drives SIO
+;CH3 divides CLK/TRG3 clock providing a clock signal at TO3 which drives SIOA
 CTC3_INIT: ld a,CTCV+6	; load CTC interrupt vector
 	out (CTC_CH3),a		; set CTC T3 to that vector
 	ld a,(CTC_CH3_CNF)	; look in CONSTANTS.asm
@@ -44,6 +46,7 @@ CTC3_INIT: ld a,CTCV+6	; load CTC interrupt vector
 	ret
 
 
+; zero timers
 CTC_TC_INIT: ld hl,SYSTMR0
 		ld b,10
 		xor a
@@ -51,7 +54,8 @@ CTC_TC_INIT1:	ld (hl),a
 		inc hl
 		djnz CTC_TC_INIT1
 
-		ld hl,CTC_DEFAULTS
+; initialize default timer values in MONVARS 
+CTC_TC_INIT2:	ld hl,CTC_DEFAULTS
 		ld de,CTC_CH0_CNF
 		ld bc,8
 		ldir
@@ -63,7 +67,7 @@ CTC_DEFAULTS:	db CTC_CH0_CNFV,CTC_CH1_CNFV,CTC_CH2_CNFV,CTC_CH3_CNFV
 
 ; T0 ISR - increment system timer by 1 on every interrupt
 ; 118 cycles when only lower counter incremented
-; 151 cycles when overflow into upper counter = 16.3845486us
+; 151 cycles when overflow into upper counter @9.216MHz= 16.3845486us
 
 CTC_T0_ISR:	push hl	; 11c
 		push af		; 11c
