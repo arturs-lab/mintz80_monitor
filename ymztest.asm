@@ -43,11 +43,7 @@ if CHIP = "AYRESCUE"
 	out (04),a
 	ld a,FRQDIV	; freq divider
 	out (05),a
-	in a,($d0)		; get current clock divider
-	push af
 endif
-;	ld a,CPUCLKD	; cpu frequency
-;	out ($d0),a
 if CPUCLKD = 0
 	ld a,$c0		; playback speed
 else
@@ -256,10 +252,6 @@ FBC7	ld	d,$07	; Write FF to register 7 - disable all channels. Should be 3F to n
 	ld	e,$FF
 	call	AYWRITE
 ;	ei
-if CHIP = "AYRESCUE"
-	pop af			; restore original clock
-	out ($d0),a
-endif
 	xor a				; return with A=0
 	ret		; exit
 
