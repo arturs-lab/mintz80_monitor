@@ -154,8 +154,8 @@ zoWarnFlow = false
 	db 0Dh,0Ah,"1 - monitor at $A000"
 	db $0d,$0a,"2 - Basic 9k"
 	db $0d,$0a,"3 - Hot start Basic 9k"
-	db $0d,$0a,"4 - VTL (RAM @ $4000) at $f800"
-	db $0d,$0a,"5 - Beverly Hills Cop at $4000"
+	db $0d,$0a,"4 - VTL @$f800 (RAM @ $4000)"
+	db $0d,$0a,"5 - Beverly Hills Cop @$4000"
 	db $0d,$0a,EOS
 zoWarnFlow = true
 	call CON_GET_CHAR
