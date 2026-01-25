@@ -13,7 +13,7 @@
 ;Function: Initialize CF to 8 bit data transfer mode
 ; Clobbers: A
 ;***************************************************************************	
-CF_INIT:	out a,(CFRESET)	; hardware reset
+CF_INIT:	out (CFRESET),a	; hardware reset
 	ld a,$0E			; issue software reset
 	out (CFCTL),a
 	ld a,$20
