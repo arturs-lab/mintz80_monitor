@@ -2,8 +2,11 @@ VERSMYR:    EQU     "1"
 VERSMIN:    EQU     "3"
 
 BOARD		EQU "REV2"
-;CPU		EQU "TOSHIBA"
-CPU		EQU "ZILOG"
+CPU		EQU "TOSHIBA"
+;CPU		EQU "ZILOG"
+
+CONBAUD	EQU 19200		; console baud
+UARTCLK	EQU 1843200	; rescue card uart clock
 
 if (CPU == "ZILOG" )
 	if (BOARD == "REV2")
@@ -29,7 +32,7 @@ MACHINE	EQU "MintZ80"
 ; but I want flexibility to include it but not use for console.
 ; USE_UART:	EQU true
 
-; do wew want to enable interrupts?
+; do we want to enable interrupts?
 EN_INT:	EQU true
 
 ; initialize memmap?
@@ -125,6 +128,13 @@ SYSTMR7:	EQU MONVARS + $b7		; hours
 SYSTMR8:	EQU MONVARS + $b8		; days, 16 bit
 SYSTMR9:	EQU MONVARS + $b9
 
+; UART
+UART_DLL	EQU MONVARS + $de		; divisor latch lsb
+UART_DLM	EQU MONVARS + $df		; divisor latch msb
+UART_IER	EQU MONVARS + $e0		; interrupt enable
+UART_LCR	EQU MONVARS + $e1		; line control reg
+UART_MCR	EQU MONVARS + $e2		; modem control reg
+
 ; SIO
 SIOA_WR0:		EQU MONVARS + $e3
 SIOA_WR1:		EQU MONVARS + $e4
@@ -211,6 +221,14 @@ beepr:	EQU $d1	; speaker beeper
 memmap:	EQU $d8	; memory map $d8-$df
 
 ; ### other
+
+; UART defaults
+UART_DLL_D:	EQU UARTCLK/(CONBAUD*16)	; divisor latch lsb
+UART_DLM_D:	EQU 0					; divisor latch msb
+UART_IER_D:	EQU 0					; interrupt enable
+UART_LCR_D:	EQU 3					; line control reg 8 BITS, NO PARITY, 1 STOP
+UART_MCR_D:	EQU 0					; modem control reg
+
 ; SIO config values
 SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
 ;if EN_INT
@@ -230,7 +248,7 @@ SIOB_WR0_CV:		EQU 00110000b	; write into WR0: error reset
 ;else
 SIOB_WR1_CV:		EQU 00000100b	; RX int disable
 ;endif
-SIOB_WR2_CV:		EQU SIOV		; write into WR2: set interrupt vector, but bits D3/D2/D1 of this vector
+SIOB_WR2_CV:		EQU SIOV		; set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
 							; (see datasheet)
 SIOB_WR3_CV:		EQU 11100001b	; write into WR3: RX enable;
@@ -261,8 +279,8 @@ CTC_CH3_CNFV:	EQU 01110111b	; int off, counter, NO prescaler, rising edge, auto 
 CTC_CH0_TV:	EQU (CPUCLK/(1000*256))	; $24 -> 1ms, $12 -> 500us
 CTC_CH1_TV:	EQU (CPUCLK/(200*256))	; 180=$b4 system interrupt, $b4 -> 200Hz, 5ms
 
-CTC_CH2_TV:	EQU (SIOCLK/(16*19200*2))	; SIOB 19200baud
-CTC_CH3_TV:	EQU (SIOCLK/(16*19200*2))	; SIOA 19200baud
+CTC_CH2_TV:	EQU (SIOCLK/(16*CONBAUD*2))	; SIOB 19200baud
+CTC_CH3_TV:	EQU (SIOCLK/(16*CONBAUD*2))	; SIOA 19200baud
 ; 9600 baud with 16x prescaler in SIO ; @4MHz CPU: 11=57600baud, 1a=38400baud, 34=19200baud, 45=14400baud, 68=9600baud, d0=4800baud
 ; 9600 baud with 16x prescaler in SIO ; @4.608MHz CPU: 14=115200, 28=57600, 3c=38400, 78=19200, a0=14400, f0=9600baud
 ; with 256x prescaler in SIO ; @4.608MHz CPU: 01=14400, 0f=9600, 1e=4800, 3c=2400
