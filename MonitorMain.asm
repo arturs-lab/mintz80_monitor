@@ -91,7 +91,7 @@ chime:	ld bc,$0200	; bc = duration
 
 ; bc = duration, a = pitch
 beep:	push af
-bep1:	out (beepr),a
+bep1:	in a,(beepr)
 	pop af
 	push af
 	call delay
@@ -102,8 +102,7 @@ bep1:	out (beepr),a
 	pop af
 	ret
 
-memmap_init:	in a,(beepr)	; unlock memmap
-	ld a,0		; init mem map
+memmap_init:	ld a,0		; init mem map
 	out (memmap),a
 	ld a,1
 	out (memmap+1),a
@@ -113,7 +112,6 @@ memmap_init:	in a,(beepr)	; unlock memmap
 	out (memmap+5),a
 	out (memmap+6),a
 	out (memmap+7),a
-	out (beepr),a	; lock memmap
 	ret
 
 ;		include "irqtab.asm"		; table for interrupts
