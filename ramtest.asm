@@ -1,4 +1,3 @@
-
 	org $2400
 
 start:	equ $
@@ -18,12 +17,18 @@ if MACHINE="MintZ80"
 		add a,-$20
 endif
 		ld c,a
-		ld a,$0f			; start with highest page
-tst1:		out (c),a			; select that page in tested slot and
+		ld a,h			; start with highest page
+		ld e,a
+tst1:		ld a,e
+		and a,$0f
+		out (c),a			; select that page in tested slot and
+		ld a,e
 		ld (hl),a			; store that page number in RAM of that slot
 		dec a
 		dec a
-		cp $ff
+		ld e,a
+		and a,$0f
+		cp $0f
 		jr nz,tst1			; repeat for all pages
 		ld a,-$20			; go to next slot
 		add h
@@ -56,8 +61,14 @@ if MACHINE="MintZ80"
 		add a,-$20
 endif
 		ld c,a
-		ld a,$1			; start with lowest bank, $01
-tst3:		out (c),a			; select bank in A
+		ld a,h			; start with lowest bank, $01
+		and a,$f0
+		inc a
+		ld e,a
+tst3:		ld a,e
+		and a,$0f
+		out (c),a			; select bank in A
+		ld a,e
 		call jCON_PRINTHBYTE
 		cp (hl)			; compare with previously stored number
 		jr nz,tst4			; jump if no match, this bank does not exist
@@ -66,8 +77,10 @@ zoWarnFlow = false
 		db "* ",0
 zoWarnFlow = true
 		add $02			; we started at 1, RAM banks are odd numbered
-		cp $10			; $0f is last bank we want to test
-		jr c,tst3			; havent passed it yet
+		ld e,a
+		and a,$0f
+		cp $01			; $0f is last bank we want to test
+		jr nz,tst3			; havent passed it yet
 		
 tst4:		jr tstup
 
