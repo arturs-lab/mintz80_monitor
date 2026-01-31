@@ -90,15 +90,14 @@ chime:	ld bc,$0200	; bc = duration
 	; fall through to beep
 
 ; bc = duration, a = pitch
-beep:	push af
-bep1:	in a,(beepr)
+beep:	out (beepr),a
 	pop af
 	push af
 	call delay
 	dec bc
 	ld a,b
 	or c
-	jr nz,bep1
+	jr nz,beep
 	pop af
 	ret
 
