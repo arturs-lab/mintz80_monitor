@@ -36,7 +36,7 @@ MACHINE	EQU "MintZ80"
 EN_INT:	EQU true
 
 ; initialize memmap?
-INIT_MEMMAP	EQU false
+;INIT_MEMMAP	EQU false
 
 ; ### MEM map
 RAM_BOTTOM:	EQU 02000H       ; Bottom address of RAM
@@ -236,7 +236,7 @@ SIOA_WR0_CV:		EQU 00110000b	; write into WR0: error reset
 ;else
 SIOA_WR1_CV:		EQU 00000000b	; RX int disable
 ;endif
-SIOA_WR3_CV:		EQU 11100001b	; write into WR3: RX enable;
+SIOA_WR3_CV:		EQU 11000001b	; write into WR3: 8 bit, no auto, RX enable;
 SIOA_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
 SIOA_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOA_WR6_CV:		EQU 0
@@ -251,7 +251,7 @@ SIOB_WR1_CV:		EQU 00000100b	; RX int disable
 SIOB_WR2_CV:		EQU SIOV		; set interrupt vector, but bits D3/D2/D1 of this vector
 							; will be affected by the channel & condition that raised the interrupt
 							; (see datasheet)
-SIOB_WR3_CV:		EQU 11100001b	; write into WR3: RX enable;
+SIOB_WR3_CV:		EQU 11000001b	; write into WR3: 8 bit, no auto, RX enable;
 SIOB_WR4_CV:		EQU 01000100b	; write into WR4: presc. 16x, 1 stop bit, no parity
 SIOB_WR5_CV:		EQU 11101000b	; write into WR5: DTR on, TX 8 bits, BREAK off, TX on, RTS off
 SIOB_WR6_CV:		EQU 0
