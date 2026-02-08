@@ -339,7 +339,7 @@ zoWarnFlow = true
 	xor a
 	ret
 
-CF_SYSLD_ERR:	call jCON_PRT_STR_SP
+CF_SYSLD_ERR:	call CON_PRT_STR_SP
 zoWarnFlow = false
 	db $0d,$0a,"CF SYSLD error ",$0d,$0a,0
 zoWarnFlow = true
@@ -388,11 +388,12 @@ zoWarnFlow = true
 	jr c,ask_run
 	cp a,$7f			; if (boot_dest + $1fe0) > "" then no label to print
 	jr nc,ask_run
-	call jCON_PRT_STR_SP	; otherwise print label
+	call CON_PRT_STR_SP	; otherwise print label
 zoWarnFlow = false
 	db $0d,$0a,"Found label: ",0
 zoWarnFlow = true
-	call jCON_PRT_STR
+	call CON_PRT_STR
+	call CON_PRT_NL
 
 ; here HL points to 0 terminating bootloader label
 	inc hl
@@ -400,9 +401,13 @@ zoWarnFlow = true
 	cp $aa	; if $aa follows label, then skip asking whether to run and autorun
 	jr z,gohl
 
+	in a,(CNFIGSW)		; read config switch. If not installed should read $ff
+	and a,$04			; keep bit 3
+	jr z,gohl			; if low, execute bootloader without asking
+
 ask_run:	call CON_PRT_STR_SP
 zoWarnFlow = false
-	db $0d,$0a,"Run it? (y/n/q) ",$0d,$0a,0
+	db "Run it? (y/n/q) ",$0d,$0a,0
 zoWarnFlow = true
 	call CON_GET_CHAR
 	cp a,"N"
@@ -417,7 +422,7 @@ gohl:	ld hl,(CFSECT_BUF)	; jump target may have gotten overwritten in HL during 
 
 CF_LD_SYS:		call CON_PRT_STR_SP	; see if user wants to jump to it
 zoWarnFlow = false
-	db "CF Loading SYS sectors",0
+	db $0d,$0a,"CF Loading SYS sectors",0
 zoWarnFlow = true
 	ld hl,(CFSECT_BUF)	; save this in HL now because call that follows will destroy it
 	call CF_SYSLD		; load rest of CF sectors into $c200-$ffff, this call destroys value of CFSECT_BUF
@@ -429,7 +434,7 @@ zoWarnFlow = true
 	ret z
 	cp a,$ff			; if (CFSECT_BUF + $0200) = $ff then no code to run
 	ret z		; otherwise presume this may be a valid code that can be jumped to
-	call jCON_PRT_STR_SP
+	call CON_PRT_STR_SP
 zoWarnFlow = false
 	db "CF SYS executable found at ",0
 zoWarnFlow = true
