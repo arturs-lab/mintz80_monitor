@@ -90,14 +90,15 @@ chime:	ld bc,$0200	; bc = duration
 	; fall through to beep
 
 ; bc = duration, a = pitch
-beep:	out (beepr),a
+beep:	push af
+bep1:	out (beepr),a
 	pop af
 	push af
 	call delay
 	dec bc
 	ld a,b
 	or c
-	jr nz,beep
+	jr nz,bep1
 	pop af
 	ret
 
@@ -167,13 +168,11 @@ if MACHINE = "MintZ80"
 	out ($f4),a	; set INTPR register, SIO-CTC-PIO priority. section 3.9, page 149
 endif
 
-if INIT_MEMMAP
+	in a,(CNFIGSW)		; read config switch. If not installed should read $ff
+	and a,$80			; keep highest bit
+	jr nz,no_mem_init	; not installed or don't run memmap_init selected
 	call memmap_init	; before using RAM, make sure all mem pages are set as expected
-else
-	nop
-	nop
-	nop
-endif
+no_mem_init:	equ $
 
 	ld a,$20
 	call delay			; looks like Z80 needs this delay to successfully write to IO ports
@@ -181,19 +180,32 @@ if MACHINE = "AL80"
 	ld a,CLKDIV		; (SYSCLK MHz/2/(value+1))
 	out (turbo),a
 endif
-	call chime
-	call ymzinit
+	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
 	call IRQTAB_INIT	; copy interrupt jump table from (IRQTABR) in eeprom to (IRQTAB) in ram
 	ld a,high IRQTAB	; load high byte of interrupt vector table address
 	ld i,a			; set interrupt vector for IM2
 	im 2				; enable interrupt mode 2
-	call JUMPTAB_INIT	; copy jump table from (JUMPTABR) in EEPROM to (JUMPTAB) in RAM
 	call PIO_INIT		; init PIO
 	call CTC_INIT_ALL	; init CTC
 	call SIO_INIT_VARS	; init SIO, CTC drives SIO, so has to be set first
+	call ymzinit
 if def UART_INIT
 	CALL UART_INIT		; Initialize UART
 endif
+	call chime			; call chime after everything initialized
+
+	in a,(CNFIGSW)		; read config switch. If not installed should read $ff
+	and a,$03			; keep 2 lowest bits
+	cp 3				; not installed or run monitor selected
+	jr z,enint
+if def ROM_BOTTOM_a000
+	cp 0				; if running $a000 code and switch selects launching $a000 code, continue
+	jr z,enint
+endif
+	add a,"1"			; therwise run code as indicated by switches
+	call RUN_EEPROM
+
+enint:	equ $
 ; this needs to happen after all hardware was initialized and had a chance to install their ISRs
 if EN_INT
 	ei
@@ -411,7 +423,7 @@ zero_ram:	di
 zero_ram_r:	ld hl,RAM_BOTTOM + (zero_ram_end - zero_ram_r)
 		ld de,hl
 		inc de
-		ld bc,$ffff - RAM_BOTTOM + (zero_ram_end - zero_ram_r)
+		ld bc,$ffff - (RAM_BOTTOM + (zero_ram_end - zero_ram_r))
 		xor a
 		ld (hl),a
 		ldir
