@@ -159,7 +159,7 @@ zoWarnFlow = false
 	db $0d,$0a,EOS
 zoWarnFlow = true
 	call CON_GET_CHAR
-	cp a,"1"
+RUN_EEPROM:	cp a,"1"
 	jr nz,LE2
 	ld hl,LE_A
 	ld de,LE_TMP
@@ -167,13 +167,15 @@ zoWarnFlow = true
 	ldir
 	jp LE_TMP
 
-LE_A:	ld a,00
+LE_A:	in a,(memmap+3)
+	push af
+	xor a
 	out (memmap+3),a
 	ld hl,$6000	; eeprom $200-$3fff is mirrored here
 	ld de,$a000
-	ld bc,$2000
+	ld bc,$1c00
 	ldir
-	ld a,01
+	pop af
 	out (memmap+3),a
 	jp $a000
 
@@ -209,23 +211,27 @@ LE_5:	cp a,"5"
 	ldir
 	jp LE_TMP
 
-LE_VTL:	ld a,00
+LE_VTL:	in a,(memmap+3)
+	push af
+	xor a
 	out (memmap+3),a
 	ld hl,$7c00	; eeprom $3c00-$3fff
 	ld de,$f800
 	ld bc,$0400
 	ldir
-	ld a,01
+	pop af
 	out (memmap+3),a
 	jp $f800
 
-LE_COP:	ld a,02
+LE_COP:	in a,(memmap+3)
+	push af
+	ld a,02
 	out (memmap+3),a
 	ld hl,$7500	; eeprom $7500-$7fff
 	ld de,$4000
 	ld bc,$0b00
 	ldir
-	ld a,01
+	pop af
 	out (memmap+3),a
 	jp $4000
 
