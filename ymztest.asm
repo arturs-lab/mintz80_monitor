@@ -51,9 +51,9 @@ else
 endif
 	ld (PBSPEED),a
 	ld a,(ctrl)
-	ld ays+1,a
+	ld (ays+1),a
 	ld a,(dta)
-	ld ayd+1,a
+	ld (ayd+1),a
 	call jCON_PRT_NL
 	jp	FBA5		; initialize note pointers and start playing
 
